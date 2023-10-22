@@ -3,6 +3,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import secrets
 
+##we're using localhost for testing
+apiUrl = "http://10.0.2.2:5000"
+
 
 class EmailSender:
     # to-do get an app email
@@ -16,9 +19,11 @@ class EmailSender:
         message["To"] = userEmail
         message["Subject"] = "ISS - Email Verification"
         token = secrets.token_urlsafe(32)
-        ##need a post verification endpoint
+
         body = (
-            "Hello, please click on the link to verify your email: https://gabrielmalek.com/ISSProject/api/verify?token="
+            "Hello, please click on the link to verify your email: "
+            + apiUrl
+            + "/verify?token="
             + token
         )
         return token

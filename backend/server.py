@@ -27,7 +27,7 @@ def check_session_cookie(func):
     return wrapper
 
 
-@app.route("/api/signUp", methods=["POST"])
+@app.route("/signUp", methods=["POST"])
 def signUp():
     # get the data from the request
     data = request.get_json()
@@ -43,7 +43,7 @@ def signUp():
     DBManager.insertUser(email, password_hash, salt, token)
 
 
-@app.route("/api/verify", methods=["GET"])
+@app.route("/verify", methods=["GET"])
 def verify():
     # get the token from the url
     token = request.args.get("token")
@@ -57,7 +57,7 @@ def verify():
         return jsonify({"message": "Account activated"}), 200
 
 
-@app.route("/api/login", methods=["POST"])
+@app.route("/login", methods=["POST"])
 def login():
     # we need to verify that the account is activated
     data = request.get_json()
