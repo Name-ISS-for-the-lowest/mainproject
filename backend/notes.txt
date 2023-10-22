@@ -1,1 +1,13 @@
-We should probably split the server code into class depending on how complex it gets.
+
+Will probably run backend on a server so front end
+work for everyone by default. - Gabriel
+
+
+Commands for python
+
+ -python -m venv venv
+ -usually [. venv/Scripts/activate] to activate venv but could be something else
+ -pip install -r requirements.txt
+
+
+ 

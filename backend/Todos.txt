@@ -1,0 +1,4 @@
+
+
+-Implement Auth (https://gist.github.com/siscia/5ed3277551370df3eb8b1063923621d4)
+-Everything else
