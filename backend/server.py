@@ -33,6 +33,10 @@ def signUp():
     data = request.get_json()
     email = data["email"]
     password = data["password"]
+    # check if the email is already in the db
+    user = DBManager.getUserByEmail(email)
+    if user is not None:
+        return jsonify({"message": "Unable to create account"}), 400
 
     # we create a salt and password hash
     salt = PassHasher.generate_salt()
@@ -41,6 +45,7 @@ def signUp():
     # we need to send a verification email
     token = EmailSender.sendAuthenticationEmail(email)
     DBManager.insertUser(email, password_hash, salt, token)
+    return jsonify({"message": "User created"}), 200
 
 
 @app.route("/verify", methods=["GET"])
@@ -76,6 +81,7 @@ def login():
             if PassHasher.check_password(password, password_hash, salt):
                 # to-do return a secure cookie
                 cookie = user.generateSecureCookie()
+                DBManager.insertCookie(cookie)
                 response = make_response("Cookie is set")
                 response.set_cookie(
                     "session_cookie",
@@ -89,13 +95,5 @@ def login():
                 return jsonify({"message": "Data does not match our records"}), 400
 
 
-def main():
-    # test password hasher
-    salt = PassHasher.generate_salt()
-    password = "password"
-    password_hash = PassHasher.hash_password(password, salt)
-    print(password_hash)
-    print(PassHasher.check_password(password, password_hash, salt))
-
-
-main()
+if __name__ == "__main__":
+    app.run()

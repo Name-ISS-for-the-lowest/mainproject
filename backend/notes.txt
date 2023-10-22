@@ -1,3 +1,8 @@
+In order for email verification to work
+create .env file and ask for the 16 character password
+
+
+
 
 Will probably run backend on a server so front end
 work for everyone by default. - Gabriel
