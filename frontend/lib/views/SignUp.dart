@@ -76,6 +76,7 @@ class _SignUpState extends State<SignUp> {
                         SizedBox(
                           width: 340,
                           child: TextField(
+                            obscureText: true,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10.0)),
