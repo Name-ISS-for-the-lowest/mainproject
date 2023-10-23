@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/auth_helper.dart';
 import 'package:frontend/views/ResetPassword.dart';
 import 'package:frontend/views/SignUp.dart';
 
@@ -14,30 +15,31 @@ class _LogInState extends State<LogIn> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  //on mount
+
   void executeLogin(String email, String password) {
     //do something with the email and password
+    AuthHelper.login(email, password);
   }
 
   void navigateToSignUp() {
+    passwordController.text = "";
     //navigate to sign up page
-    Navigator.of(context).push(
+    final result = Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
           return Scaffold(
-            body: Stack(children: [
-              SizedBox(
-                height: 100,
-                child: AppBar(
-                  backgroundColor: Colors.transparent,
-                  iconTheme: const IconThemeData(color: Colors.white),
-                ),
-              ),
-              const SignUp()
-            ]),
+            //I kept the email in the text field
+            body: SignUp(email: emailController.text),
           );
         },
       ),
     );
+    result.then((value) {
+      if (value != null) {
+        emailController.text = value;
+      }
+    });
   }
 
   void navigateToResetPassword() {

@@ -27,7 +27,7 @@ def check_session_cookie(func):
     return wrapper
 
 
-@app.route("/signUp", methods=["POST"])
+@app.route("/signup", methods=["POST"])
 def signUp():
     # get the data from the request
     data = request.get_json()
@@ -45,7 +45,7 @@ def signUp():
     # we need to send a verification email
     token = EmailSender.sendAuthenticationEmail(email)
     DBManager.insertUser(email, password_hash, salt, token)
-    return jsonify({"message": "User created"}), 200
+    return jsonify({"message": "Please verify your email"}), 200
 
 
 @app.route("/verify", methods=["GET"])
@@ -79,13 +79,26 @@ def login():
             password_hash = user["password_hash"]
             salt = user["salt"]
             if PassHasher.check_password(password, password_hash, salt):
+                # check if the user has a cookie
+                if "session_cookie" in request.cookies:
+                    # check if the cookie is in the db
+                    cookie = request.cookies["session_cookie"]
+                    if DBManager.checkCookie(cookie):
+                        return jsonify({"message": "You are already logged in"}), 400
+
                 # to-do return a secure cookie
                 cookie = user.generateSecureCookie()
+                # print(cookie)
                 DBManager.insertCookie(cookie)
+
+                cookie["_id"] = str(cookie["_id"])
+
                 response = make_response("Cookie is set")
+
+                stringCookie = json.dumps(cookie)
                 response.set_cookie(
                     "session_cookie",
-                    cookie,
+                    stringCookie,
                     expires=cookie["expires"],
                     secure=True,
                     httponly=True,
@@ -93,6 +106,25 @@ def login():
                 return response, 200
             else:
                 return jsonify({"message": "Data does not match our records"}), 400
+
+
+@app.route("/logout", methods=["GET"])
+@check_session_cookie
+def logout():
+    # get the cookie from the request
+    cookie = request.cookies["session_cookie"]
+    # delete the cookie from the db
+    DBManager.deleteCookie(cookie)
+    # delete the cookie from the client
+    response = make_response("Successfully logged out")
+    response.set_cookie("session_cookie", "", expires=0)
+    return response, 200
+
+
+@app.route("/protected", methods=["GET"])
+@check_session_cookie
+def protected():
+    return jsonify({"message": "You are authorized"}), 200
 
 
 if __name__ == "__main__":

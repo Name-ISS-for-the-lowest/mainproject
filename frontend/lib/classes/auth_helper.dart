@@ -1,0 +1,34 @@
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class AuthHelper {
+  static String defaultHost = "http://10.0.2.2:5000";
+  static String sessionCookie = "";
+
+  static void login(String email, String password) async {
+    final data = {'email': email, 'password': password};
+    String endPoint = '/login';
+    final url = Uri.parse('$defaultHost$endPoint');
+    final response = await http.post(url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Cookie': sessionCookie
+        },
+        body: jsonEncode(data));
+    if (response.statusCode == 200) {
+      AuthHelper.sessionCookie = response.headers['set-cookie']!;
+    }
+  }
+
+  static void signUp(String email, String password) async {
+    final data = {'email': email, 'password': password};
+    String endPoint = '/signup';
+    final url = Uri.parse('$defaultHost$endPoint');
+    final response = await http.post(url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Cookie': sessionCookie
+        },
+        body: jsonEncode(data));
+  }
+}

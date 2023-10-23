@@ -44,9 +44,20 @@ class DBManager:
 
     @staticmethod
     def checkCookie(cookie):
+        # parse json
+        cookie = json.loads(cookie)
         # check if the cookie is in the db
-        cookie = DBManager.db["session_cookies"].find_one({"session_id": cookie})
+        cookie = DBManager.db["session_cookies"].find_one(
+            {"session_id": cookie["session_id"]}
+        )
         if cookie is None:
             return False
         else:
             return True
+
+    @staticmethod
+    def deleteCookie(cookie):
+        # parse json
+        cookie = json.loads(cookie)
+        # delete the cookie from the db
+        DBManager.db["session_cookies"].delete_one({"session_id": cookie["session_id"]})
