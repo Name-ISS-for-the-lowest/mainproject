@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/auth_helper.dart';
+import 'package:http/http.dart';
 
 class SignUp extends StatefulWidget {
   String email = "";
@@ -35,7 +38,7 @@ class _SignUpState extends State<SignUp> {
     return passwordRegExp.hasMatch(password);
   }
 
-  void executeSignUp(String email, String password) {
+  void executeSignUp(String email, String password) async {
     final validEmail = validateEmail(email);
     final validPassword = validatePassword(password);
 
@@ -60,7 +63,17 @@ class _SignUpState extends State<SignUp> {
     }
     //need to do email validation to make sure email is not garbage
     //also should have password validation minimum 8 characters, etc
-    AuthHelper.signUp(email, password);
+    Response response = await AuthHelper.signUp(email, password);
+    String jsonBody = response.body;
+    Map<String, dynamic> body = jsonDecode(jsonBody);
+    String message = body['message'];
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+    }
   }
 
   @override
@@ -82,16 +95,18 @@ class _SignUpState extends State<SignUp> {
         ),
         Stack(
           children: [
-            Positioned.fill(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: SizedBox(
+            Column(
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.6,
+                ),
+                SizedBox(
                     height: MediaQuery.of(context).size.height * 0.4,
                     child: SvgPicture.asset(
                       'assets/BackGround.svg',
-                      fit: BoxFit.fitHeight,
+                      fit: BoxFit.fitWidth,
                     )),
-              ),
+              ],
             ),
             Column(
               children: [

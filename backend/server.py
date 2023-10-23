@@ -93,7 +93,7 @@ def login():
 
                 cookie["_id"] = str(cookie["_id"])
 
-                response = make_response("Cookie is set")
+                response = make_response(jsonify({"message": "Login successful"}))
 
                 stringCookie = json.dumps(cookie)
                 response.set_cookie(

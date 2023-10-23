@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 
 
+load_dotenv()
 ##this is local host in the emulator
 # apiUrl = "http://10.0.2.2:5000"
 
@@ -37,6 +38,8 @@ class EmailSender:
         message.attach(MIMEText(body, "plain"))
         # Create SMTP session for sending the mail
         try:
+            print("sending email to: ", userEmail)
+            print("email password: ", emailPassword)
             server = smtplib.SMTP("smtp.gmail.com", 587)
             server.starttls()
             server.login(EmailSender.fromEmail, emailPassword)

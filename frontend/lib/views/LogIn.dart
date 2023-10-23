@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/auth_helper.dart';
 import 'package:frontend/views/ResetPassword.dart';
 import 'package:frontend/views/SignUp.dart';
+import 'package:http/http.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
@@ -15,11 +18,19 @@ class _LogInState extends State<LogIn> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  //on mount
-
-  void executeLogin(String email, String password) {
+  void executeLogin(BuildContext context, email, String password) async {
     //do something with the email and password
-    AuthHelper.login(email, password);
+    Response response = await AuthHelper.login(email, password);
+    String jsonBody = response.body;
+    Map<String, dynamic> body = jsonDecode(jsonBody);
+    String message = body['message'];
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+    }
   }
 
   void navigateToSignUp() {
@@ -68,16 +79,18 @@ class _LogInState extends State<LogIn> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Positioned.fill(
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.4,
+        Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.60,
+            ),
+            SizedBox(
+                height: MediaQuery.of(context).size.height * 0.40,
                 child: SvgPicture.asset(
                   'assets/BackGround.svg',
-                  fit: BoxFit.fitHeight,
+                  fit: BoxFit.fitWidth,
                 )),
-          ),
+          ],
         ),
         Column(
           children: [
@@ -174,7 +187,7 @@ class _LogInState extends State<LogIn> {
                                     borderRadius: BorderRadius.circular(10.0)),
                               ),
                               onPressed: () => {
-                                executeLogin(emailController.text,
+                                executeLogin(context, emailController.text,
                                     passwordController.text)
                               },
                               child: const Text(
