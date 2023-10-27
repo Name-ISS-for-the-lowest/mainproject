@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         scaffoldBackgroundColor: const Color.fromRGBO(4, 57, 39, 1),
       ),
-      home: const Home(title: 'Flutter Demo Home Page'),
+      home: const Home(),
     );
   }
 }

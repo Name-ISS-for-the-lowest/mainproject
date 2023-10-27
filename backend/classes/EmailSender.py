@@ -2,14 +2,23 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import secrets
+from dotenv import load_dotenv
+import os
 
-##we're using localhost for testing
-apiUrl = "http://10.0.2.2:5000"
+
+load_dotenv()
+##this is local host in the emulator
+# apiUrl = "http://10.0.2.2:5000"
+
+apiUrl = "http://localhost:5000"
+
+# apiUrl= somebackendurl for later
+emailPassword = os.getenv("EMAIL_PASSWORD")
 
 
 class EmailSender:
-    # to-do get an app email
-    fromEmail = "malek.gabriel33@gmail.com"
+    # app email
+    fromEmail = "internationlstudentstation@gmail.com"
 
     # this return a verification token to store in the db
     def sendAuthenticationEmail(userEmail):
@@ -26,4 +35,23 @@ class EmailSender:
             + "/verify?token="
             + token
         )
+        message.attach(MIMEText(body, "plain"))
+        # Create SMTP session for sending the mail
+        try:
+            print("sending email to: ", userEmail)
+            print("email password: ", emailPassword)
+            server = smtplib.SMTP("smtp.gmail.com", 587)
+            server.starttls()
+            server.login(EmailSender.fromEmail, emailPassword)
+
+            text = message.as_string()
+
+            server.sendmail(EmailSender.fromEmail, userEmail, text)
+
+            server.quit()
+        except Exception as e:
+            print("Error: unable to send email", e)
+
+            #
+
         return token
