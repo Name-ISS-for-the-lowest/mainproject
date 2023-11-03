@@ -5,6 +5,12 @@ from bson import ObjectId
 
 class User:
     # to-do add default values
+    email: str
+    password_hash: str
+    salt: str
+    language = "en"
+    nationality = "N/A"
+    profilePictureUrl = "https://i.stack.imgur.com/SE2cv.jpg"
 
     def __init__(self, email, password_hash, salt, token=None):
         self.email = email
@@ -17,8 +23,8 @@ class User:
     def fromDict(dict):
         # turn a dictionary into a class instance
         user = User(dict["email"], dict["password_hash"], dict["salt"])
-        if "token" in dict:
-            user.token = dict["token"]
+        # if "token" in dict:
+        #     user.token = dict["token"]
         for key in dict:
             setattr(user, key, dict[key])
         return user

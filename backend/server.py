@@ -3,6 +3,7 @@ import json
 from classes.EmailSender import EmailSender
 from classes.PasswordHasher import PassHasher
 from classes.DBManager import DBManager
+from classes.ImageHelper import ImageHelper
 
 
 app = Flask(__name__)
@@ -86,15 +87,18 @@ def login():
                     if DBManager.checkCookie(cookie):
                         return jsonify({"message": "You are already logged in"}), 400
 
-                # to-do return a secure cookie
+                # generate a session cookie for this user
                 cookie = user.generateSecureCookie()
-                # print(cookie)
+                # insert the cookie into the db to track session
                 DBManager.insertCookie(cookie)
 
+                # we need to convert the id to a string since it is a bson object
                 cookie["_id"] = str(cookie["_id"])
 
+                # set response message
                 response = make_response(jsonify({"message": "Login successful"}))
 
+                # set the cookie in the response
                 stringCookie = json.dumps(cookie)
                 response.set_cookie(
                     "session_cookie",
@@ -121,11 +125,28 @@ def logout():
     return response, 200
 
 
+# example of a auth protected route
 @app.route("/protected", methods=["GET"])
+# this line is middleware that checks if the user is logged in
 @check_session_cookie
 def protected():
     return jsonify({"message": "You are authorized"}), 200
 
 
+# example picture upload endpoint
+@app.route("/uploadPhoto", methods=["POST"])
+def uploadPhoto():
+    print("here")
+    try:
+        uploadPhoto = request.files["photo"]
+        image = ImageHelper.uploadeImage(uploadPhoto, "test")
+        return jsonify(image), 200
+
+    except Exception as e:
+        print(e)
+        return jsonify({"message": "Unable to upload photo"}), 400
+
+
+# start the server
 if __name__ == "__main__":
     app.run()
