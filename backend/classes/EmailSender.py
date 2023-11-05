@@ -10,7 +10,7 @@ load_dotenv()
 ##this is local host in the emulator
 # apiUrl = "http://10.0.2.2:5000"
 
-apiUrl = "http://localhost:5000"
+apiUrl = "http://localhost:8000"
 
 # apiUrl= somebackendurl for later
 emailPassword = os.getenv("EMAIL_PASSWORD")
