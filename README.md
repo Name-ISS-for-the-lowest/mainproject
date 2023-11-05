@@ -16,25 +16,25 @@ What we have so far for implementation, I messed up in some of my naming, I chan
 
 Everything is oficially switched everything over to fastApi from Flask, the backend comes with a requirements.txt file, before you install everything I recommend you create a python venv by cd-ing into backend and running.
 
-    ```python -m venv venv```
+    python -m venv venv
 
 then this to activate it
 
-    ```. venv/Scripts/activate```
+    . venv/Scripts/activate
 
 then run this to install all the packages
 
-    ```pip install -r requirements.txt```
+    pip install -r requirements.txt
 
 I made a makefile to run commands, it works on gitbash but if you're having trouble, just go into the Makefile and copy paste the commands.
 
 to run the server
 
-    ```make watch```
+    make watch
 
 or
 
-    ```uvicorn index:app --reload```
+    uvicorn index:app --reload
 
 if you have trouble with Makefile.
 
