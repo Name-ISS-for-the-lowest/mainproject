@@ -11,10 +11,10 @@ BackEnd Structure:
     Classes: helper classes such as email sender
     JsonModels: might remove later
 
-More:
-What we have so far for implementation, I messed up in some of my naming, I changed them but missed a few so you might see some random method that is not camel case, if you change it on your branch it might be a problem when trying to merge.
+#Stuff:
+I messed up in some of my naming, so you might see inconsistent camel casing.
 
-Everything is oficially switched everything over to fastApi from Flask, the backend comes with a requirements.txt file, before you install everything I recommend you create a python venv by cd-ing into backend and running.
+Everything is oficially switched over to fastApi from Flask, the backend comes with a requirements.txt file, before you install everything I recommend you create a python venv by cd-ing into backend and running.
 
     python -m venv venv
 
@@ -39,3 +39,11 @@ or
 if you have trouble with Makefile.
 
 This command will run the server and watch for changes on save, so you don't have to manually restart the server everytime.
+
+#Tools:
+
+I believe everyone got flutter setup, if you want to work on the backend you should also download:
+
+    MongoDB
+    MongoDB Compass
+    Postman
