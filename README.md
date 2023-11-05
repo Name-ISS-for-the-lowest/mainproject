@@ -48,3 +48,7 @@ I believe everyone got flutter setup, if you want to work on the backend you sho
     MongoDB
     MongoDB Compass
     Postman
+
+# WSL
+
+Unfortunatly Redis does not run on windows without WSL(windows subsystem for linux). Thinking we just forget about it for now, and in like three weeks when we worry about deployment, we might consider implementing it, since it is in the SDD. In the meantime, if you want you might consider getting WSL2 enabled and getting Ubuntu from the microsoft store. Not neecesary but if you are planning to work on machine-learning/web-dev you'll most likely need it at some point.
