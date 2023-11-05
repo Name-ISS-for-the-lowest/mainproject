@@ -13,16 +13,18 @@ class _ResetPasswordState extends State<ResetPassword> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Positioned.fill(
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: SizedBox(
+        Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.6,
+            ),
+            SizedBox(
                 height: MediaQuery.of(context).size.height * 0.4,
                 child: SvgPicture.asset(
                   'assets/BackGround.svg',
-                  fit: BoxFit.fitHeight,
+                  fit: BoxFit.fitWidth,
                 )),
-          ),
+          ],
         ),
         Column(
           children: [

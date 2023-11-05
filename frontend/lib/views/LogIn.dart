@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/auth_helper.dart';
 import 'package:frontend/views/ResetPassword.dart';
 import 'package:frontend/views/SignUp.dart';
+import 'package:http/http.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
@@ -14,30 +18,39 @@ class _LogInState extends State<LogIn> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  void executeLogin(String email, String password) {
+  void executeLogin(BuildContext context, email, String password) async {
     //do something with the email and password
+    Response response = await AuthHelper.login(email, password);
+    String jsonBody = response.body;
+    Map<String, dynamic> body = jsonDecode(jsonBody);
+    String message = body['message'];
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+    }
   }
 
   void navigateToSignUp() {
+    passwordController.text = "";
     //navigate to sign up page
-    Navigator.of(context).push(
+    final result = Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
           return Scaffold(
-            body: Stack(children: [
-              SizedBox(
-                height: 100,
-                child: AppBar(
-                  backgroundColor: Colors.transparent,
-                  iconTheme: const IconThemeData(color: Colors.white),
-                ),
-              ),
-              const SignUp()
-            ]),
+            //I kept the email in the text field
+            body: SignUp(email: emailController.text),
           );
         },
       ),
     );
+    result.then((value) {
+      if (value != null) {
+        emailController.text = value;
+      }
+    });
   }
 
   void navigateToResetPassword() {
@@ -66,16 +79,18 @@ class _LogInState extends State<LogIn> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Positioned.fill(
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.4,
+        Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.60,
+            ),
+            SizedBox(
+                height: MediaQuery.of(context).size.height * 0.40,
                 child: SvgPicture.asset(
                   'assets/BackGround.svg',
-                  fit: BoxFit.fitHeight,
+                  fit: BoxFit.fitWidth,
                 )),
-          ),
+          ],
         ),
         Column(
           children: [
@@ -172,7 +187,7 @@ class _LogInState extends State<LogIn> {
                                     borderRadius: BorderRadius.circular(10.0)),
                               ),
                               onPressed: () => {
-                                executeLogin(emailController.text,
+                                executeLogin(context, emailController.text,
                                     passwordController.text)
                               },
                               child: const Text(
