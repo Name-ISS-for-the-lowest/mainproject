@@ -20,7 +20,7 @@ class EmailSender:
     # app email
     fromEmail = "internationlstudentstation@gmail.com"
 
-    # this return a verification token to store in the db
+    # this returns a verification token to store in the db
     def sendAuthenticationEmail(userEmail):
         # Set your email and password
         message = MIMEMultipart()
