@@ -1,4 +1,33 @@
+DELETE TODOS AS YOU SEE FIT
 
 
--Implement Auth (https://gist.github.com/siscia/5ed3277551370df3eb8b1063923621d4)
--Everything else
+-Add forgot password route and workflow
+-Modify current signup workflow to include language and possible profile picture
+-modify email sender link so that after verifing account, the link tries to open app on  the 'all done' screen. 
+-Should we protect endpoints beyond just checking for login and admin priviliges ??
+
+-Add posting route
+-Add change profile pic route
+-Add get events route
+
+-Create some workflow for recommendations
+-Add liking post route
+-Add editing own post route
+-Add deleting own post route
+-Add deleting account route
+-Add commenting on post route
+
+-add route for registering reports, and maybe some way for admins to manage it, or some auto removal after a certain amount of reports, perhaps
+a percentage based on "impressions/views" or just a hard number.
+
+
+-Add seperate route for editing users setting route can be something /me/username and be a patch route or something like that
+
+-figure out how we are gonna do events - school api?
+-> gottem-> https://www.trumba.com/s.aspx?hosted2=1&editmode&calendar=sacramento-state-events&widget=main&index=100&spudformat=xhr&events=50%25 <- the 50 here represents the number of events, range is 50-1000
+-> this ones fetches in json but only the next 50 events with no pagination possible -> https://www.trumba.com/calendars/sacramento-state-events.json
+-> don't ask how I got this, it involved summoning a Council of Delphic Oracles... also hacking
+-> will prob make a scrapper helper tha paginates the events from the first link into nicely formatted json 50 events at a time
+-> helper will take in a data and return 50 events from that date onward, then flutter needs to autofetch on scroll.
+-> might need to do calendar nav so it's not just a giant list scroll.
+

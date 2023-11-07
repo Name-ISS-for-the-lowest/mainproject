@@ -1,6 +1,4 @@
 import bcrypt
-import random
-import string
 import hashlib
 from argon2 import PasswordHasher
 
@@ -9,18 +7,18 @@ from argon2 import PasswordHasher
 class PassHasher:
     # private method
     @staticmethod
-    def _fast_Hash(password):
+    def _fastHash(password):
         return hashlib.sha512(password.encode("utf-8")).hexdigest()
 
     @staticmethod
-    def hash_password(password, salt):
-        fast_hash = PassHasher._fast_Hash(password)
+    def hashPassword(password, salt):
+        fastHash = PassHasher._fastHash(password)
         ph = PasswordHasher()
-        return ph.hash(fast_hash, salt=salt)
+        return ph.hash(fastHash, salt=salt)
 
     @staticmethod
-    def check_password(password, hashed, salt):
-        newHash = PassHasher.hash_password(password, salt)
+    def checkPassword(password, hashed, salt):
+        newHash = PassHasher.hashPassword(password, salt)
         return newHash == hashed
 
     @staticmethod
