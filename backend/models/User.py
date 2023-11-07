@@ -6,9 +6,9 @@ from bson import ObjectId
 class User:
     # to-do add default values
 
-    def __init__(self, email, password_hash, salt, token=None):
+    def __init__(self, email, passwordHash, salt, token=None):
         self.email = email
-        self.password_hash = password_hash
+        self.passwordHash = passwordHash
         self.salt = salt
         self.token = token
         self.accountActivated = False
