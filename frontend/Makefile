@@ -1,0 +1,2 @@
+install:
+	@flutter pub get
