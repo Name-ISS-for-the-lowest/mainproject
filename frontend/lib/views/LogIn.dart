@@ -36,7 +36,7 @@ class _LogInState extends State<LogIn> {
   void navigateToSignUp() {
     passwordController.text = "";
     //navigate to sign up page
-    final result = Navigator.of(context).push(
+    var result = Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
           return Scaffold(

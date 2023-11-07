@@ -22,5 +22,5 @@ class PassHasher:
         return newHash == hashed
 
     @staticmethod
-    def generate_salt():
+    def generateSalt():
         return bcrypt.gensalt()
