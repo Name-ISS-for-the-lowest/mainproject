@@ -9,8 +9,8 @@ class DBManager:
     db = client["ISSDB"]
 
     @staticmethod
-    def insertUser(email, password_hash, salt, token):
-        new_user = User(email, password_hash, salt, token)
+    def insertUser(email, passwordHash, salt, token):
+        new_user = User(email, passwordHash, salt, token)
         id = DBManager.db["users"].insert_one(new_user.__dict__)
         print("id: ", id.inserted_id)
 
