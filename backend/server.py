@@ -70,9 +70,9 @@ def login(creds: credentials, request: Request, response: Response):
             )
         else:
             # we need to check the password
-            password_hash = user["password_hash"]
+            passwordHash = user["passwordHash"]
             salt = user["salt"]
-            if PassHasher.checkPassword(password, password_hash, salt):
+            if PassHasher.checkPassword(password, passwordHash, salt):
                 # check if the user has a cookie
                 if "session_cookie" in request.cookies:
                     # check if the cookie is in the db
@@ -147,11 +147,11 @@ def signUp(creds: credentials, request: Request, response: Response):
         )
     # create a new user
     salt = PassHasher.generateSalt()
-    password_hash = PassHasher.hashPassword(password, salt)
+    passwordHash = PassHasher.hashPassword(password, salt)
     # generate a token
     token = EmailSender.sendAuthenticationEmail(email)
     # insert the user into the db
-    DBManager.insertUser(email, password_hash, salt, token)
+    DBManager.insertUser(email, passwordHash, salt, token)
     return JSONResponse(
         content={"message": "Please verify your email"}, status_code=200
     )
