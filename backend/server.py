@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Response, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
 from classes.PasswordHasher import PassHasher
@@ -9,8 +9,7 @@ from classes.ImageHelper import ImageHelper
 import json
 
 
-app = FastAPI()
-# app.config["max_upload_size"] = 10 * 1024 * 1024
+app = FastAPI(title="ISS App")
 
 
 class CookiesMiddleWare(BaseHTTPMiddleware):
@@ -70,9 +69,9 @@ def login(creds: credentials, request: Request, response: Response):
             )
         else:
             # we need to check the password
-            password_hash = user["password_hash"]
+            passwordHash = user["passwordHash"]
             salt = user["salt"]
-            if PassHasher.checkPassword(password, password_hash, salt):
+            if PassHasher.checkPassword(password, passwordHash, salt):
                 # check if the user has a cookie
                 if "session_cookie" in request.cookies:
                     # check if the cookie is in the db
@@ -147,20 +146,22 @@ def signUp(creds: credentials, request: Request, response: Response):
         )
     # create a new user
     salt = PassHasher.generateSalt()
-    password_hash = PassHasher.hashPassword(password, salt)
+    passwordHash = PassHasher.hashPassword(password, salt)
     # generate a token
     token = EmailSender.sendAuthenticationEmail(email)
     # insert the user into the db
-    DBManager.insertUser(email, password_hash, salt, token)
+    DBManager.insertUser(email, passwordHash, salt, token)
     return JSONResponse(
         content={"message": "Please verify your email"}, status_code=200
     )
     # send the user an email with the token
 
 
+# todo change the url button so that it opens the app
+# add ISS logo to email and page
 @app.get("/verify")
 def verifyAccount(token: str):
-    print("token: ", token)
+    # print("token: ", token)
     user = DBManager.getUserByToken(token)
     if user is None:
         return JSONResponse(
@@ -168,7 +169,9 @@ def verifyAccount(token: str):
         )
     else:
         DBManager.activateAccount(token)
-        return JSONResponse(content={"message": "Account activated"}, status_code=200)
+        with open("verified.html") as f:
+            html = f.read()
+        return HTMLResponse(content=html, status_code=200)
 
 
 @app.get("/protected")
@@ -176,9 +179,11 @@ def protected(request: Request):
     return {"message": "You are authorized"}
 
 
+# I need to upload an actual endpoint for updating the profile picture
+# it will be protected so I can use the cookie to get the userID, and change the url of the profile picture  in the db
+# also add an optional signUp field for profile picture, and set it to the default profile picture
 @app.post("/uploadPhoto")
 async def uploadPhoto(photo: UploadFile):
-    print("file: ", photo)
     try:
         image = await ImageHelper.uploadImage(photo, "test")
         return JSONResponse(content=image, status_code=200)

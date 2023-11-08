@@ -1,5 +1,10 @@
 watch:
+<<<<<<< HEAD
 	@uvicorn server:app --reload
+=======
+	
+	uvicorn server:app --reload
+>>>>>>> gabriel
 
 save:
 	@pip freeze > requirements.txt

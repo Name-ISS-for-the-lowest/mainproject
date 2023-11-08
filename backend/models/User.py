@@ -6,7 +6,7 @@ from bson import ObjectId
 class User:
     # to-do add default values
     email: str
-    password_hash: str
+    passwordHash: str
     salt: str
     language = "en"
     nationality = "N/A"
