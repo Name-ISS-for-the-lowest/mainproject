@@ -35,4 +35,18 @@ class AuthHelper {
         body: jsonEncode(data));
     return response;
   }
+
+  static Future<bool> isLoggedIn() async {
+    String endPoint = '/protected';
+    final url = Uri.parse('$defaultHost$endPoint');
+    final response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Cookie': sessionCookie
+    });
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

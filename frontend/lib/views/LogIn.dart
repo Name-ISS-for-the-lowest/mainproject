@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/auth_helper.dart';
 import 'package:frontend/views/ResetPassword.dart';
 import 'package:frontend/views/SignUp.dart';
+import 'package:frontend/views/ForumPage.dart';
 import 'package:http/http.dart';
 
 class LogIn extends StatefulWidget {
@@ -21,15 +22,13 @@ class _LogInState extends State<LogIn> {
   void executeLogin(BuildContext context, email, String password) async {
     //do something with the email and password
     Response response = await AuthHelper.login(email, password);
-    String jsonBody = response.body;
-    Map<String, dynamic> body = jsonDecode(jsonBody);
-    String message = body['message'];
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-        ),
-      );
+    bool check = await AuthHelper.isLoggedIn();
+    if (check) {
+      navigateToForumHome();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Login Failed!"),
+      ));
     }
   }
 
@@ -69,6 +68,18 @@ class _LogInState extends State<LogIn> {
               ),
               const ResetPassword()
             ]),
+          );
+        },
+      ),
+    );
+  }
+
+  void navigateToForumHome() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ForumPage(),
           );
         },
       ),
