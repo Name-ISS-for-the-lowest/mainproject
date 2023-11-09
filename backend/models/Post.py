@@ -7,6 +7,7 @@ class Post:
     user_id: str
     date: datetime.datetime
     likes: int
+    imagelinks: list
 
     def __init__(self, content, user_id, parent_id=None):
         self.content = content
