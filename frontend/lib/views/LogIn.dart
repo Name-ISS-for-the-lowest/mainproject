@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/auth_helper.dart';
 import 'package:frontend/views/ResetPassword.dart';
 import 'package:frontend/views/SignUp.dart';
-import 'package:frontend/views/ForumPage.dart';
+import 'package:frontend/views/CoreTemplate.dart';
 import 'package:http/http.dart';
 
 class LogIn extends StatefulWidget {
@@ -24,7 +24,7 @@ class _LogInState extends State<LogIn> {
     Response response = await AuthHelper.login(email, password);
     bool check = await AuthHelper.isLoggedIn();
     if (check) {
-      navigateToForumHome();
+      navigateToPrimaryScreens();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Login Failed!"),
@@ -74,12 +74,12 @@ class _LogInState extends State<LogIn> {
     );
   }
 
-  void navigateToForumHome() {
+  void navigateToPrimaryScreens() {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
           return Scaffold(
-            body: ForumPage(),
+            body: CoreTemplate(),
           );
         },
       ),

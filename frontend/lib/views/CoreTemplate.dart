@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/views/LogIn.dart';
+import 'ResetPassword.dart';
 
-class ForumPage extends StatefulWidget {
-  const ForumPage({super.key});
+class CoreTemplate extends StatefulWidget {
+  const CoreTemplate({super.key});
 
   @override
-  State<ForumPage> createState() => _ForumPageState();
+  State<CoreTemplate> createState() => _CoreTemplateState();
 }
 
-class _ForumPageState extends State<ForumPage> {
+class _CoreTemplateState extends State<CoreTemplate> {
   int selectedIndex = 0;
+  final screens = [
+    ResetPassword(),
+    LogIn(),
+    ResetPassword(),
+    LogIn(),
+    ResetPassword(),
+  ];
   void onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
@@ -32,6 +41,7 @@ class _ForumPageState extends State<ForumPage> {
               color: Color(0x5f000000),
               margin: EdgeInsets.symmetric(vertical: 0),
             ),
+            screens[selectedIndex],
           ],
         ),
         bottomNavigationBar: SizedBox(
