@@ -22,7 +22,7 @@ class User:
     @staticmethod
     def fromDict(dict):
         # turn a dictionary into a class instance
-        user = User(dict["email"], dict["password_hash"], dict["salt"])
+        user = User(dict["email"], dict["passwordHash"], dict["salt"])
         # if "token" in dict:
         #     user.token = dict["token"]
         for key in dict:
