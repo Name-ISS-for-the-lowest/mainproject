@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/views/LogIn.dart';
 import 'ResetPassword.dart';
+import 'package:frontend/views/ForumHome.dart';
+import 'package:frontend/views/CreatePost.dart';
+import 'package:frontend/views/EventsPage.dart';
+import 'package:frontend/views/ProfilePage.dart';
+import 'package:frontend/views/ResourceCenter.dart';
 
 class CoreTemplate extends StatefulWidget {
   const CoreTemplate({super.key});
@@ -13,11 +18,11 @@ class CoreTemplate extends StatefulWidget {
 class _CoreTemplateState extends State<CoreTemplate> {
   int selectedIndex = 0;
   final screens = [
-    ResetPassword(),
-    LogIn(),
-    ResetPassword(),
-    LogIn(),
-    ResetPassword(),
+    ForumHome(),
+    ResourceCenter(),
+    CreatePost(),
+    EventsPage(),
+    ProfilePage(),
   ];
   void onItemTapped(int index) {
     setState(() {
@@ -41,7 +46,11 @@ class _CoreTemplateState extends State<CoreTemplate> {
               color: Color(0x5f000000),
               margin: EdgeInsets.symmetric(vertical: 0),
             ),
-            screens[selectedIndex],
+            Container(
+              height: 734,
+              width: 412,
+              child: screens[selectedIndex],
+            ),
           ],
         ),
         bottomNavigationBar: SizedBox(
