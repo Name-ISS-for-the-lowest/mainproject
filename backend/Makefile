@@ -1,5 +1,5 @@
 watch:
-	uvicorn server:app --reload
+	@uvicorn server:app --reload
 
 save:
 	@pip freeze > requirements.txt
