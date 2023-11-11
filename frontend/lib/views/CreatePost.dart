@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/auth_helper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 
 class CreatePost extends StatefulWidget {
@@ -109,9 +110,9 @@ class _CreatePostState extends State<CreatePost> {
                     right: 20,
                     top: 22.5,
                     child: GestureDetector(
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text("You Posted: $currentPostBody")));
+                      onTap: () async {
+                        var response =
+                            await AuthHelper.createPost('0', currentPostBody);
                         navigateToPrimaryScreens();
                       },
                       child: Text(
