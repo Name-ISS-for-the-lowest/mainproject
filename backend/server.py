@@ -55,6 +55,7 @@ def readItem(item_id: int, q: str = None):
 
 @app.post("/login")
 def login(creds: credentials, request: Request, response: Response):
+    print("login route")
     email = creds.email
     password = creds.password
     user = DBManager.getUserByEmail(email)
@@ -76,6 +77,7 @@ def login(creds: credentials, request: Request, response: Response):
                 if "session_cookie" in request.cookies:
                     # check if the cookie is in the db
                     cookie = request.cookies["session_cookie"]
+                    print("cookie: ", cookie)
                     if DBManager.checkCookie(cookie):
                         return JSONResponse(
                             content={"message": "You are already logged in"},
@@ -94,13 +96,8 @@ def login(creds: credentials, request: Request, response: Response):
                 response = JSONResponse(content={"message": "Login successful"})
 
                 # set the cookie in the response
-                stringCookie = json.dumps(cookie)
                 response.set_cookie(
-                    "session_cookie",
-                    stringCookie,
-                    expires=cookie["expires"],
-                    secure=True,
-                    httponly=True,
+                    key = "session_cookie", value = (cookie),
                 )
                 return response
             else:

@@ -21,13 +21,13 @@ class _LogInState extends State<LogIn> {
 
   void executeLogin(BuildContext context, email, String password) async {
     //do something with the email and password
-    Response response = await AuthHelper.login(email, password);
+    var response = await AuthHelper.login(email, password);
     bool check = await AuthHelper.isLoggedIn();
     if (check) {
       navigateToPrimaryScreens();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Login Failed!"),
+        content: Text(response.body),
       ));
     }
   }

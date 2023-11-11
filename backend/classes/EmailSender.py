@@ -39,7 +39,7 @@ class EmailSender:
   <body>
     <div class="main-container">
       <h1 class="main-header">
-        Welcome to Sacramento State's International Student Support (ISS)!
+        Welcome to Sacramento State's International Student Station (ISS)!
       </h1>
       <p class="mb-6">
         You are one step closer to becoming an integral part of our diverse
@@ -196,7 +196,7 @@ class EmailSender:
   <body>
     <div class="main-container">
       <h1 class="main-header">
-        Welcome to Sacramento State's International Student Support (ISS)!
+        Welcome to Sacramento State's International Student Station (ISS)!
       </h1>
       <p class="mb-6">
         You are one step closer to becoming an integral part of our diverse
