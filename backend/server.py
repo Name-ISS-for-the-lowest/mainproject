@@ -7,6 +7,7 @@ from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
 from classes.ImageHelper import ImageHelper
 import json
+import urllib.parse
 
 
 app = FastAPI(title="ISS App")
@@ -26,6 +27,7 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
         # check if the user has a cookie
         if "session_cookie" in request.cookies:
             cookie = request.cookies["session_cookie"]
+            cookie = urllib.parse.unquote_plus(cookie)
             if DBManager.checkCookie(cookie):
                 return await call_next(request)
             else:
@@ -77,6 +79,7 @@ def login(creds: credentials, request: Request, response: Response):
                 if "session_cookie" in request.cookies:
                     # check if the cookie is in the db
                     cookie = request.cookies["session_cookie"]
+                    cookie = urllib.parse.unquote_plus(cookie)
                     print("cookie: ", cookie)
                     if DBManager.checkCookie(cookie):
                         return JSONResponse(
@@ -91,13 +94,15 @@ def login(creds: credentials, request: Request, response: Response):
 
                 # we need to convert the id to a string since it is a bson object
                 cookie["_id"] = str(cookie["_id"])
+                jsonCookie = json.dumps(cookie)
+                encoded = urllib.parse.quote_plus(jsonCookie)
 
                 # set response message
                 response = JSONResponse(content={"message": "Login successful"})
 
                 # set the cookie in the response
                 response.set_cookie(
-                    key = "session_cookie", value = (cookie),
+                    key = "session_cookie", value=(encoded),
                 )
                 return response
             else:
@@ -113,6 +118,7 @@ def logout(request: Request, response: Response):
     if "session_cookie" in request.cookies:
         # check if the cookie is in the db
         cookie = request.cookies["session_cookie"]
+        cookie = urllib.parse.unquote_plus(cookie)
         if DBManager.checkCookie(cookie):
             # delete the cookie from the db
             DBManager.deleteCookie(cookie)
