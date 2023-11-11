@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request, Response, UploadFile
 from fastapi.responses import JSONResponse, HTMLResponse
 from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
+from JSONmodels.postdata import postdata
 from classes.PasswordHasher import PassHasher
 from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -193,3 +194,10 @@ async def uploadPhoto(photo: UploadFile):
     except Exception as e:
         print(e)
         return JSONResponse({"message": "Unable to upload photo"}), 400
+    
+@app.post("/createPost")
+def createPost(data: postdata):
+    userID = data.userID
+    postBody = data.postBody
+    DBManager.addPost(userID, postBody)
+

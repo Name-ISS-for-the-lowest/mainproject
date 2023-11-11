@@ -1,6 +1,7 @@
 import pymongo
 import json
 from models.User import User
+from models.Post import Post
 
 
 class DBManager:
@@ -65,3 +66,10 @@ class DBManager:
         cookie = json.loads(cookie)
         # delete the cookie from the db
         DBManager.db["session_cookies"].delete_one({"session_id": cookie["session_id"]})
+
+    @staticmethod
+    def addPost(content, userID):
+        newPost = Post(content, userID)
+        id = DBManager.db["posts"].insert_one(newPost.__dict__)
+
+
