@@ -29,7 +29,6 @@ class _CoreTemplateState extends State<CoreTemplate> {
       if (index != 2) {
         selectedIndex = index;
       } else {
-        selectedIndex = 0;
         navigateToCreatePost();
       }
     });
