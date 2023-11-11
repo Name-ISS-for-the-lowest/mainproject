@@ -9,8 +9,8 @@ class DBManager:
     db = client["ISSDB"]
 
     @staticmethod
-    def insertUser(email, password_hash, salt, token):
-        new_user = User(email, password_hash, salt, token)
+    def insertUser(email, passwordHash, salt, token):
+        new_user = User(email, passwordHash, salt, token)
         id = DBManager.db["users"].insert_one(new_user.__dict__)
         print("id: ", id.inserted_id)
 
@@ -46,7 +46,9 @@ class DBManager:
     @staticmethod
     def checkCookie(cookie):
         # parse json
+        cookie = cookie.replace("'", "\"")
         cookie = json.loads(cookie)
+        
         # check if the cookie is in the db
         cookie = DBManager.db["session_cookies"].find_one(
             {"session_id": cookie["session_id"]}
@@ -59,6 +61,7 @@ class DBManager:
     @staticmethod
     def deleteCookie(cookie):
         # parse json
+        cookie = cookie.replace("'", "\"")
         cookie = json.loads(cookie)
         # delete the cookie from the db
         DBManager.db["session_cookies"].delete_one({"session_id": cookie["session_id"]})

@@ -1,12 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/auth_helper.dart';
 import 'package:frontend/views/ResetPassword.dart';
 import 'package:frontend/views/SignUp.dart';
 import 'package:frontend/views/CoreTemplate.dart';
-import 'package:http/http.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
@@ -21,13 +18,13 @@ class _LogInState extends State<LogIn> {
 
   void executeLogin(BuildContext context, email, String password) async {
     //do something with the email and password
-    Response response = await AuthHelper.login(email, password);
+    var response = await AuthHelper.login(email, password);
     bool check = await AuthHelper.isLoggedIn();
     if (check) {
       navigateToPrimaryScreens();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Login Failed!"),
+        content: Text(response.data["message"] ?? "Error"),
       ));
     }
   }

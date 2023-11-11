@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Response, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
 from classes.PasswordHasher import PassHasher
@@ -7,10 +7,10 @@ from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
 from classes.ImageHelper import ImageHelper
 import json
+import urllib.parse
 
 
-app = FastAPI()
-# app.config["max_upload_size"] = 10 * 1024 * 1024
+app = FastAPI(title="ISS App")
 
 
 class CookiesMiddleWare(BaseHTTPMiddleware):
@@ -27,6 +27,7 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
         # check if the user has a cookie
         if "session_cookie" in request.cookies:
             cookie = request.cookies["session_cookie"]
+            cookie = urllib.parse.unquote_plus(cookie)
             if DBManager.checkCookie(cookie):
                 return await call_next(request)
             else:
@@ -56,6 +57,7 @@ def readItem(item_id: int, q: str = None):
 
 @app.post("/login")
 def login(creds: credentials, request: Request, response: Response):
+    print("login route")
     email = creds.email
     password = creds.password
     user = DBManager.getUserByEmail(email)
@@ -77,6 +79,8 @@ def login(creds: credentials, request: Request, response: Response):
                 if "session_cookie" in request.cookies:
                     # check if the cookie is in the db
                     cookie = request.cookies["session_cookie"]
+                    cookie = urllib.parse.unquote_plus(cookie)
+                    print("cookie: ", cookie)
                     if DBManager.checkCookie(cookie):
                         return JSONResponse(
                             content={"message": "You are already logged in"},
@@ -90,18 +94,15 @@ def login(creds: credentials, request: Request, response: Response):
 
                 # we need to convert the id to a string since it is a bson object
                 cookie["_id"] = str(cookie["_id"])
+                jsonCookie = json.dumps(cookie)
+                encoded = urllib.parse.quote_plus(jsonCookie)
 
                 # set response message
                 response = JSONResponse(content={"message": "Login successful"})
 
                 # set the cookie in the response
-                stringCookie = json.dumps(cookie)
                 response.set_cookie(
-                    "session_cookie",
-                    stringCookie,
-                    expires=cookie["expires"],
-                    secure=True,
-                    httponly=True,
+                    key = "session_cookie", value=(encoded),
                 )
                 return response
             else:
@@ -117,6 +118,7 @@ def logout(request: Request, response: Response):
     if "session_cookie" in request.cookies:
         # check if the cookie is in the db
         cookie = request.cookies["session_cookie"]
+        cookie = urllib.parse.unquote_plus(cookie)
         if DBManager.checkCookie(cookie):
             # delete the cookie from the db
             DBManager.deleteCookie(cookie)
@@ -158,9 +160,11 @@ def signUp(creds: credentials, request: Request, response: Response):
     # send the user an email with the token
 
 
+# todo change the url button so that it opens the app
+# add ISS logo to email and page
 @app.get("/verify")
 def verifyAccount(token: str):
-    print("token: ", token)
+    # print("token: ", token)
     user = DBManager.getUserByToken(token)
     if user is None:
         return JSONResponse(
@@ -168,7 +172,9 @@ def verifyAccount(token: str):
         )
     else:
         DBManager.activateAccount(token)
-        return JSONResponse(content={"message": "Account activated"}, status_code=200)
+        with open("verified.html") as f:
+            html = f.read()
+        return HTMLResponse(content=html, status_code=200)
 
 
 @app.get("/protected")
@@ -176,9 +182,11 @@ def protected(request: Request):
     return {"message": "You are authorized"}
 
 
+# I need to upload an actual endpoint for updating the profile picture
+# it will be protected so I can use the cookie to get the userID, and change the url of the profile picture  in the db
+# also add an optional signUp field for profile picture, and set it to the default profile picture
 @app.post("/uploadPhoto")
 async def uploadPhoto(photo: UploadFile):
-    print("file: ", photo)
     try:
         image = await ImageHelper.uploadImage(photo, "test")
         return JSONResponse(content=image, status_code=200)
