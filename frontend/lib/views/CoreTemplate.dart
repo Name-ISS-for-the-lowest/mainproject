@@ -26,8 +26,25 @@ class _CoreTemplateState extends State<CoreTemplate> {
   ];
   void onItemTapped(int index) {
     setState(() {
-      selectedIndex = index;
+      if (index != 2) {
+        selectedIndex = index;
+      } else {
+        selectedIndex = 0;
+        navigateToCreatePost();
+      }
     });
+  }
+
+  void navigateToCreatePost() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: CreatePost(),
+          );
+        },
+      ),
+    );
   }
 
   @override
