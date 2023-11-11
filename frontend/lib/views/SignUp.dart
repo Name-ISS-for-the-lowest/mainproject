@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/auth_helper.dart';
-import 'package:http/http.dart';
+import 'package:dio/dio.dart';
 
 class SignUp extends StatefulWidget {
   String email = "";
@@ -64,7 +64,7 @@ class _SignUpState extends State<SignUp> {
     //need to do email validation to make sure email is not garbage
     //also should have password validation minimum 8 characters, etc
     Response response = await AuthHelper.signUp(email, password);
-    String jsonBody = response.body;
+    String jsonBody = response.data;
     print(jsonBody);
     Map<String, dynamic> body = jsonDecode(jsonBody);
     String message = body['message'];
