@@ -9,10 +9,21 @@ class EventsPage extends StatefulWidget {
 
 class _EventsPageState extends State<EventsPage> {
   @override
+  Widget _buildList() {
+    return ListView.builder(
+      itemCount: 10,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text("Event $index"),
+        );
+      },
+    );
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xffece7d5),
-      body: Center(child: Text("Events Page")),
+      body: _buildList(),
     );
   }
 }
