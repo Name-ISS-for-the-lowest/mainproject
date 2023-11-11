@@ -20,22 +20,50 @@ class AuthHelper {
     var url = '$defaultHost$endPoint';
 
     //this is the dio library making a post request
-    final response = await dio.post(
-      url,
-      data: jsonEncode(data),
-      options: Options(contentType: Headers.jsonContentType),
-    );
-    return response;
+    try {
+      final response = await dio.post(
+        url,
+        data: jsonEncode(data),
+        options: Options(contentType: Headers.jsonContentType),
+      );
+      return response;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!;
+      } else {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'Unable to connect to server'},
+          statusCode: 500,
+          statusMessage: 'Unable to connect to server',
+        );
+      }
+    }
   }
 
   static Future<Response> signUp(String email, String password) async {
     final data = {'email': email, 'password': password};
     String endPoint = '/signup';
     final url = '$defaultHost$endPoint';
-    final response = await dio.post(url,
+    try {
+      final response = await dio.post(
+        url,
         data: jsonEncode(data),
-        options: Options(contentType: Headers.jsonContentType));
-    return response;
+        options: Options(contentType: Headers.jsonContentType),
+      );
+      return response;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!;
+      } else {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'Unable to connect to server'},
+          statusCode: 500,
+          statusMessage: 'Unable to connect to server',
+        );
+      }
+    }
   }
 
   static Future<bool> isLoggedIn() async {
