@@ -9,6 +9,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from classes.ImageHelper import ImageHelper
 import json
 import urllib.parse
+import re
 
 
 app = FastAPI(title="ISS App")
@@ -16,6 +17,10 @@ app = FastAPI(title="ISS App")
 
 class CookiesMiddleWare(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        pattern = r"^/.*$"
+
+        print("request: ", request.url.path)
+        print("Hi there", re.match(pattern, request.url.path))
         if (
             request.url.path == "/login"
             or request.url.path == "/signup"
@@ -23,6 +28,7 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/docs"
             or request.url.path == "/logout"
             or request.url.path == "/openapi.json"
+            or re.match(pattern, request.url.path)
         ):
             return await call_next(request)
         # check if the user has a cookie
@@ -103,7 +109,8 @@ def login(creds: credentials, request: Request, response: Response):
 
                 # set the cookie in the response
                 response.set_cookie(
-                    key = "session_cookie", value=(encoded),
+                    key="session_cookie",
+                    value=(encoded),
                 )
                 return response
             else:
@@ -187,12 +194,16 @@ def protected(request: Request):
 # it will be protected so I can use the cookie to get the userID, and change the url of the profile picture  in the db
 # also add an optional signUp field for profile picture, and set it to the default profile picture
 @app.post("/uploadPhoto")
-async def uploadPhoto(photo: UploadFile):
+async def uploadPhoto(photo: UploadFile, name: str):
     try:
-        image = await ImageHelper.uploadImage(photo, "test")
-        return JSONResponse(content=image, status_code=200)
+        image = await ImageHelper.uploadImage(photo, name)
+        print("image: ", image.__dict__)
+        jsonImage = json.dumps(image.__dict__, ensure_ascii=False)
+
+        return JSONResponse(content=image.__dict__, status_code=200)
     except Exception as e:
         print(e)
+<<<<<<< HEAD
         return JSONResponse({"message": "Unable to upload photo"}), 400
     
 @app.post("/createPost")
@@ -201,3 +212,6 @@ def createPost(data: postdata):
     postBody = data.postBody
     DBManager.addPost(userID, postBody)
 
+=======
+        return JSONResponse({"message": "Unable to upload photo"}, status_code=400)
+>>>>>>> origin/main

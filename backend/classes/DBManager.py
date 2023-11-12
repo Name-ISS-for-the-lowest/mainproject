@@ -2,6 +2,12 @@ import pymongo
 import json
 from models.User import User
 from models.Post import Post
+<<<<<<< HEAD
+=======
+import bson
+from bson import ObjectId, binary, BSON
+import base64
+>>>>>>> origin/main
 
 
 class DBManager:
@@ -47,9 +53,9 @@ class DBManager:
     @staticmethod
     def checkCookie(cookie):
         # parse json
-        cookie = cookie.replace("'", "\"")
+        cookie = cookie.replace("'", '"')
         cookie = json.loads(cookie)
-        
+
         # check if the cookie is in the db
         cookie = DBManager.db["session_cookies"].find_one(
             {"session_id": cookie["session_id"]}
@@ -62,14 +68,30 @@ class DBManager:
     @staticmethod
     def deleteCookie(cookie):
         # parse json
-        cookie = cookie.replace("'", "\"")
+        cookie = cookie.replace("'", '"')
         cookie = json.loads(cookie)
         # delete the cookie from the db
         DBManager.db["session_cookies"].delete_one({"session_id": cookie["session_id"]})
 
     @staticmethod
+<<<<<<< HEAD
     def addPost(content, userID):
         newPost = Post(content, userID)
         id = DBManager.db["posts"].insert_one(newPost.__dict__)
 
 
+=======
+    def insertUserList(users: [User]):
+        for user in users:
+            userJson = user.__dict__
+            userJson["_id"] = ObjectId(userJson["_id"]["$oid"])
+            userJson["salt"] = bson.BSON.encode(userJson["salt"])
+            DBManager.db["users"].insert_one(userJson)
+
+    @staticmethod
+    def insertPostList(posts: [Post]):
+        for post in posts:
+            postJson = post.__dict__
+            postJson["user_id"] = ObjectId(postJson["user_id"]["$oid"])
+            DBManager.db["posts"].insert_one(postJson)
+>>>>>>> origin/main

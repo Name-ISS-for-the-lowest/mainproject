@@ -14,28 +14,59 @@ class AuthHelper {
 
   static Future<Response> login(String email, String password) async {
     dio.interceptors.add(CookieManager(cookieJar));
+    dio.options.connectTimeout = const Duration(seconds: 5);
 
     final data = {'email': email, 'password': password};
     String endPoint = '/login';
     var url = '$defaultHost$endPoint';
 
     //this is the dio library making a post request
-    final response = await dio.post(
-      url,
-      data: jsonEncode(data),
-      options: Options(contentType: Headers.jsonContentType),
-    );
-    return response;
+    try {
+      final response = await dio.post(
+        url,
+        data: jsonEncode(data),
+        options: Options(contentType: Headers.jsonContentType),
+      );
+      return response;
+
+      //on anything but a 200 response this code will run
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!;
+      } else {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'Unable to connect to server'},
+          statusCode: 500,
+          statusMessage: 'Unable to connect to server',
+        );
+      }
+    }
   }
 
   static Future<Response> signUp(String email, String password) async {
     final data = {'email': email, 'password': password};
     String endPoint = '/signup';
     final url = '$defaultHost$endPoint';
-    final response = await dio.post(url,
+    try {
+      final response = await dio.post(
+        url,
         data: jsonEncode(data),
-        options: Options(contentType: Headers.jsonContentType));
-    return response;
+        options: Options(contentType: Headers.jsonContentType),
+      );
+      return response;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!;
+      } else {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'Unable to connect to server'},
+          statusCode: 500,
+          statusMessage: 'Unable to connect to server',
+        );
+      }
+    }
   }
 
   static Future<Response> createPost(String userID, String postBody) async {

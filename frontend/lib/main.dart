@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
           Brightness.dark, // Use dark icons for better visibility
     ));
     return MaterialApp(
+      debugShowCheckedModeBanner: false, //remove debug banner
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

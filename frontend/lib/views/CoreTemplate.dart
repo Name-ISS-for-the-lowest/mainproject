@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frontend/views/LogIn.dart';
-import 'ResetPassword.dart';
 import 'package:frontend/views/ForumHome.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/EventsPage.dart';
