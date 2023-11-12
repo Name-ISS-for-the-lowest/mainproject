@@ -81,10 +81,13 @@ class _EventsPageState extends State<EventsPage> {
         if (item.isOdd) return const Divider();
 
         final index = item ~/ 2;
+        //if at bottom of list show loading indicator
         if (index == _events.length) {
           return const Center(
             child: CircularProgressIndicator(),
           );
+          //right now the events are only 50 long so I return null
+          //I am thinking of using a different api to get way more events will see later
         } else if (index >= _events.length) {
           return null;
         }
