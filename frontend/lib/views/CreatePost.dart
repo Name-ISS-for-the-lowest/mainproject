@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frontend/classes/auth_helper.dart';
+import 'package:frontend/classes/post_helper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 
 class CreatePost extends StatefulWidget {
@@ -112,7 +112,7 @@ class _CreatePostState extends State<CreatePost> {
                     child: GestureDetector(
                       onTap: () async {
                         var response =
-                            await AuthHelper.createPost('0', currentPostBody);
+                            await PostHelper.createPost('0', currentPostBody);
                         navigateToPrimaryScreens();
                       },
                       child: Text(

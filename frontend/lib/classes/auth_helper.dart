@@ -69,16 +69,6 @@ class AuthHelper {
     }
   }
 
-  static Future<Response> createPost(String userID, String postBody) async {
-    final data = {'userID': userID, 'postBody': postBody};
-    String endPoint = '/createPost';
-    final url = '$defaultHost$endPoint';
-    final response = await dio.post(url,
-        data: jsonEncode(data),
-        options: Options(contentType: Headers.jsonContentType));
-    return response;
-  }
-
   static Future<bool> isLoggedIn() async {
     String endPoint = '/login';
     var url = '$defaultHost$endPoint';
