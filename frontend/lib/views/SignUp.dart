@@ -63,13 +63,10 @@ class _SignUpState extends State<SignUp> {
     //need to do email validation to make sure email is not garbage
     //also should have password validation minimum 8 characters, etc
     Response response = await AuthHelper.signUp(email, password);
-    String jsonBody = response.data;
-    Map<String, dynamic> body = jsonDecode(jsonBody);
-    String message = body['message'];
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: Text(response.data["message"] ?? "Error"),
         ),
       );
     }

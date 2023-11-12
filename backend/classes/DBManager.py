@@ -2,7 +2,9 @@ import pymongo
 import json
 from models.User import User
 from models.Post import Post
-from bson import ObjectId
+import bson
+from bson import ObjectId, binary, BSON
+import base64
 
 
 class DBManager:
@@ -73,7 +75,8 @@ class DBManager:
         for user in users:
             userJson = user.__dict__
             userJson["_id"] = ObjectId(userJson["_id"]["$oid"])
-            DBManager.db["users"].insert_one(user.__dict__)
+            userJson["salt"] = bson.BSON.encode(userJson["salt"])
+            DBManager.db["users"].insert_one(userJson)
 
     @staticmethod
     def insertPostList(posts: [Post]):
