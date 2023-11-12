@@ -1,8 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frontend/classes/auth_helper.dart';
+import 'package:frontend/classes/authHelper.dart';
 import 'package:dio/dio.dart';
 
 class SignUp extends StatefulWidget {
