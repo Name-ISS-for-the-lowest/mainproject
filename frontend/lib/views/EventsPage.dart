@@ -1,8 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/routeHandler.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:memoized/memoized.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -12,7 +15,7 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsPage> {
-  final _events = <Map<String, String>>[];
+  var _events = <Map<String, String>>[];
 
   //init
   @override
@@ -27,12 +30,8 @@ class _EventsPageState extends State<EventsPage> {
     }
   }
 
-  Future<void> _launchInWebView(Uri url) async {
-    if (!await launchUrl(url, mode: LaunchMode.inAppWebView)) {
-      throw Exception('Could not launch $url');
-    }
-  }
-
+//I need to move this function to events helper where I can make
+//the results memoized by hand since flutter hooks and memoization absolutelty failed me
   Future fetchEvents() async {
     final monthsOfYear = {
       1: 'JAN',
@@ -49,29 +48,30 @@ class _EventsPageState extends State<EventsPage> {
       12: 'DEC',
     };
 
-    var unescape = HtmlUnescape();
-    await RouteHandler.dio
-        .get('https://www.trumba.com/calendars/sacramento-state-events.json')
-        .then((response) => {
-              setState(() {
-                List<dynamic> events = response.data;
-
-                for (var event in events) {
-                  DateTime dateTime = DateTime.parse(event['startDateTime']);
-                  _events.add({
-                    'title': unescape.convert(event['title']),
-                    'date': unescape.convert(event['dateTimeFormatted']),
-                    'location': parse(event['location']).body!.text,
-                    'day': dateTime.day.toString(),
-                    'month': monthsOfYear[dateTime.month]!,
-                    'url': event['permaLinkUrl'],
-                  });
-                }
-              })
-            })
-        .catchError((error) => print(error));
-
-    print(_events);
+    try {
+      var unescape = HtmlUnescape();
+      var url = "https://www.trumba.com/calendars/sacramento-state-events.json";
+      final response = await RouteHandler.dio.get(url);
+      var events = response.data;
+      setState(() {
+        for (var event in events) {
+          DateTime dateTime = DateTime.parse(event['startDateTime']);
+          _events.add({
+            'title': unescape.convert(event['title']),
+            'date': unescape.convert(event['dateTimeFormatted']),
+            'location': parse(event['location']).body!.text,
+            'day': dateTime.day.toString(),
+            'month': monthsOfYear[dateTime.month]!,
+            'url': event['permaLinkUrl'],
+          });
+        }
+      });
+      return response;
+    } on DioException catch (e) {
+      print(e);
+      // Handle the error, you might want to throw an exception or return a default response
+      throw e;
+    }
   }
 
   Widget _buildList() {
@@ -104,18 +104,18 @@ class _EventsPageState extends State<EventsPage> {
       child: Row(
         children: [
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
                 Text(
                   event['day']!,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 25,
                   ),
                 ),
                 Text(
                   event['month']!,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -125,7 +125,7 @@ class _EventsPageState extends State<EventsPage> {
           ),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

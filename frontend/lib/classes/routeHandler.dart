@@ -10,7 +10,7 @@ class RouteHandler {
   static void init() {
     if (started) return;
     dio.interceptors.add(CookieManager(cookieJar));
-    dio.options.connectTimeout = const Duration(seconds: 5);
+    dio.options.connectTimeout = const Duration(seconds: 30);
     started = true;
   }
 }

@@ -44,6 +44,8 @@ dependencies:
   html_unescape: ^2.0.0
   html: ^0.15.4
   url_launcher: ^6.2.1
+  flutter_hooks: ^0.20.3
+  memoized: ^2.2.1
 
 dev_dependencies:
   flutter_test:
