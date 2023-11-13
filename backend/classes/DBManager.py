@@ -74,8 +74,6 @@ class DBManager:
     def insertUserList(users: [User]):
         for user in users:
             userJson = user.__dict__
-            userJson["_id"] = ObjectId(userJson["_id"]["$oid"])
-            userJson["salt"] = bson.BSON.encode(userJson["salt"])
             DBManager.db["users"].insert_one(userJson)
 
     @staticmethod

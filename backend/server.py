@@ -17,9 +17,6 @@ app = FastAPI(title="ISS App")
 class CookiesMiddleWare(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         pattern = r"^/.*$"
-
-        print("request: ", request.url.path)
-        print("Hi there", re.match(pattern, request.url.path))
         if (
             request.url.path == "/login"
             or request.url.path == "/signup"
@@ -63,11 +60,12 @@ def readItem(item_id: int, q: str = None):
 
 @app.post("/login")
 def login(creds: credentials, request: Request, response: Response):
-    print("login route")
     email = creds.email
     password = creds.password
     user = DBManager.getUserByEmail(email)
+
     if user is None:
+        print("user is none")
         return JSONResponse(
             content={"message": "Data does not match our records"}, status_code=400
         )
@@ -80,6 +78,9 @@ def login(creds: credentials, request: Request, response: Response):
             # we need to check the password
             passwordHash = user["passwordHash"]
             salt = user["salt"]
+            print(type(salt))
+            print(user.__dict__)
+            print(PassHasher.checkPassword(password, passwordHash, salt))
             if PassHasher.checkPassword(password, passwordHash, salt):
                 # check if the user has a cookie
                 if "session_cookie" in request.cookies:
