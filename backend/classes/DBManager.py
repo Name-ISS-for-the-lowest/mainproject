@@ -71,6 +71,20 @@ class DBManager:
         DBManager.db["session_cookies"].delete_one({"session_id": cookie["session_id"]})
 
     @staticmethod
+    def addPost(content, userID):
+        newPost = Post(content, userID)
+        id = DBManager.db["posts"].insert_one(newPost.__dict__)
+    
+    @staticmethod
+    def getPosts(start, end):
+        posts = DBManager.db["posts"].find().sort("_id", -1).skip(start).limit(end)
+        return_posts = []
+        for elem in posts:
+            return_posts.append(Post.fromDict(elem))
+        return return_posts
+
+
+
     def insertUserList(users: [User]):
         for user in users:
             userJson = user.__dict__
