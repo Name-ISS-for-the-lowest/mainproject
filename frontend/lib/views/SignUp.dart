@@ -73,34 +73,30 @@ class _SignUpState extends State<SignUp> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        SizedBox(
-          height: 100,
-          child: AppBar(
-            backgroundColor: Colors.transparent,
-            iconTheme: const IconThemeData(color: Colors.white),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () =>
-                  //when I navigate back to login page, I want keep the email
-                  {Navigator.of(context).pop(emailController.text)},
-            ),
-          ),
-        ),
-        Stack(
+    return Scaffold(
+      extendBodyBehindAppBar: true, // Extend content behind the AppBar
+      appBar: AppBar(
+        backgroundColor:
+            Colors.transparent, // Set the background color to transparent
+        elevation: 0, // Remove the shadow
+        iconTheme:
+            IconThemeData(color: Colors.white), // Set the back arrow color
+      ),
+      body: SingleChildScrollView(
+        child: Stack(
           children: [
             Column(
               children: [
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.6,
+                  height: MediaQuery.of(context).size.height * 0.60,
                 ),
                 SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.4,
-                    child: SvgPicture.asset(
-                      'assets/BackGround.svg',
-                      fit: BoxFit.fitWidth,
-                    )),
+                  height: MediaQuery.of(context).size.height * 0.40,
+                  child: SvgPicture.asset(
+                    'assets/BackGround.svg',
+                    fit: BoxFit.fitWidth,
+                  ),
+                ),
               ],
             ),
             Column(
@@ -113,11 +109,14 @@ class _SignUpState extends State<SignUp> {
                 const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
-                    child: Text("Sign Up",
-                        style: TextStyle(
-                            fontSize: 50,
-                            fontWeight: FontWeight.w700,
-                            color: Color.fromRGBO(230, 183, 17, 1))),
+                    child: Text(
+                      "Sign Up",
+                      style: TextStyle(
+                        fontSize: 50,
+                        fontWeight: FontWeight.w700,
+                        color: Color.fromRGBO(230, 183, 17, 1),
+                      ),
+                    ),
                   ),
                 ),
                 //Input fields
@@ -136,8 +135,8 @@ class _SignUpState extends State<SignUp> {
                                 controller: emailController,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
                                   labelText: 'Email',
                                   contentPadding: const EdgeInsets.all(18),
                                   fillColor: Colors.white,
@@ -146,7 +145,7 @@ class _SignUpState extends State<SignUp> {
                                       FloatingLabelBehavior.never,
                                 ),
                               ),
-                            )
+                            ),
                           ],
                         ),
                         const SizedBox(
@@ -157,12 +156,12 @@ class _SignUpState extends State<SignUp> {
                             SizedBox(
                               width: 340,
                               child: TextField(
-                                controller: passwordController,
                                 obscureText: true,
+                                controller: passwordController,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
                                   labelText: 'Password',
                                   contentPadding: const EdgeInsets.all(18),
                                   fillColor: Colors.white,
@@ -171,11 +170,11 @@ class _SignUpState extends State<SignUp> {
                                       FloatingLabelBehavior.never,
                                 ),
                               ),
-                            )
+                            ),
                           ],
-                        )
+                        ),
                       ],
-                    )
+                    ),
                   ],
                 ),
                 Column(
@@ -197,8 +196,8 @@ class _SignUpState extends State<SignUp> {
                                     backgroundColor:
                                         const Color.fromRGBO(230, 183, 17, 1),
                                     shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0)),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
                                   ),
                                   onPressed: () => {
                                     executeSignUp(emailController.text,
@@ -214,21 +213,21 @@ class _SignUpState extends State<SignUp> {
                                   ),
                                 ),
                               ),
-                            )
+                            ),
                           ],
+                        ),
+                        const SizedBox(
+                          height: 5,
                         ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
                   ],
-                )
+                ),
               ],
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 }
