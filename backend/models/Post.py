@@ -5,14 +5,16 @@ import datetime
 class Post:
     content: str
     user_id: str
-    date: datetime.datetime
+    date: str
     likes: int
     imagelinks: list
 
     def __init__(self, content, user_id, parent_id=None):
         self.content = content
         self.user_id = user_id
-        self.date = datetime.datetime.now()
+        time = datetime.datetime.now()
+        time = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.date = time
         self.likes = 0
         # if parent is none then post is not a reply
         # otherwise the post is a reply to parent

@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse, HTMLResponse
 from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
 from JSONmodels.postdata import postdata
+from JSONmodels.postfetcher import postfetcher
 from classes.PasswordHasher import PassHasher
 from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -203,15 +204,28 @@ async def uploadPhoto(photo: UploadFile, name: str):
         return JSONResponse(content=image.__dict__, status_code=200)
     except Exception as e:
         print(e)
-<<<<<<< HEAD
         return JSONResponse({"message": "Unable to upload photo"}), 400
     
 @app.post("/createPost")
 def createPost(data: postdata):
     userID = data.userID
     postBody = data.postBody
-    DBManager.addPost(userID, postBody)
+    DBManager.addPost(userID=userID, content=postBody)
 
-=======
-        return JSONResponse({"message": "Unable to upload photo"}, status_code=400)
->>>>>>> origin/main
+    return JSONResponse({"message": "Post Added"}, status_code=200)
+
+@app.get("/getPosts")
+def getPosts(data: postfetcher):
+    start = data.start
+    end = data.end
+    posts = DBManager.getPosts(start=start, end=end)
+    dictDump = []
+    for elem in posts:
+        newDict = elem.__dict__
+        newDict['_id'] = str(newDict['_id'])
+        dictDump.append(newDict)
+    postsJSON = json.dumps(dictDump)
+
+    return JSONResponse(postsJSON, status_code=200)
+
+
