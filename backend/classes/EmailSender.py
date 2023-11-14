@@ -21,6 +21,7 @@ class EmailSender:
     fromEmail = "internationlstudentstation@gmail.com"
 
     # this returns a verification token to store in the db
+    @staticmethod
     def sendAuthenticationEmail(userEmail):
         # Set your email and password
         message = MIMEMultipart()
@@ -159,7 +160,6 @@ class EmailSender:
         # Create SMTP session for sending the mail
         try:
             print("sending email to: ", userEmail)
-            print("email password: ", emailPassword)
             server = smtplib.SMTP("smtp.gmail.com", 587)
             server.starttls()
             server.login(EmailSender.fromEmail, emailPassword)
@@ -177,7 +177,7 @@ class EmailSender:
         return token
 
 
-#testing function
+#testing function DO NOT USE
     def sendHTMLEMAIL(userEmail: str, subject: str, token: str):
         # Set your email and password
         message = MIMEMultipart('alternative')
