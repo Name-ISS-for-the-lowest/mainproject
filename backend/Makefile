@@ -7,3 +7,7 @@ save:
 
 install: 
 	@pip install -r requirements.txt
+
+
+migrate:
+	@python migrate.py
