@@ -1,6 +1,8 @@
 import secrets
 import datetime
+from pymongo import MongoClient
 from bson import ObjectId
+from models.Picture import Picture
 
 
 class User:
@@ -10,7 +12,7 @@ class User:
     salt: str
     language = "en"
     nationality = "N/A"
-    profilePictureUrl = "https://i.stack.imgur.com/SE2cv.jpg"
+    profilePicture = Picture()
 
     def __init__(self, email, passwordHash, salt, token=None):
         self.email = email

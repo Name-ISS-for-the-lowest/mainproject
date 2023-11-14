@@ -2,8 +2,8 @@ from imagekitio import ImageKit
 from imagekitio.models.UploadFileRequestOptions import UploadFileRequestOptions
 import base64
 import os
-import sys
 from dotenv import load_dotenv
+from models.Picture import Picture
 
 load_dotenv()
 
@@ -20,8 +20,8 @@ class ImageHelper:
     # be encoded into base64
     # returns dict with url and fileId
     @staticmethod
-    def uploadeImage(img, name, folder=""):
-        imgstr = base64.b64encode(img.read())
+    async def uploadImage(img, name, folder=""):
+        imgstr = base64.b64encode(await img.read())
         upload = imagekit.upload_file(
             file=imgstr,
             file_name=name,
@@ -31,10 +31,10 @@ class ImageHelper:
                 is_private_file=False,
             ),
         )
-        image = {
-            "url": upload.response_metadata.raw["url"],
-            "fileId": upload.response_metadata.raw["fileId"],
-        }
+        image = Picture(
+            url=upload.response_metadata.raw["url"],
+            fileId=upload.response_metadata.raw["fileId"],
+        )
 
         return image
 
