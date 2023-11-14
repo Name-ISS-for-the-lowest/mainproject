@@ -1,5 +1,5 @@
 watch:
-	uvicorn server:app --reload
+	@uvicorn server:app --reload
 
 save:
 	@pip freeze > requirements.txt
@@ -7,3 +7,7 @@ save:
 
 install: 
 	@pip install -r requirements.txt
+
+
+migrate:
+	@python migrate.py

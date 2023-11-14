@@ -2,18 +2,26 @@ from fastapi import FastAPI, Request, Response, UploadFile
 from fastapi.responses import JSONResponse, HTMLResponse
 from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
+from JSONmodels.postdata import postdata
+from JSONmodels.postfetcher import postfetcher
 from classes.PasswordHasher import PassHasher
 from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
 from classes.ImageHelper import ImageHelper
 import json
+import urllib.parse
+from models.Post import Post
+from bson import ObjectId
+import migrate
 
 
 app = FastAPI(title="ISS App")
+migrate.migrate()
 
 
 class CookiesMiddleWare(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        pattern = r"^/.*$"
         if (
             request.url.path == "/login"
             or request.url.path == "/signup"
@@ -21,11 +29,13 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/docs"
             or request.url.path == "/logout"
             or request.url.path == "/openapi.json"
+            # or re.match(pattern, request.url.path)
         ):
             return await call_next(request)
         # check if the user has a cookie
         if "session_cookie" in request.cookies:
             cookie = request.cookies["session_cookie"]
+            cookie = urllib.parse.unquote_plus(cookie)
             if DBManager.checkCookie(cookie):
                 return await call_next(request)
             else:
@@ -58,7 +68,9 @@ def login(creds: credentials, request: Request, response: Response):
     email = creds.email
     password = creds.password
     user = DBManager.getUserByEmail(email)
+
     if user is None:
+        print("user is none")
         return JSONResponse(
             content={"message": "Data does not match our records"}, status_code=400
         )
@@ -71,11 +83,16 @@ def login(creds: credentials, request: Request, response: Response):
             # we need to check the password
             passwordHash = user["passwordHash"]
             salt = user["salt"]
+            print(type(salt))
+            print(user.__dict__)
+            print(PassHasher.checkPassword(password, passwordHash, salt))
             if PassHasher.checkPassword(password, passwordHash, salt):
                 # check if the user has a cookie
                 if "session_cookie" in request.cookies:
                     # check if the cookie is in the db
                     cookie = request.cookies["session_cookie"]
+                    cookie = urllib.parse.unquote_plus(cookie)
+                    print("cookie: ", cookie)
                     if DBManager.checkCookie(cookie):
                         return JSONResponse(
                             content={"message": "You are already logged in"},
@@ -89,18 +106,16 @@ def login(creds: credentials, request: Request, response: Response):
 
                 # we need to convert the id to a string since it is a bson object
                 cookie["_id"] = str(cookie["_id"])
+                jsonCookie = json.dumps(cookie)
+                encoded = urllib.parse.quote_plus(jsonCookie)
 
                 # set response message
                 response = JSONResponse(content={"message": "Login successful"})
 
                 # set the cookie in the response
-                stringCookie = json.dumps(cookie)
                 response.set_cookie(
-                    "session_cookie",
-                    stringCookie,
-                    expires=cookie["expires"],
-                    secure=True,
-                    httponly=True,
+                    key="session_cookie",
+                    value=(encoded),
                 )
                 return response
             else:
@@ -116,6 +131,7 @@ def logout(request: Request, response: Response):
     if "session_cookie" in request.cookies:
         # check if the cookie is in the db
         cookie = request.cookies["session_cookie"]
+        cookie = urllib.parse.unquote_plus(cookie)
         if DBManager.checkCookie(cookie):
             # delete the cookie from the db
             DBManager.deleteCookie(cookie)
@@ -183,10 +199,35 @@ def protected(request: Request):
 # it will be protected so I can use the cookie to get the userID, and change the url of the profile picture  in the db
 # also add an optional signUp field for profile picture, and set it to the default profile picture
 @app.post("/uploadPhoto")
-async def uploadPhoto(photo: UploadFile):
+async def uploadPhoto(photo: UploadFile, name: str):
     try:
-        image = await ImageHelper.uploadImage(photo, "test")
-        return JSONResponse(content=image, status_code=200)
+        image = await ImageHelper.uploadImage(photo, name)
+        print("image: ", image.__dict__)
+        jsonImage = json.dumps(image.__dict__, ensure_ascii=False)
+
+        return JSONResponse(content=image.__dict__, status_code=200)
     except Exception as e:
         print(e)
         return JSONResponse({"message": "Unable to upload photo"}), 400
+
+
+@app.post("/createPost")
+def createPost(data: postdata):
+    userId = ObjectId(data.userID)
+    DBManager.addPost(userId, data.postBody)
+    return JSONResponse({"message": "Post Added"}, status_code=200)
+
+
+@app.get("/getPosts")
+def getPosts(data: postfetcher):
+    start = data.start
+    end = data.end
+    posts = DBManager.getPosts(start=start, end=end)
+    postsJSON = Post.listToJson(posts)
+
+    return JSONResponse(postsJSON, status_code=200)
+
+
+@app.post("/testing")
+def testing(data: postdata):
+    return JSONResponse({"message": "Post Added"}, status_code=200)
