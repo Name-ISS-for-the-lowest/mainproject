@@ -10,7 +10,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from classes.ImageHelper import ImageHelper
 import json
 import urllib.parse
-import re
+from models.Post import Post
+from bson import ObjectId
 
 
 app = FastAPI(title="ISS App")
@@ -205,27 +206,25 @@ async def uploadPhoto(photo: UploadFile, name: str):
     except Exception as e:
         print(e)
         return JSONResponse({"message": "Unable to upload photo"}), 400
-    
+
+
 @app.post("/createPost")
 def createPost(data: postdata):
-    userID = data.userID
-    postBody = data.postBody
-    DBManager.addPost(userID=userID, content=postBody)
-
+    userId = ObjectId(data.userID)
+    DBManager.addPost(userId, data.postBody)
     return JSONResponse({"message": "Post Added"}, status_code=200)
+
 
 @app.get("/getPosts")
 def getPosts(data: postfetcher):
     start = data.start
     end = data.end
     posts = DBManager.getPosts(start=start, end=end)
-    dictDump = []
-    for elem in posts:
-        newDict = elem.__dict__
-        newDict['_id'] = str(newDict['_id'])
-        dictDump.append(newDict)
-    postsJSON = json.dumps(dictDump)
+    postsJSON = Post.listToJson(posts)
 
     return JSONResponse(postsJSON, status_code=200)
 
 
+@app.post("/testing")
+def testing(data: postdata):
+    return JSONResponse({"message": "Post Added"}, status_code=200)
