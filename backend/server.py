@@ -12,9 +12,11 @@ import json
 import urllib.parse
 from models.Post import Post
 from bson import ObjectId
+import migrate
 
 
 app = FastAPI(title="ISS App")
+migrate.migrate()
 
 
 class CookiesMiddleWare(BaseHTTPMiddleware):

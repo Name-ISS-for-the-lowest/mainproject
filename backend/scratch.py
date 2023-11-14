@@ -1,17 +1,17 @@
 # # need to generate random users
 # # generate 20 random users
 
-# from models.User import User
-# from classes.PasswordHasher import PassHasher
-# from models.Picture import Picture
-# from models.Post import Post
-# from classes.DBManager import DBManager
-# import requests
-# import random
-# from bson import ObjectId, json_util
-# import json
-# import lorem
-# import pymongo
+from models.User import User
+from classes.PasswordHasher import PassHasher
+from models.Picture import Picture
+from models.Post import Post
+from classes.DBManager import DBManager
+import requests
+import random
+from bson import ObjectId, json_util
+import json
+import lorem
+import pymongo
 
 
 # names = [
@@ -201,3 +201,26 @@
 
 
 # insertUsers()
+
+
+# def updatePosts():
+#     ##get posts json file
+#     file = open("posts.json")
+#     data = json.load(file)
+#     for i in range(len(data)):
+#         data[i] = Post.fromDict(data[i])
+#         data[i]._id = ObjectId()
+#         # turn id's to json
+#         data[i]._id = {"$oid": str(data[i]._id)}
+#     # print(data[0].__dict__)
+#     # # turn the data back into a json object
+#     dicts = []
+#     for post in data:
+#         dicts.append(post.__dict__)
+#     print(dicts[0])
+#     # save json object to file
+#     with open("posts1.json", "w") as file:
+#         json.dump(dicts, file)
+
+
+# updatePosts()
