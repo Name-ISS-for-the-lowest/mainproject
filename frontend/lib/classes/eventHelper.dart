@@ -5,11 +5,13 @@ import 'package:html/parser.dart' show parse;
 
 class EventHelper {
   static final events = <Map<String, String>>[];
+  static bool mounted = true;
 
-  static Future fetchEvents(Function setState, mounted) async {
-    if (events.isNotEmpty) {
-      return;
-    }
+  static Future fetchEvents(Function setState) async {
+    // if (events.isNotEmpty) {
+    //   return;
+    // }
+    events.clear();
     final monthsOfYear = {
       1: 'JAN',
       2: 'FEB',

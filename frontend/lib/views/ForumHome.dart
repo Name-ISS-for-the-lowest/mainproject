@@ -49,9 +49,12 @@ class _ForumHomeState extends State<ForumHome> {
 
   Future<void> loadData() async {
     var dataCall = await PostHelper.getPosts(0, postsPerFetch);
+    //Add a sleep here to simulate loading
+    // await Future.delayed(const Duration(seconds: 5));
     if (mounted) {
+      print(dataCall);
+      print("hello ther");
       setState(() {
-        print(dataCall);
         postData = dataCall;
         init = true;
         num fetchedLength = dataCall.length;
@@ -66,6 +69,8 @@ class _ForumHomeState extends State<ForumHome> {
   }
 
   Future<void> addData() async {
+    //Add a sleep here to simulate loading
+    // await Future.delayed(const Duration(seconds: 5));
     var dataCall =
         await PostHelper.getPosts(postsFetched, postsFetched + postsPerFetch);
     if (mounted) {
