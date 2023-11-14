@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frontend/classes/auth_helper.dart';
+import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/post_helper.dart';
 
 class ForumHome extends StatefulWidget {
@@ -51,6 +51,7 @@ class _ForumHomeState extends State<ForumHome> {
     var dataCall = await PostHelper.getPosts(0, postsPerFetch);
     if (mounted) {
       setState(() {
+        print(dataCall);
         postData = dataCall;
         init = true;
         num fetchedLength = dataCall.length;

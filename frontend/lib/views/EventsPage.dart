@@ -20,7 +20,7 @@ class _EventsPageState extends State<EventsPage> {
   @override
   void initState() {
     super.initState();
-    EventHelper.fetchEvents(setState);
+    EventHelper.fetchEvents(setState, mounted);
   }
 
   Future<void> _launchURL(Uri url) async {
