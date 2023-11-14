@@ -2,7 +2,6 @@ import pymongo
 import json
 from models.User import User
 
-
 class DBManager:
     host = "mongodb://localhost:27017/"
     client = pymongo.MongoClient(host)
