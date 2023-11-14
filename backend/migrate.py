@@ -19,8 +19,11 @@ def insertPostList(posts: [Post]):
     for post in posts:
         postJson = post.__dict__
         postJson["user_id"] = ObjectId(postJson["user_id"]["$oid"])
+        postJson["_id"] = ObjectId(postJson["_id"]["$oid"])
         DBManager.db["posts"].update_one(
-            {"user_id": postJson["user_id"]}, {"$set": postJson}, upsert=True
+            {"_id": postJson["_id"]},
+            {"$set": postJson},
+            upsert=True,
         )
 
 
@@ -39,9 +42,6 @@ def insertUsers():
     insertUserList(data)
 
 
-insertUsers()
-
-
 def insertPosts():
     file = open("posts.json")
     data = json.load(file)
@@ -56,6 +56,7 @@ def insertPosts():
     insertPostList(data)
 
 
-insertPosts()
-
-print("Successfully migrated data to MongoDB!")
+def migrate():
+    insertUsers()
+    insertPosts()
+    print("Successfully migrated data to MongoDB!")
