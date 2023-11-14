@@ -20,7 +20,7 @@ class _EventsPageState extends State<EventsPage> {
   @override
   void initState() {
     super.initState();
-    EventHelper.fetchEvents(setState);
+    EventHelper.fetchEvents(setState, mounted);
   }
 
   Future<void> _launchURL(Uri url) async {
@@ -60,24 +60,26 @@ class _EventsPageState extends State<EventsPage> {
       },
       child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Text(
-                  event['day']!,
-                  style: const TextStyle(
-                    fontSize: 25,
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Text(
+                    event['day']!,
+                    style: const TextStyle(
+                      fontSize: 27,
+                    ),
                   ),
-                ),
-                Text(
-                  event['month']!,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                  Text(
+                    event['month']!,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           Expanded(
@@ -90,28 +92,30 @@ class _EventsPageState extends State<EventsPage> {
                     children: <Widget>[
                       Text(
                         "${event['title']}",
-                        maxLines: 1,
-                        style: TextStyle(
-                          overflow: TextOverflow.ellipsis,
+                        // maxLines: 1,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          // overflow: TextOverflow.ellipsis,
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       Text(
                         "${event['date']}",
-                        maxLines: 4,
-                        style: TextStyle(
+                        // maxLines: 4,
+                        style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
                       Text(
                         "${event['location']}",
-                        maxLines: 2,
-                        style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
-                            overflow: TextOverflow.ellipsis),
+                        // maxLines: 2,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                          // overflow: TextOverflow.ellipsis
+                        ),
                       )
                     ],
                   ),

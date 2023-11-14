@@ -13,7 +13,7 @@ class PostHelper {
     String endPoint = '/createPost';
     final url = '$defaultHost$endPoint';
     try {
-      final response = await RouteHandler.dio.post(url,
+      final response = await dio.post(url,
           data: jsonEncode(data),
           options: Options(contentType: Headers.jsonContentType));
       return response;
@@ -31,7 +31,7 @@ class PostHelper {
     String endPoint = '/getPosts';
     final url = '$defaultHost$endPoint';
     try {
-      final response = await RouteHandler.dio.get(url,
+      final response = await dio.get(url,
           data: jsonEncode(data),
           options: Options(contentType: Headers.jsonContentType));
       List<dynamic> decodedList = jsonDecode(response.data);

@@ -6,7 +6,7 @@ import 'package:html/parser.dart' show parse;
 class EventHelper {
   static final events = <Map<String, String>>[];
 
-  static Future fetchEvents(Function setState) async {
+  static Future fetchEvents(Function setState, mounted) async {
     if (events.isNotEmpty) {
       return;
     }
@@ -33,19 +33,22 @@ class EventHelper {
 
       //I need to fix the set state bug, if you click to another page while events are fetching,
       //an error will be thrown because set state is called on an non-existent widget, RIP.
-      setState(() {
-        for (var event in results) {
-          DateTime dateTime = DateTime.parse(event['startDateTime']);
-          events.add({
-            'title': unescape.convert(event['title']),
-            'date': unescape.convert(event['dateTimeFormatted']),
-            'location': parse(event['location']).body!.text,
-            'day': dateTime.day.toString(),
-            'month': monthsOfYear[dateTime.month]!,
-            'url': event['permaLinkUrl'],
-          });
-        }
-      });
+      if (mounted) {
+        setState(() {
+          for (var event in results) {
+            DateTime dateTime = DateTime.parse(event['startDateTime']);
+            events.add({
+              'title': unescape.convert(event['title']),
+              'date': unescape.convert(event['dateTimeFormatted']),
+              'location': parse(event['location']).body!.text,
+              'day': dateTime.day.toString(),
+              'month': monthsOfYear[dateTime.month]!,
+              'url': event['permaLinkUrl'],
+            });
+          }
+        });
+      }
+
       return response;
     } on DioException catch (e) {
       print(e);
