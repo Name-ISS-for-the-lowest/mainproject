@@ -65,7 +65,6 @@ class _ForumHomeState extends State<ForumHome> {
   }
 
   Future<void> addData() async {
-    print('hi');
     var dataCall =
         await PostHelper.getPosts(postsFetched, postsFetched + postsPerFetch);
     if (mounted) {
