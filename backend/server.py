@@ -2,13 +2,16 @@ from fastapi import FastAPI, Request, Response, UploadFile
 from fastapi.responses import JSONResponse, HTMLResponse
 from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
+from JSONmodels.postdata import postdata
+from JSONmodels.postfetcher import postfetcher
 from classes.PasswordHasher import PassHasher
 from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
 from classes.ImageHelper import ImageHelper
 import json
 import urllib.parse
-import re
+from models.Post import Post
+from bson import ObjectId
 
 
 app = FastAPI(title="ISS App")
@@ -24,7 +27,7 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/docs"
             or request.url.path == "/logout"
             or request.url.path == "/openapi.json"
-            or re.match(pattern, request.url.path)
+            # or re.match(pattern, request.url.path)
         ):
             return await call_next(request)
         # check if the user has a cookie
@@ -203,4 +206,26 @@ async def uploadPhoto(photo: UploadFile, name: str):
         return JSONResponse(content=image.__dict__, status_code=200)
     except Exception as e:
         print(e)
-        return JSONResponse({"message": "Unable to upload photo"}, status_code=400)
+        return JSONResponse({"message": "Unable to upload photo"}), 400
+
+
+@app.post("/createPost")
+def createPost(data: postdata):
+    userId = ObjectId(data.userID)
+    DBManager.addPost(userId, data.postBody)
+    return JSONResponse({"message": "Post Added"}, status_code=200)
+
+
+@app.get("/getPosts")
+def getPosts(data: postfetcher):
+    start = data.start
+    end = data.end
+    posts = DBManager.getPosts(start=start, end=end)
+    postsJSON = Post.listToJson(posts)
+
+    return JSONResponse(postsJSON, status_code=200)
+
+
+@app.post("/testing")
+def testing(data: postdata):
+    return JSONResponse({"message": "Post Added"}, status_code=200)

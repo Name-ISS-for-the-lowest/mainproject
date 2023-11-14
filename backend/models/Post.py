@@ -1,5 +1,7 @@
 # this is the users post
 import datetime
+import json
+from bson import ObjectId
 
 
 class Post:
@@ -24,3 +26,20 @@ class Post:
         for key in dict:
             setattr(post, key, dict[key])
         return post
+
+    @staticmethod
+    def toJson(post):
+        # turn all to string
+        post.date = str(post.date)
+        post._id = str(post._id)
+        post.user_id = str(post.user_id)
+        return json.dumps(post.__dict__)
+
+    @staticmethod
+    def listToJson(posts):
+        # turn all to string
+        for post in posts:
+            post.date = str(post.date)
+            post._id = str(post._id)
+            post.user_id = str(post.user_id)
+        return json.dumps([post.__dict__ for post in posts])
