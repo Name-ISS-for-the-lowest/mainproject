@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/authHelper.dart';
-<<<<<<< HEAD
 import 'package:frontend/classes/postHelper.dart';
-=======
-import 'package:frontend/classes/post_helper.dart';
->>>>>>> origin/gabriel
 
 class ForumHome extends StatefulWidget {
   const ForumHome({super.key});
