@@ -3,7 +3,28 @@ from classes.DBManager import DBManager
 from models.User import User
 from models.Post import Post
 import base64
+import datetime
 from bson import ObjectId
+
+
+def insertUserList(users: [User]):
+    for user in users:
+        userJson = user.__dict__
+        DBManager.db["users"].update_one(
+            {"email": userJson["email"]}, {"$set": userJson}, upsert=True
+        )
+
+
+def insertPostList(posts: [Post]):
+    for post in posts:
+        postJson = post.__dict__
+        postJson["user_id"] = ObjectId(postJson["user_id"]["$oid"])
+        postJson["_id"] = ObjectId(postJson["_id"]["$oid"])
+        DBManager.db["posts"].update_one(
+            {"_id": postJson["_id"]},
+            {"$set": postJson},
+            upsert=True,
+        )
 
 
 def insertUsers():
@@ -18,10 +39,7 @@ def insertUsers():
         salt_bytes = base64.b64decode(base64_string)
         data[i].salt = salt_bytes
         data[i]._id = ObjectId(data[i]._id["$oid"])
-    DBManager.insertUserList(data)
-
-
-insertUsers()
+    insertUserList(data)
 
 
 def insertPosts():
@@ -30,7 +48,15 @@ def insertPosts():
     # turn the data into user object
     for i in range(len(data)):
         data[i] = Post.fromDict(data[i])
-    DBManager.insertPostList(data)
+        # turn date into datetime object
+        # data[i].date = datetime.datetime.strptime(data[i].date, "%Y-%m-%d %H:%M:%S.%f")
+        data[i].date = datetime.datetime.strptime(
+            data[i].date["$date"], "%Y-%m-%dT%H:%M:%S.%fZ"
+        )
+    insertPostList(data)
 
 
-insertPosts()
+def migrate():
+    insertUsers()
+    insertPosts()
+    print("Successfully migrated data to MongoDB!")
