@@ -13,6 +13,8 @@ import urllib.parse
 from models.Post import Post
 from bson import ObjectId
 import migrate
+# from googletrans import Translator
+# from JSONmodels.translateData import translateData
 
 
 app = FastAPI(title="ISS App")
@@ -231,3 +233,15 @@ def getPosts(data: postfetcher):
 @app.post("/testing")
 def testing(data: postdata):
     return JSONResponse({"message": "Post Added"}, status_code=200)
+
+
+
+# @app.get("/translate")
+# def translate(data: translateData):
+#     if data.source != "none":
+#         result = Translator.translate(data.source,data.content, data.target)
+#     else:
+#         result = Translator.translate(data.content, data.target)
+#         jsonResul = json.dumps(result)
+#     JSONResponse(jsonResul, status_code=200)
+    
