@@ -2,17 +2,18 @@
 import datetime
 import json
 from bson import ObjectId
+from models.Picture import Picture
 
 
 class Post:
     content: str
     user_id: str
     username: str
-    profilePicLink: str
+    profilePicture = Picture()
     date: datetime.datetime
     likes: int
     imagelinks: list
-    
+    liked: bool = False
 
     def __init__(self, content, user_id, parent_id=None):
         self.content = content
@@ -45,4 +46,5 @@ class Post:
             post.date = str(post.date)
             post._id = str(post._id)
             post.user_id = str(post.user_id)
-        return json.dumps([post.__dict__ for post in posts])
+            post = Post.toJson(post)
+        return posts

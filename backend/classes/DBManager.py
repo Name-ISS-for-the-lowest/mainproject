@@ -6,6 +6,7 @@ import bson
 from bson import ObjectId, binary, BSON
 import base64
 
+
 class DBManager:
     host = "mongodb://localhost:27017/"
     client = pymongo.MongoClient(host)
@@ -29,6 +30,14 @@ class DBManager:
     @staticmethod
     def getUserByToken(token):
         user = DBManager.db["users"].find_one({"token": token})
+        if user is None:
+            return None
+        else:
+            return User.fromDict(user)
+
+    @staticmethod
+    def getUserById(id):
+        user = DBManager.db["users"].find_one({"_id": id})
         if user is None:
             return None
         else:
@@ -72,19 +81,39 @@ class DBManager:
     @staticmethod
     def addPost(userID, content):
         newPost = Post(content, userID)
-        id = DBManager.db["posts"].insert_one(newPost.__dict__)
+        user = DBManager.getUserById(userID)
+        newPost.username = user.username
+        newPost.profilePicture = user.profilePicture
+        DBManager.db["posts"].insert_one(newPost.__dict__)
 
     @staticmethod
-    def getPosts(start, end):
+    def getPosts(start, end, userID=None):
         posts = DBManager.db["posts"].find().sort("_id", -1).skip(start).limit(end)
-        return_posts = []
+        returnPosts = []
         for elem in posts:
-            return_posts.append(Post.fromDict(elem))
-        return return_posts
+            post = Post.fromDict(elem)
+            comboID = str(post._id) + str(userID)
+            likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
+            if likedResult is not None:
+                post.liked = True
+            returnPosts.append(post)
+        return returnPosts
 
-    # db.collection.find({
-    #   "date": { $lt: endDate }
-    # }).sort({"timestamp": -1}).limit(25)
+    @staticmethod
+    def likePost(postID, userID):
+        # check if the user has already liked the post
+        comboID = str(postID) + str(userID)
+        likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
+        if likedResult is None:
+            # increment the likes
+            DBManager.db["posts"].update_one({"_id": postID}, {"$inc": {"likes": 1}})
+            # add the like to the likes collection
+            DBManager.db["likes"].insert_one({"comboID": comboID})
+        else:
+            # decrement the likes
+            DBManager.db["posts"].update_one({"_id": postID}, {"$inc": {"likes": -1}})
+            # remove the like from the likes collection
+            DBManager.db["likes"].delete_one({"comboID": comboID})
 
     def insertUserList(users: [User]):
         for user in users:
