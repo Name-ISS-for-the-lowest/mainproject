@@ -15,6 +15,8 @@ class DBManager:
     @staticmethod
     def insertUser(email, passwordHash, salt, token):
         new_user = User(email, passwordHash, salt, token)
+        print(new_user.__dict__)
+        print("here")
         id = DBManager.db["users"].insert_one(new_user.__dict__)
         print("id: ", id.inserted_id)
 

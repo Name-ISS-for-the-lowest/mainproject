@@ -40,6 +40,7 @@ def insertUsers():
         salt_bytes = base64.b64decode(base64_string)
         data[i].salt = salt_bytes
         data[i]._id = ObjectId(data[i]._id["$oid"])
+        data[i].username = data[i].email.split("@")[0]
     insertUserList(data)
 
 

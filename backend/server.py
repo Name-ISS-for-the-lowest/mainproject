@@ -162,7 +162,7 @@ def logout(request: Request, response: Response):
 
 
 @app.post("/signup")
-def signUp(creds: credentials, request: Request, response: Response):
+def signUp(creds: credentials):
     email = creds.email
     password = creds.password
     # check if the user already exists
@@ -232,6 +232,7 @@ def createPost(data: postdata, request: Request):
 @app.get("/getPosts")
 def getPosts(data: postfetcher, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
+    print("userID: ", userID)
     start = data.start
     end = data.end
     posts = DBManager.getPosts(start=start, end=end, userID=userID)
