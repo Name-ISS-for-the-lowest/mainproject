@@ -1,13 +1,19 @@
 # this is the users post
 import datetime
+import json
+from bson import ObjectId
+from models.Picture import Picture
 
 
 class Post:
     content: str
     user_id: str
+    username: str
+    profilePicture = Picture()
     date: datetime.datetime
     likes: int
     imagelinks: list
+    liked: bool = False
 
     def __init__(self, content, user_id, parent_id=None):
         self.content = content
@@ -24,3 +30,21 @@ class Post:
         for key in dict:
             setattr(post, key, dict[key])
         return post
+
+    @staticmethod
+    def toJson(post):
+        # turn all to string
+        post.date = str(post.date)
+        post._id = str(post._id)
+        post.user_id = str(post.user_id)
+        return json.dumps(post.__dict__)
+
+    @staticmethod
+    def listToJson(posts):
+        # turn all to string
+        for post in posts:
+            post.date = str(post.date)
+            post._id = str(post._id)
+            post.user_id = str(post.user_id)
+            post = Post.toJson(post)
+        return posts

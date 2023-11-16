@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frontend/views/LogIn.dart';
-import 'ResetPassword.dart';
 import 'package:frontend/views/ForumHome.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/EventsPage.dart';
@@ -26,8 +24,24 @@ class _CoreTemplateState extends State<CoreTemplate> {
   ];
   void onItemTapped(int index) {
     setState(() {
-      selectedIndex = index;
+      if (index != 2) {
+        selectedIndex = index;
+      } else {
+        navigateToCreatePost();
+      }
     });
+  }
+
+  void navigateToCreatePost() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: CreatePost(),
+          );
+        },
+      ),
+    );
   }
 
   @override
