@@ -39,11 +39,14 @@ class DBManager:
 
     @staticmethod
     def getUserById(id):
+        if isinstance(id, str):
+            id = ObjectId(id)
         user = DBManager.db["users"].find_one({"_id": id})
         if user is None:
             return None
         else:
             return User.fromDict(user)
+        
 
     @staticmethod
     def activateAccount(token):

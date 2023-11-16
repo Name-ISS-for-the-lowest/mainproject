@@ -4,6 +4,7 @@ from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
 from JSONmodels.postdata import postdata
 from JSONmodels.postfetcher import postfetcher
+from JSONmodels.userid import userid
 from classes.PasswordHasher import PassHasher
 from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -257,3 +258,15 @@ def translate(data: translateData, request: Request):
     print("made it here")
     print(result)
     return JSONResponse({"result": result}, status_code=200)
+
+@app.get("/getUserByID", summary = "A way to get a User's information by their ID")
+def getUserByID(data: userid, request: Request):
+    userID = data.userID
+    user = DBManager.getUserById(userID)
+    pfpUrl = user.profilePicture['url']
+    pfpFileId = user.profilePicture['fileId']
+    userDict = user.__dict__
+    returnedDict = {'_id': str(userDict['_id']), 'email': userDict['email'], 'language': userDict['language'], 'nationality': userDict['nationality'], 'username': userDict['username'], 'profilePicture.url': pfpUrl, 'profilePicture.fileId' : pfpFileId}
+    return JSONResponse(content = returnedDict, status_code = 200)
+
+

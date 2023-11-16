@@ -4,6 +4,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:frontend/classes/routeHandler.dart';
+import 'package:frontend/classes/authHelper.dart';
 
 class PostHelper {
   static String defaultHost = RouteHandler.defaultHost;
@@ -46,7 +47,9 @@ class PostHelper {
   }
 
   static getTranslation(String input) async {
-    final data = {'source': 'en', 'target': 'es', 'content': input};
+    String targetLang = AuthHelper.userInfoCache['language'];
+    print(targetLang);
+    final data = {'source': 'en', 'target': targetLang, 'content': input};
     String endPoint = '/translate';
     final url = '$defaultHost$endPoint';
     try {

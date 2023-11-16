@@ -107,22 +107,12 @@ class _ForumHomeState extends State<ForumHome> {
       firstload();
     }
 
-    List<Container> postArray = [];
-    List<String> sampleImages = [
-      'assets/DefaultPFPs/pfp-mrwhiskers.png',
-      'assets/DefaultPFPs/pfp-goodboy.png',
-      'assets/DefaultPFPs/pfp-kevin.png'
-    ];
-    List<String> posterNames = ['Mr. Whiskers', 'Good Boy', 'Kevin'];
-    List<String> animalNoises = ['Meow.', 'Woof Woof.', 'Caw Caw.'];
-
     return Scaffold(
       backgroundColor: Color(0xffece7d5),
       body: ListView.builder(
         itemCount: postData.length,
         controller: scrollController,
         itemBuilder: (BuildContext context, int index) {
-          int postIndex = index % 3;
           String imageURL = postData[index]["profilePicture"]['url'];
           String posterName = postData[index]["username"];
           String postContent = postData[index]["content"];
@@ -264,7 +254,7 @@ class _ForumHomeState extends State<ForumHome> {
                     },
                     child: Text(
                       (currentlyTranslated.containsKey(postContent))
-                          ? "Original Text"!
+                          ? "Original Text"
                           : "Translate",
                       style: TextStyle(
                         color: Color(0xff0094FF),
