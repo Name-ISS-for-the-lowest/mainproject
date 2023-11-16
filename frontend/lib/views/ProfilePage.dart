@@ -14,8 +14,8 @@ class _ProfilePageState extends State<ProfilePage> {
     String profilePicture = "assets/pfp-mrwhiskers.png";
     String displayName = "Mr. Whiskers";
     String nationality = "Brazilian";
+    String language = "English";
     String emailAddress = "mrwhiskers@csus.edu";
-
 
     return Scaffold(
       backgroundColor: Color(0xffece7d5),
@@ -26,7 +26,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
           Stack(
             
-
             children: <Widget>[
 
               Positioned(
@@ -40,8 +39,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
 
-
-
               Positioned.fill(
                 left: 140,
                 child: Align(
@@ -50,36 +47,26 @@ class _ProfilePageState extends State<ProfilePage> {
                     Icons.camera_alt,
                     size: 50,
                     )
-
                 ),
                 ),
             ],
           ),
 
-
-          // Container(
-          //   child: Image.asset(
-          //     profilePicture,
-          //     height: 150,
-          //     width: 150,
-          //     //trailing: Icon(Icons.camera_alt),
-          //   ),
-            
-          // ),
-
-
-
           //USERNAME
           Container( 
             child: ListTile(
-              leading: Icon(Icons.person),
-              title: Text('Display Name'),
-              subtitle: Text(displayName),
-              trailing: Icon(Icons.edit_note),
+              //leading: Icon(Icons.person),
+              title: Text(
+                displayName, 
+                textAlign: TextAlign.center,
+                textScaleFactor: 2,
+                ),
+              trailing: Icon(
+                Icons.edit_note,
+                
+                ),
             ),
           ),
-
-
 
           //NATIONALITY
           Container(
@@ -91,7 +78,17 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
 
+          //Language
+          Container(
+            child: ListTile(
+              leading: Icon(Icons.chat_rounded),
+              title: Text('Language'),
+              subtitle: Text(language),
+              trailing: Icon(Icons.edit_note),
+            ),
+          ),
 
+          //EMAIL ADDRESS
           Container(
             child: ListTile(
               leading: Icon(Icons.mail),
@@ -100,6 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
 
+          //DELETE ACCOUNT
           Container(
             child: ListTile(
               leading: Icon(Icons.delete),
@@ -109,8 +107,6 @@ class _ProfilePageState extends State<ProfilePage> {
               textColor: Colors.redAccent,
             ),
           ),
-
-
 
         ],
       )
