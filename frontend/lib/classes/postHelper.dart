@@ -34,8 +34,7 @@ class PostHelper {
       final response = await RouteHandler.dio.get(url,
           data: jsonEncode(data),
           options: Options(contentType: Headers.jsonContentType));
-      List<dynamic> decodedList = jsonDecode(response.data);
-      return decodedList;
+      return response.data;
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),

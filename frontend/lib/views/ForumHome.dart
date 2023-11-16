@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/authHelper.dart';
-import 'package:frontend/classes/post_helper.dart';
+import 'package:frontend/classes/postHelper.dart';
 
 class ForumHome extends StatefulWidget {
   const ForumHome({super.key});
@@ -52,8 +52,6 @@ class _ForumHomeState extends State<ForumHome> {
     //Add a sleep here to simulate loading
     // await Future.delayed(const Duration(seconds: 5));
     if (mounted) {
-      print(dataCall);
-      print("hello ther");
       setState(() {
         postData = dataCall;
         init = true;
@@ -76,6 +74,8 @@ class _ForumHomeState extends State<ForumHome> {
         await PostHelper.getPosts(postsFetched, postsFetched + postsPerFetch);
     if (mounted) {
       setState(() {
+        print("dataCall: $dataCall");
+        print(dataCall[0]['profilePicture']['url']);
         postData.addAll(dataCall);
         num fetchedLength = dataCall.length;
         int convertedFetch = fetchedLength.toInt();
@@ -106,8 +106,8 @@ class _ForumHomeState extends State<ForumHome> {
         controller: scrollController,
         itemBuilder: (BuildContext context, int index) {
           int postIndex = index % 3;
-          String imageURL = sampleImages[postIndex];
-          String posterName = posterNames[postIndex];
+          String imageURL = postData[index]["profilePicture"]['url'];
+          String posterName = postData[index]["username"];
           String postContent = postData[index]["content"];
           postContent = postContent.replaceAll('\n', ' ');
           bool postTooLong = false;
@@ -138,10 +138,18 @@ class _ForumHomeState extends State<ForumHome> {
               children: [
                 Positioned(
                   left: 15,
-                  child: Image.asset(
-                    imageURL,
-                    height: 50,
+                  child: Container(
                     width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        fit: BoxFit.fill,
+                        image: NetworkImage(
+                          "$imageURL?tr=w-50,h-50,fo-auto",
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 Positioned(

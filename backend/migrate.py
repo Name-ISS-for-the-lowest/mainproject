@@ -5,6 +5,7 @@ from models.Post import Post
 import base64
 import datetime
 from bson import ObjectId
+from classes.DBManager import DBManager
 
 
 def insertUserList(users: [User]):
@@ -39,6 +40,7 @@ def insertUsers():
         salt_bytes = base64.b64decode(base64_string)
         data[i].salt = salt_bytes
         data[i]._id = ObjectId(data[i]._id["$oid"])
+        data[i].username = data[i].email.split("@")[0]
     insertUserList(data)
 
 
@@ -48,6 +50,9 @@ def insertPosts():
     # turn the data into user object
     for i in range(len(data)):
         data[i] = Post.fromDict(data[i])
+        user = DBManager.getUserById(ObjectId(data[i].user_id["$oid"]))
+        data[i].username = user.username
+        data[i].profilePicture = user.profilePicture
         # turn date into datetime object
         # data[i].date = datetime.datetime.strptime(data[i].date, "%Y-%m-%d %H:%M:%S.%f")
         data[i].date = datetime.datetime.strptime(
