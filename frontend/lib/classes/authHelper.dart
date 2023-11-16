@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 //todo add persitent storage for session cookie
 
 class AuthHelper {
-  static String defaultHost = "http://10.0.2.2:8000";
+  static String defaultHost = RouteHandler.defaultHost;
 
   static Future<Response> login(String email, String password) async {
     final data = {'email': email, 'password': password};
