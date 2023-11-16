@@ -166,11 +166,13 @@ class _ResourceCenterState extends State<ResourceCenter> {
               child: Column(
                 children: [
                   Text("Serna Center", style: TextStyle(color: Colors.white)),
+                  Spacer(),
                   IconButton(
                     onPressed: () {_launchURL(Uri.parse("https://www.csus.edu/student-affairs/centers-programs/serna-center/")); }, 
                     icon: SvgPicture.asset("assets/ResourceCenter/icon-serna.svg"),
                     color: Colors.white,
                   ),
+                  Spacer(),
                 ]
               ),
             ),
@@ -240,11 +242,13 @@ class _ResourceCenterState extends State<ResourceCenter> {
               child: Column(
                 children: [
                   Text("Basic Needs", style: TextStyle(color: Colors.white)),
+                  Spacer(),
                   IconButton(
                     onPressed: () {_launchURL(Uri.parse("https://www.csus.edu/student-affairs/crisis-assistance-resource-education-support/resources.html"));}, 
                     icon: SvgPicture.asset("assets/ResourceCenter/icon-basic.svg"),
                     color: Colors.white,
                   ),
+                  Spacer(),
                 ]
               ),
             ),
