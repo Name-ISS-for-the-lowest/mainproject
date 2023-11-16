@@ -7,6 +7,7 @@ import 'package:frontend/classes/routeHandler.dart';
 
 class PostHelper {
   static String defaultHost = "http://10.0.2.2:8000";
+  static Map<String, String> cachedTranslations = Map();
 
   static Future<Response> createPost(String userID, String postBody) async {
     final data = {'userID': userID, 'postBody': postBody};
@@ -29,6 +30,24 @@ class PostHelper {
   static getPosts(int start, int end) async {
     final data = {'start': start, 'end': end};
     String endPoint = '/getPosts';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.get(url,
+          data: jsonEncode(data),
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': 'post machine broke lil bro'},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static getTranslation(String input) async {
+    final data = {'source': 'en', 'target': 'es', 'content': input};
+    String endPoint = '/translate';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.get(url,

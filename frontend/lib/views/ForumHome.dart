@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/authHelper.dart';
@@ -15,6 +17,7 @@ class _ForumHomeState extends State<ForumHome> {
   int postsFetched = 0;
   int postsPerFetch = 25;
   bool init = false;
+  Map<String, String> currentlyTranslated = Map();
   ScrollController scrollController = ScrollController();
 
   @override
@@ -83,6 +86,21 @@ class _ForumHomeState extends State<ForumHome> {
     }
   }
 
+  Future<void> translatePost(String originalText) async {
+    if (PostHelper.cachedTranslations.containsKey(originalText)) {
+      return;
+    } else {
+      var translationCall = await PostHelper.getTranslation(originalText);
+      print(translationCall);
+      if (mounted) {
+        setState(() {
+          String returnedTranslation = translationCall['result'];
+          PostHelper.cachedTranslations[originalText] = returnedTranslation;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!init) {
@@ -121,7 +139,9 @@ class _ForumHomeState extends State<ForumHome> {
             child: Builder(
               builder: (BuildContext context) {
                 return Text(
-                  postContent,
+                  (currentlyTranslated.containsKey(postContent))
+                      ? currentlyTranslated[postContent]!
+                      : postContent,
                   softWrap: true,
                 );
               },
@@ -229,12 +249,23 @@ class _ForumHomeState extends State<ForumHome> {
                   bottom: 33,
                   left: 280,
                   child: GestureDetector(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Translate Tapped")));
+                    onTap: () async {
+                      await translatePost(postContent);
+                      if (mounted) {
+                        setState(() {
+                          if (currentlyTranslated.containsKey(postContent)) {
+                            currentlyTranslated.remove(postContent);
+                          } else {
+                            currentlyTranslated[postContent] =
+                                PostHelper.cachedTranslations[postContent]!;
+                          }
+                        });
+                      }
                     },
                     child: Text(
-                      "Translate",
+                      (currentlyTranslated.containsKey(postContent))
+                          ? "Original Text"!
+                          : "Translate",
                       style: TextStyle(
                         color: Color(0xff0094FF),
                       ),
