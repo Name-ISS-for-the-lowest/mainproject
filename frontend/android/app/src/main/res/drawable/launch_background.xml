@@ -4,9 +4,11 @@
     <item android:drawable="@android:color/white" />
 
     <!-- You can insert your own image assets here -->
-    <!-- <item>
+    
+    <!-- This sets our custom image as the the splash screen image -->
+    <item>
         <bitmap
             android:gravity="center"
-            android:src="@mipmap/launch_image" />
-    </item> -->
+            android:src="@drawable/splash_image"/>
+    </item> 
 </layer-list>

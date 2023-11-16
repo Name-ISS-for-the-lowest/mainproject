@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:dio/dio.dart';
+import 'package:frontend/views/PasswordSetup.dart';
 
 class SignUp extends StatefulWidget {
   String email = "";
@@ -39,6 +40,7 @@ class _SignUpState extends State<SignUp> {
 
   void executeSignUp(String email, String password) async {
     final validEmail = validateEmail(email);
+    //might remove this since we must match flow we have in figma
     final validPassword = validatePassword(password);
     if (!validEmail) {
       //show error message
@@ -71,6 +73,28 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
+  void navigateToPassWordSetUp() {
+    //navigate to confirm email page
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: Stack(children: [
+              SizedBox(
+                height: 100,
+                child: AppBar(
+                  backgroundColor: Colors.transparent,
+                  iconTheme: const IconThemeData(color: Colors.white),
+                ),
+              ),
+              const PasswordSetUp()
+            ]),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +112,7 @@ class _SignUpState extends State<SignUp> {
             Column(
               children: [
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.60,
+                  height: MediaQuery.of(context).size.height * 0.75,
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.40,
@@ -110,12 +134,55 @@ class _SignUpState extends State<SignUp> {
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Sign Up",
+                      "Welcome to the I.S.S.!",
                       style: TextStyle(
                         fontSize: 50,
                         fontWeight: FontWeight.w700,
                         color: Color.fromRGBO(230, 183, 17, 1),
                       ),
+                      textAlign: TextAlign.center, // Center-align the text
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text(
+                      "Before we begin, please enter a valid Sacramento State email",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(230, 183, 17, 1),
+                      ),
+                      textAlign: TextAlign.center, // Center-align the text
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text(
+                      "These can be identified by the “@csus.edu” handle near the end like this:",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(230, 183, 17, 1),
+                      ),
+                      textAlign: TextAlign.center, // Center-align the text
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text(
+                      "“Example@csus.edu”",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(230, 183, 17, 1),
+                      ),
+                      textAlign: TextAlign.center, // Center-align the text
                     ),
                   ),
                 ),
@@ -151,6 +218,7 @@ class _SignUpState extends State<SignUp> {
                         const SizedBox(
                           height: 5,
                         ),
+                        /*
                         Column(
                           children: [
                             SizedBox(
@@ -173,6 +241,7 @@ class _SignUpState extends State<SignUp> {
                             ),
                           ],
                         ),
+                        */
                       ],
                     ),
                   ],
@@ -182,7 +251,7 @@ class _SignUpState extends State<SignUp> {
                     Column(
                       children: [
                         const SizedBox(
-                          height: 50,
+                          height: 180,
                         ),
                         Column(
                           children: [
@@ -200,11 +269,10 @@ class _SignUpState extends State<SignUp> {
                                     ),
                                   ),
                                   onPressed: () => {
-                                    executeSignUp(emailController.text,
-                                        passwordController.text)
+                                    navigateToPassWordSetUp(),
                                   },
                                   child: const Text(
-                                    "Sign Up",
+                                    "Next",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,

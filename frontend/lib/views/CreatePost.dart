@@ -25,7 +25,7 @@ class _CreatePostState extends State<CreatePost> {
   }
 
   Widget build(BuildContext context) {
-    String profilePicture = 'assets/pfp-mrwhiskers.png';
+    String profilePicture = 'assets/DefaultPFPs/pfp-mrwhiskers.png';
     String screenName = 'Mr. Whiskers';
     String currentPostBody = "";
     return Scaffold(

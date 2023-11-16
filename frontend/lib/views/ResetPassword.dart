@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ResetPassword extends StatefulWidget {
+  final String email = "";
   const ResetPassword({super.key});
 
   @override
@@ -9,6 +11,36 @@ class ResetPassword extends StatefulWidget {
 }
 
 class _ResetPasswordState extends State<ResetPassword> {
+  TextEditingController emailController = TextEditingController();
+
+  //on mount
+  @override
+  void initState() {
+    super.initState();
+    emailController.text = widget.email;
+  }
+
+  bool validateEmail(String email) {
+    //general email regex
+    // final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+    //csus email regex
+    final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@csus\.edu$');
+    return emailRegExp.hasMatch(email);
+  }
+
+  void executeRestsetPassWord(String email) async {
+    final validEmail = validateEmail(email);
+    if (!validEmail) {
+      //show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Invalid email, must be a CSUS email'),
+        ),
+      );
+      return;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,6 +84,35 @@ class _ResetPasswordState extends State<ResetPassword> {
                         fontWeight: FontWeight.w700,
                         color: Color.fromRGBO(230, 183, 17, 1),
                       ),
+                      textAlign: TextAlign.center, // Center-align the text
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text(
+                      "Forgot your password?",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Color.fromRGBO(230, 183, 17, 1),
+                      ),
+                      textAlign: TextAlign.center, // Center-align the text
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text(
+                      "Just enter your account’s email and a recovery link will be sent right to you!",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Color.fromRGBO(230, 183, 17, 1),
+                      ),
+                      textAlign: TextAlign.center, // Center-align the text
                     ),
                   ),
                 ),
@@ -112,6 +173,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                                     ),
                                   ),
                                   onPressed: () {
+                                    executeRestsetPassWord(
+                                        emailController.text);
                                     // Add your logic for sending recovery email
                                   },
                                   child: const Text(

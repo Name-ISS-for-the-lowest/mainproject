@@ -31,7 +31,6 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/docs"
             or request.url.path == "/logout"
             or request.url.path == "/openapi.json"
-            # or re.match(pattern, request.url.path)
         ):
             return await call_next(request)
         # check if the user has a cookie
