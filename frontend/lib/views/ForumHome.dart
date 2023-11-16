@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/authHelper.dart';
@@ -15,6 +17,7 @@ class _ForumHomeState extends State<ForumHome> {
   int postsFetched = 0;
   int postsPerFetch = 25;
   bool init = false;
+  Map<String, String> currentlyTranslated = Map();
   ScrollController scrollController = ScrollController();
 
   @override
@@ -69,7 +72,6 @@ class _ForumHomeState extends State<ForumHome> {
   Future<void> addData() async {
     //Add a sleep here to simulate loading
     // await Future.delayed(const Duration(seconds: 5));
-    print('hi');
     var dataCall =
         await PostHelper.getPosts(postsFetched, postsFetched + postsPerFetch);
     if (mounted) {
@@ -84,6 +86,21 @@ class _ForumHomeState extends State<ForumHome> {
     }
   }
 
+  Future<void> translatePost(String originalText) async {
+    if (PostHelper.cachedTranslations.containsKey(originalText)) {
+      return;
+    } else {
+      var translationCall = await PostHelper.getTranslation(originalText);
+      print(translationCall);
+      if (mounted) {
+        setState(() {
+          String returnedTranslation = translationCall['result'];
+          PostHelper.cachedTranslations[originalText] = returnedTranslation;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!init) {
@@ -92,9 +109,9 @@ class _ForumHomeState extends State<ForumHome> {
 
     List<Container> postArray = [];
     List<String> sampleImages = [
-      'assets/pfp-mrwhiskers.png',
-      'assets/pfp-goodboy.png',
-      'assets/pfp-kevin.png'
+      'assets/DefaultPFPs/pfp-mrwhiskers.png',
+      'assets/DefaultPFPs/pfp-goodboy.png',
+      'assets/DefaultPFPs/pfp-kevin.png'
     ];
     List<String> posterNames = ['Mr. Whiskers', 'Good Boy', 'Kevin'];
     List<String> animalNoises = ['Meow.', 'Woof Woof.', 'Caw Caw.'];
@@ -122,7 +139,9 @@ class _ForumHomeState extends State<ForumHome> {
             child: Builder(
               builder: (BuildContext context) {
                 return Text(
-                  postContent,
+                  (currentlyTranslated.containsKey(postContent))
+                      ? currentlyTranslated[postContent]!
+                      : postContent,
                   softWrap: true,
                 );
               },
@@ -173,7 +192,7 @@ class _ForumHomeState extends State<ForumHome> {
                               SnackBar(content: Text("3 Dots Tapped")));
                         },
                         child: SvgPicture.asset(
-                          "assets/icon-3dots.svg",
+                          "assets/PostUI/icon-3dots.svg",
                           width: 20,
                           height: 5,
                           color: Colors.black,
@@ -205,7 +224,7 @@ class _ForumHomeState extends State<ForumHome> {
                           SnackBar(content: Text("Heart Tapped")));
                     },
                     child: SvgPicture.asset(
-                      "assets/icon-heart.svg",
+                      "assets/PostUI/icon-heart.svg",
                       height: 20,
                       width: 20,
                     ),
@@ -220,7 +239,7 @@ class _ForumHomeState extends State<ForumHome> {
                           SnackBar(content: Text("Comment Tapped")));
                     },
                     child: SvgPicture.asset(
-                      "assets/icon-comment.svg",
+                      "assets/PostUI/icon-comment.svg",
                       height: 20,
                       width: 20,
                     ),
@@ -230,12 +249,23 @@ class _ForumHomeState extends State<ForumHome> {
                   bottom: 33,
                   left: 280,
                   child: GestureDetector(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Translate Tapped")));
+                    onTap: () async {
+                      await translatePost(postContent);
+                      if (mounted) {
+                        setState(() {
+                          if (currentlyTranslated.containsKey(postContent)) {
+                            currentlyTranslated.remove(postContent);
+                          } else {
+                            currentlyTranslated[postContent] =
+                                PostHelper.cachedTranslations[postContent]!;
+                          }
+                        });
+                      }
                     },
                     child: Text(
-                      "Translate",
+                      (currentlyTranslated.containsKey(postContent))
+                          ? "Original Text"!
+                          : "Translate",
                       style: TextStyle(
                         color: Color(0xff0094FF),
                       ),
