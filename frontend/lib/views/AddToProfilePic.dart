@@ -1,38 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frontend/views/AddToProfilePic.dart';
 
-class ConfirmPassword extends StatefulWidget {
-  const ConfirmPassword({super.key});
+class AddToProfilePic extends StatefulWidget {
+  const AddToProfilePic({super.key});
 
   @override
-  State<ConfirmPassword> createState() => _ConfirmPasswordState();
+  State<AddToProfilePic> createState() => _AddToProfilePicState();
 }
 
-class _ConfirmPasswordState extends State<ConfirmPassword> {
-  void navigateToAddProfilePic() {
-    //navigate to AddProfilePic page
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return Scaffold(
-            body: Stack(children: [
-              SizedBox(
-                height: 100,
-                child: AppBar(
-                  backgroundColor: Colors.transparent,
-                  iconTheme: const IconThemeData(color: Colors.white),
-                ),
-              ),
-              const AddToProfilePic()
-            ]),
-          );
-        },
-      ),
-    );
-  }
-
+class _AddToProfilePicState extends State<AddToProfilePic> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,7 +49,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Confirm Password",
+                      "Add Profile Picture",
                       style: TextStyle(
                         fontSize: 50,
                         fontWeight: FontWeight.w700,
@@ -86,7 +63,21 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Almost there! Please confirm the password you just created by entering it one more time. ",
+                      "Finally, add an image that you want to use to represent yourself ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(230, 183, 17, 1),
+                      ),
+                      textAlign: TextAlign.center, // Center-align the text
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text(
+                      "Please be mindful of other users, Avoid using images that may be considered disturbing or offensive. Images should be inline with Sac State’s Hornet Honor Code policy",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -102,6 +93,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                     const SizedBox(
                       height: 50,
                     ),
+                    //going to have to add the circle that lets you add the profile picture
                     Column(
                       children: [
                         Column(
@@ -161,7 +153,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                     Column(
                       children: [
                         const SizedBox(
-                          height: 300,
+                          height: 180,
                         ),
                         Column(
                           children: [
@@ -178,7 +170,9 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                       borderRadius: BorderRadius.circular(10.0),
                                     ),
                                   ),
-                                  onPressed: () => {navigateToAddProfilePic()},
+                                  onPressed: () => {
+                                    // enter logic to go to confirm password screen
+                                  },
                                   child: const Text(
                                     "Next",
                                     style: TextStyle(
