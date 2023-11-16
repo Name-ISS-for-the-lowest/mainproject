@@ -3,6 +3,7 @@ import datetime
 from pymongo import MongoClient
 from bson import ObjectId
 from models.Picture import Picture
+import json
 
 
 class User:
@@ -13,6 +14,7 @@ class User:
     language = "en"
     nationality = "N/A"
     profilePicture = Picture()
+    username: str = ""
 
     def __init__(self, email, passwordHash, salt, token=None):
         self.email = email
@@ -20,6 +22,11 @@ class User:
         self.salt = salt
         self.token = token
         self.accountActivated = False
+        self.username = email.split("@")[0]
+        self.profilePicture = Picture()
+        self.profilePicture = self.profilePicture.__dict__
+        self.language = "en"
+        self.nationality = "N/A"
 
     @staticmethod
     def fromDict(dict):
