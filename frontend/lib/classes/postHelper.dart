@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:frontend/classes/routeHandler.dart';
 
 class PostHelper {
-  static String defaultHost = "http://10.0.2.2:8000";
+  static String defaultHost = RouteHandler.defaultHost;
   static Map<String, String> cachedTranslations = Map();
 
   static Future<Response> createPost(String userID, String postBody) async {
