@@ -2,6 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+<<<<<<< HEAD
+=======
+import 'package:frontend/classes/authHelper.dart';
+>>>>>>> 843f2816411831cd2e62691b6dad661bb1a2fdad
 import 'package:frontend/classes/postHelper.dart';
 
 class ForumHome extends StatefulWidget {
@@ -289,4 +293,8 @@ class _ForumHomeState extends State<ForumHome> {
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 843f2816411831cd2e62691b6dad661bb1a2fdad

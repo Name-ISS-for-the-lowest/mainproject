@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Email Verification</title>
+    <style>
+      body {
+        text-align: center;
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        margin: 100px auto;
+        padding: 20px;
+        max-width: 400px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+      }
+      h1 {
+        color: #333;
+      }
+      #goToApp {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      #goToApp:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Email Verified!</h1>
+      <p>Your email has been successfully verified.</p>
+      <button id="goToApp" onclick="goToApp()">Go to Login</button>
+    </div>
+
+    <script>
+      function goToApp() {
+        // Replace the URL with your app's URL
+        window.location.href = "https://example.com";
+      }
+    </script>
+  </body>
+</html>
