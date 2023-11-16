@@ -54,19 +54,19 @@ class _ResourceCenterState extends State<ResourceCenter> {
           children: [
             Spacer(),
             SizedBox(
-            child: SvgPicture.asset("assets/icon-homehome.svg"),
+            child: SvgPicture.asset("assets/icon-research.svg"),
             width: 75,
             height: 75,
             ),
             Spacer(),
             SizedBox(
-            child: SvgPicture.asset("assets/icon-visavisa.svg"),
+            child: SvgPicture.asset("assets/icon-earthearth.svg"),
             width: 75,
             height: 75,
             ),
             Spacer(),
             SizedBox(
-            child: SvgPicture.asset("assets/icon-jobjob.svg"),
+            child: SvgPicture.asset("assets/icon-serna.svg"),
             width: 75,
             height: 75,
             ),
