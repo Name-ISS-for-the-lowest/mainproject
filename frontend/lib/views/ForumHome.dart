@@ -91,9 +91,9 @@ class _ForumHomeState extends State<ForumHome> {
 
     List<Container> postArray = [];
     List<String> sampleImages = [
-      'assets/pfp-mrwhiskers.png',
-      'assets/pfp-goodboy.png',
-      'assets/pfp-kevin.png'
+      'assets/DefaultPFPs/pfp-mrwhiskers.png',
+      'assets/DefaultPFPs/pfp-goodboy.png',
+      'assets/DefaultPFPs/pfp-kevin.png'
     ];
     List<String> posterNames = ['Mr. Whiskers', 'Good Boy', 'Kevin'];
     List<String> animalNoises = ['Meow.', 'Woof Woof.', 'Caw Caw.'];
@@ -172,7 +172,7 @@ class _ForumHomeState extends State<ForumHome> {
                               SnackBar(content: Text("3 Dots Tapped")));
                         },
                         child: SvgPicture.asset(
-                          "assets/icon-3dots.svg",
+                          "assets/PostUI/icon-3dots.svg",
                           width: 20,
                           height: 5,
                           color: Colors.black,
@@ -204,7 +204,7 @@ class _ForumHomeState extends State<ForumHome> {
                           SnackBar(content: Text("Heart Tapped")));
                     },
                     child: SvgPicture.asset(
-                      "assets/icon-heart.svg",
+                      "assets/PostUI/icon-heart.svg",
                       height: 20,
                       width: 20,
                     ),
@@ -219,7 +219,7 @@ class _ForumHomeState extends State<ForumHome> {
                           SnackBar(content: Text("Comment Tapped")));
                     },
                     child: SvgPicture.asset(
-                      "assets/icon-comment.svg",
+                      "assets/PostUI/icon-comment.svg",
                       height: 20,
                       width: 20,
                     ),
