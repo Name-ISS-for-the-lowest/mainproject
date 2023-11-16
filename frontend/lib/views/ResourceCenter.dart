@@ -49,6 +49,30 @@ class _ResourceCenterState extends State<ResourceCenter> {
             Spacer(),
           ],
         ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Spacer(),
+            SizedBox(
+            child: SvgPicture.asset("assets/icon-homehome.svg"),
+            width: 75,
+            height: 75,
+            ),
+            Spacer(),
+            SizedBox(
+            child: SvgPicture.asset("assets/icon-visavisa.svg"),
+            width: 75,
+            height: 75,
+            ),
+            Spacer(),
+            SizedBox(
+            child: SvgPicture.asset("assets/icon-jobjob.svg"),
+            width: 75,
+            height: 75,
+            ),
+            Spacer(),
+          ],
+        ),
         Spacer(),
       ]
     );
