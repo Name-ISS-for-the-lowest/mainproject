@@ -30,43 +30,68 @@ class _ResourceCenterState extends State<ResourceCenter> {
           children: [
             Spacer(),
             SizedBox(
-            child: SvgPicture.asset("assets/icon-homehome.svg"),
-            width: 75,
-            height: 75,
+              width: 75,
+              height: 75,
+              child: SvgPicture.asset('assets/ResourceCenter/icon-homehome.svg'),
             ),
             Spacer(),
             SizedBox(
-            child: SvgPicture.asset("assets/icon-visavisa.svg"),
             width: 75,
             height: 75,
+            child: SvgPicture.asset("assets/ResourceCenter/icon-visavisa.svg"),
             ),
             Spacer(),
             SizedBox(
-            child: SvgPicture.asset("assets/icon-jobjob.svg"),
+            child: SvgPicture.asset("assets/ResourceCenter/icon-jobjob.svg"),
             width: 75,
             height: 75,
             ),
             Spacer(),
           ],
         ),
+        Spacer(),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Spacer(),
             SizedBox(
-            child: SvgPicture.asset("assets/icon-research.svg"),
+            child: SvgPicture.asset("assets/ResourceCenter/icon-research.svg"),
             width: 75,
             height: 75,
             ),
             Spacer(),
             SizedBox(
-            child: SvgPicture.asset("assets/icon-earthearth.svg"),
+            child: SvgPicture.asset("assets/ResourceCenter/icon-earthearth.svg"),
             width: 75,
             height: 75,
             ),
             Spacer(),
             SizedBox(
-            child: SvgPicture.asset("assets/icon-serna.svg"),
+            child: SvgPicture.asset("assets/ResourceCenter/icon-serna.svg"),
+            width: 75,
+            height: 75,
+            ),
+            Spacer(),
+          ],
+        ),
+        Spacer(),Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Spacer(),
+            SizedBox(
+            child: SvgPicture.asset("assets/ResourceCenter/icon-research.svg"),
+            width: 75,
+            height: 75,
+            ),
+            Spacer(),
+            SizedBox(
+            child: SvgPicture.asset("assets/ResourceCenter/icon-earthearth.svg"),
+            width: 75,
+            height: 75,
+            ),
+            Spacer(),
+            SizedBox(
+            child: SvgPicture.asset("assets/ResourceCenter/icon-serna.svg"),
             width: 75,
             height: 75,
             ),
