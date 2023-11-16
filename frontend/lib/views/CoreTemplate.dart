@@ -81,13 +81,13 @@ class _CoreTemplateState extends State<CoreTemplate> {
                   icon: Container(
                     width: 40,
                     height: 40,
-                    child: SvgPicture.asset('assets/icon-home.svg',
+                    child: SvgPicture.asset('assets/NavBarUI/icon-home.svg',
                         color: Color(0xff89875A)),
                   ),
                   activeIcon: Container(
                     width: 40,
                     height: 40,
-                    child: SvgPicture.asset('assets/icon-home.svg',
+                    child: SvgPicture.asset('assets/NavBarUI/icon-home.svg',
                         color: Color(0xffFFE89A)),
                   ),
                   label: '',
@@ -96,12 +96,12 @@ class _CoreTemplateState extends State<CoreTemplate> {
                   icon: Container(
                     width: 40,
                     height: 40,
-                    child: SvgPicture.asset('assets/icon-search.svg'),
+                    child: SvgPicture.asset('assets/NavBarUI/icon-search.svg'),
                   ),
                   activeIcon: Container(
                     width: 40,
                     height: 40,
-                    child: SvgPicture.asset('assets/icon-search.svg',
+                    child: SvgPicture.asset('assets/NavBarUI/icon-search.svg',
                         color: Color(0xffFFE89A)),
                   ),
                   label: '',
@@ -110,12 +110,14 @@ class _CoreTemplateState extends State<CoreTemplate> {
                   icon: Container(
                     width: 40,
                     height: 40,
-                    child: SvgPicture.asset('assets/icon-createpost.svg'),
+                    child:
+                        SvgPicture.asset('assets/NavBarUI/icon-createpost.svg'),
                   ),
                   activeIcon: Container(
                     width: 40,
                     height: 40,
-                    child: SvgPicture.asset('assets/icon-createpost.svg',
+                    child: SvgPicture.asset(
+                        'assets/NavBarUI/icon-createpost.svg',
                         color: Color(0xffFFE89A)),
                   ),
                   label: '',
@@ -124,13 +126,15 @@ class _CoreTemplateState extends State<CoreTemplate> {
                   icon: Container(
                     width: 40,
                     height: 40,
-                    child: SvgPicture.asset('assets/icon-resources.svg',
+                    child: SvgPicture.asset(
+                        'assets/NavBarUI/icon-resources.svg',
                         color: Color(0xff89875A)),
                   ),
                   activeIcon: Container(
                     width: 40,
                     height: 40,
-                    child: SvgPicture.asset('assets/icon-resources.svg',
+                    child: SvgPicture.asset(
+                        'assets/NavBarUI/icon-resources.svg',
                         color: Color(0xffFFE89A)),
                   ),
                   label: '',
@@ -139,12 +143,12 @@ class _CoreTemplateState extends State<CoreTemplate> {
                   icon: Container(
                     width: 40,
                     height: 40,
-                    child: SvgPicture.asset('assets/icon-profile.svg'),
+                    child: SvgPicture.asset('assets/NavBarUI/icon-profile.svg'),
                   ),
                   activeIcon: Container(
                     width: 40,
                     height: 40,
-                    child: SvgPicture.asset('assets/icon-profile.svg',
+                    child: SvgPicture.asset('assets/NavBarUI/icon-profile.svg',
                         color: Color(0xffFFE89A)),
                   ),
                   label: '',
