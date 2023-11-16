@@ -24,15 +24,48 @@ class _ProfilePageState extends State<ProfilePage> {
       body: ListView(
         children: [
 
-          Container(
-            child: Image.asset(
-              profilePicture,
-              height: 150,
-              width: 150,
-              //trailing: Icon(Icons.camera_alt),
-            ),
+          Stack(
             
+
+            children: <Widget>[
+
+              Positioned(
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Image.asset(
+                  profilePicture,
+                  height: 150,
+                  width: 150,
+                ),
+                ),
+              ),
+
+
+
+              Positioned.fill(
+                left: 140,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: const Icon(
+                    Icons.camera_alt,
+                    size: 50,
+                    )
+
+                ),
+                ),
+            ],
           ),
+
+
+          // Container(
+          //   child: Image.asset(
+          //     profilePicture,
+          //     height: 150,
+          //     width: 150,
+          //     //trailing: Icon(Icons.camera_alt),
+          //   ),
+            
+          // ),
 
 
 
