@@ -8,10 +8,9 @@ class EventHelper {
   static bool mounted = true;
 
   static Future fetchEvents(Function setState) async {
-    // if (events.isNotEmpty) {
-    //   return;
-    // }
-    events.clear();
+    if (events.isNotEmpty) {
+      return;
+    }
     final monthsOfYear = {
       1: 'JAN',
       2: 'FEB',

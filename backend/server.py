@@ -12,14 +12,18 @@ import json
 import urllib.parse
 from models.Post import Post
 from bson import ObjectId
+import migrate
+from classes.Translator import Translator
+from JSONmodels.translateData import translateData
 
 
 app = FastAPI(title="ISS App")
+migrate.migrate()
 
 
 class CookiesMiddleWare(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        pattern = r"^/.*$"
+        # pattern = r"^/.*$"
         if (
             request.url.path == "/login"
             or request.url.path == "/signup"
@@ -45,6 +49,15 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
                 content={"message": "You are not authorized"},
                 status_code=401,
             )
+
+
+def IdFromCookie(cookie):  # returns the user id from the cookie
+    # parse json
+    cookie = urllib.parse.unquote_plus(cookie)
+    cookie = cookie.replace("'", '"')
+    cookie = json.loads(cookie)
+    id = ObjectId(cookie["user_id"])
+    return id
 
 
 app.add_middleware(CookiesMiddleWare)
@@ -148,7 +161,7 @@ def logout(request: Request, response: Response):
 
 
 @app.post("/signup")
-def signUp(creds: credentials, request: Request, response: Response):
+def signUp(creds: credentials):
     email = creds.email
     password = creds.password
     # check if the user already exists
@@ -209,22 +222,38 @@ async def uploadPhoto(photo: UploadFile, name: str):
 
 
 @app.post("/createPost")
-def createPost(data: postdata):
-    userId = ObjectId(data.userID)
-    DBManager.addPost(userId, data.postBody)
+def createPost(data: postdata, request: Request):
+    id = IdFromCookie(request.cookies["session_cookie"])
+    DBManager.addPost(id, data.postBody)
     return JSONResponse({"message": "Post Added"}, status_code=200)
 
 
 @app.get("/getPosts")
-def getPosts(data: postfetcher):
+def getPosts(data: postfetcher, request: Request):
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    print("userID: ", userID)
     start = data.start
     end = data.end
-    posts = DBManager.getPosts(start=start, end=end)
-    postsJSON = Post.listToJson(posts)
+    posts = DBManager.getPosts(start=start, end=end, userID=userID)
+    posts = Post.listToJson(posts)
+    return posts
 
-    return JSONResponse(postsJSON, status_code=200)
+
+##if post is liked then it will unlike it
+@app.post("/likePost", summary="Like a post, if already liked it will be unliked")
+def likePost(data: postdata, request: Request):
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    postID = data.postID
+    DBManager.likePost(userID, postID)
+    return JSONResponse({"message": "Post liked"}, status_code=200)
 
 
-@app.post("/testing")
-def testing(data: postdata):
-    return JSONResponse({"message": "Post Added"}, status_code=200)
+@app.get(
+    "/translate",
+    summary="Translate a string from one language to another",
+)
+def translate(data: translateData, request: Request):
+    result = Translator.translate(data.content, data.target, data.source)
+    print("made it here")
+    print(result)
+    return JSONResponse({"result": result}, status_code=200)
