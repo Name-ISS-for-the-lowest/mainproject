@@ -86,9 +86,17 @@ class _ForumHomeState extends State<ForumHome> {
     }
   }
 
-  Future<void> translatePost(String originalText) async {
+  Future<void> translatePost(String originalText, int index) async {
     if (PostHelper.cachedTranslations.containsKey(originalText)) {
       return;
+    } else if (postData[index]['translations'] != '') {
+      if (mounted) {
+        setState(() {
+          PostHelper.cachedTranslations[originalText] =
+              postData[index]['translations'];
+        });
+        return;
+      }
     } else {
       var translationCall = await PostHelper.getTranslation(originalText);
       print(translationCall);
@@ -240,7 +248,12 @@ class _ForumHomeState extends State<ForumHome> {
                   left: 280,
                   child: GestureDetector(
                     onTap: () async {
-                      await translatePost(postContent);
+                      await translatePost(postContent, index);
+                      if (postData[index]['translations'] == '') {
+                        await PostHelper.storeTranslation(
+                            PostHelper.cachedTranslations[postContent]!,
+                            postData[index]['_id']);
+                      }
                       if (mounted) {
                         setState(() {
                           if (currentlyTranslated.containsKey(postContent)) {

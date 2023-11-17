@@ -120,6 +120,11 @@ class DBManager:
             # remove the like from the likes collection
             DBManager.db["likes"].delete_one({"comboID": comboID})
 
+    @staticmethod
+    def addTranslationToPost(translatedText, userLang, postID):
+        DBManager.db["posts"].update_one({"_id": ObjectId(postID)}, {"$set": {f"translations.{userLang}": translatedText}})
+
+
     def insertUserList(users: [User]):
         for user in users:
             userJson = user.__dict__
