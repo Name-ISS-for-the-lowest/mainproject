@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:country_picker/country_picker.dart';
+import 'package:reactive_language_picker/reactive_language_picker.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -36,12 +39,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Positioned.fill(
                   left: 140,
-                  child: Align(
+                  child: Align(                      
                       alignment: Alignment.bottomCenter,
-                      child: const Icon(
-                        Icons.camera_alt,
-                        size: 50,
-                      )),
+                      child: IconButton(
+                        icon: Icon(Icons.camera_alt),
+                        iconSize: 50,
+                        onPressed: (){
+                          
+                        },
+                      ),
+                  ),
                 ),
             ],
           ),
@@ -55,10 +62,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 textAlign: TextAlign.center,
                 textScaleFactor: 2,
                 ),
-              trailing: Icon(
-                Icons.edit_note,
+              trailing: IconButton(
+                //alignment: ,
+                icon: Icon(Icons.edit_note),
+                onPressed: (){
+
+                },
                 
-                ),
+              ),
             ),
           ),
 
@@ -68,7 +79,27 @@ class _ProfilePageState extends State<ProfilePage> {
               leading: Icon(Icons.flag),
               title: Text('Nationality'),
               subtitle: Text(nationality),
-              trailing: Icon(Icons.edit_note),
+              trailing: IconButton(
+                icon: Icon(Icons.edit_note),
+
+                onPressed: (){
+                  showCountryPicker(
+                    context: context,
+                    favorite: <String>['US', 'CN', 'MX', 'IN'],
+                    //exclude: <String>['FR'],
+                    countryListTheme: CountryListThemeData(
+                      backgroundColor: Color(0xffece7d5),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(0),
+                        topRight: Radius.circular(0),
+                      ),
+                    ),
+                    onSelect: (Country country) {
+                    print('Select country: ${country.displayName}');
+                    },
+                  );
+                },
+              ),
             ),
           ),
 
@@ -78,7 +109,12 @@ class _ProfilePageState extends State<ProfilePage> {
               leading: Icon(Icons.chat_rounded),
               title: Text('Language'),
               subtitle: Text(language),
-              trailing: Icon(Icons.edit_note),
+              trailing: IconButton(
+                icon: Icon(Icons.edit_note),
+                onPressed: (){
+                  
+                },
+              ),
             ),
           ),
 
@@ -99,6 +135,10 @@ class _ProfilePageState extends State<ProfilePage> {
               title: Text('Delete Account'),
               subtitle: Text('This action cannot be restored.'),
               textColor: Colors.redAccent,
+
+              onTap: (){
+
+              },
             ),
           ),
 
