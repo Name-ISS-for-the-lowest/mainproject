@@ -39,11 +39,14 @@ class DBManager:
 
     @staticmethod
     def getUserById(id):
+        if isinstance(id, str):
+            id = ObjectId(id)
         user = DBManager.db["users"].find_one({"_id": id})
         if user is None:
             return None
         else:
             return User.fromDict(user)
+        
 
     @staticmethod
     def activateAccount(token):
@@ -116,6 +119,11 @@ class DBManager:
             DBManager.db["posts"].update_one({"_id": postID}, {"$inc": {"likes": -1}})
             # remove the like from the likes collection
             DBManager.db["likes"].delete_one({"comboID": comboID})
+
+    @staticmethod
+    def addTranslationToPost(translatedText, userLang, postID):
+        DBManager.db["posts"].update_one({"_id": ObjectId(postID)}, {"$set": {f"translations.{userLang}": translatedText}})
+
 
     def insertUserList(users: [User]):
         for user in users:

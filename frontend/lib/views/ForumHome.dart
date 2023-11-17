@@ -86,9 +86,17 @@ class _ForumHomeState extends State<ForumHome> {
     }
   }
 
-  Future<void> translatePost(String originalText) async {
+  Future<void> translatePost(String originalText, int index) async {
     if (PostHelper.cachedTranslations.containsKey(originalText)) {
       return;
+    } else if (postData[index]['translations'] != '') {
+      if (mounted) {
+        setState(() {
+          PostHelper.cachedTranslations[originalText] =
+              postData[index]['translations'];
+        });
+        return;
+      }
     } else {
       var translationCall = await PostHelper.getTranslation(originalText);
       print(translationCall);
@@ -107,22 +115,12 @@ class _ForumHomeState extends State<ForumHome> {
       firstload();
     }
 
-    List<Container> postArray = [];
-    List<String> sampleImages = [
-      'assets/DefaultPFPs/pfp-mrwhiskers.png',
-      'assets/DefaultPFPs/pfp-goodboy.png',
-      'assets/DefaultPFPs/pfp-kevin.png'
-    ];
-    List<String> posterNames = ['Mr. Whiskers', 'Good Boy', 'Kevin'];
-    List<String> animalNoises = ['Meow.', 'Woof Woof.', 'Caw Caw.'];
-
     return Scaffold(
       backgroundColor: Color(0xffece7d5),
       body: ListView.builder(
         itemCount: postData.length,
         controller: scrollController,
         itemBuilder: (BuildContext context, int index) {
-          int postIndex = index % 3;
           String imageURL = postData[index]["profilePicture"]['url'];
           String posterName = postData[index]["username"];
           String postContent = postData[index]["content"];
@@ -250,7 +248,12 @@ class _ForumHomeState extends State<ForumHome> {
                   left: 280,
                   child: GestureDetector(
                     onTap: () async {
-                      await translatePost(postContent);
+                      await translatePost(postContent, index);
+                      if (postData[index]['translations'] == '') {
+                        await PostHelper.storeTranslation(
+                            PostHelper.cachedTranslations[postContent]!,
+                            postData[index]['_id']);
+                      }
                       if (mounted) {
                         setState(() {
                           if (currentlyTranslated.containsKey(postContent)) {
@@ -264,7 +267,7 @@ class _ForumHomeState extends State<ForumHome> {
                     },
                     child: Text(
                       (currentlyTranslated.containsKey(postContent))
-                          ? "Original Text"!
+                          ? "Original Text"
                           : "Translate",
                       style: TextStyle(
                         color: Color(0xff0094FF),

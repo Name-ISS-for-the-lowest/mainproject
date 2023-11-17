@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 
 class AuthHelper {
   static String defaultHost = RouteHandler.defaultHost;
+  static Map<String, dynamic> userInfoCache = Map();
 
   static Future<Response> login(String email, String password) async {
     final data = {'email': email, 'password': password};
@@ -21,6 +22,7 @@ class AuthHelper {
         data: jsonEncode(data),
         options: Options(contentType: Headers.jsonContentType),
       );
+      await cacheUserInfo();
       return response;
 
       //on anything but a 200 response this code will run
@@ -100,6 +102,54 @@ class AuthHelper {
         decoded = decoded.replaceAll("+", " ");
         return json.decode(decoded);
       }
+    }
+  }
+
+  static cacheUserInfo() async {
+    String endPoint = '/login';
+    String userID;
+    var url = '$defaultHost$endPoint';
+    Uri uri = Uri.parse(url);
+    var data = {};
+    List<Cookie> cookies = await RouteHandler.cookieJar.loadForRequest(uri);
+
+    for (var cookie in cookies) {
+      if (cookie.name == 'session_cookie') {
+        var decoded = Uri.decodeFull(cookie.value);
+        decoded = decoded.replaceAll("+", " ");
+        var cookieObject = json.decode(decoded);
+        userID = cookieObject['user_id'];
+        print("the user id...");
+        print(userID);
+        data = {'userID': userID};
+        break;
+      }
+    }
+    endPoint = '/getUserByID';
+    url = '$defaultHost$endPoint';
+    uri = Uri.parse(url);
+
+    try {
+      final response = await RouteHandler.dio.get(url,
+          data: jsonEncode(data),
+          options: Options(contentType: Headers.jsonContentType));
+      var userInfo = response.data;
+      userInfoCache['_id'] = userInfo['_id'];
+      userInfoCache['email'] = userInfo['email'];
+      userInfoCache['username'] = userInfo['username'];
+      userInfoCache['language'] = userInfo['language'];
+      userInfoCache['nationality'] = userInfo['nationality'];
+      userInfoCache['profilePicture.url'] = userInfo['profilePicture.url'];
+      userInfoCache['profilePicture.fileId'] =
+          userInfo['profilePicture.fileId'];
+      print(userInfoCache);
+    } on DioException catch (e) {
+      print(e);
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': 'post machine broke lil bro'},
+        statusCode: 500,
+      );
     }
   }
 }

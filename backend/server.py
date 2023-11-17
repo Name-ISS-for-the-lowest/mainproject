@@ -4,6 +4,8 @@ from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
 from JSONmodels.postdata import postdata
 from JSONmodels.postfetcher import postfetcher
+from JSONmodels.userid import userid
+from JSONmodels.translationAddition import translationAddition
 from classes.PasswordHasher import PassHasher
 from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -234,8 +236,9 @@ def getPosts(data: postfetcher, request: Request):
     print("userID: ", userID)
     start = data.start
     end = data.end
+    userLang = data.userLang
     posts = DBManager.getPosts(start=start, end=end, userID=userID)
-    posts = Post.listToJson(posts)
+    posts = Post.listToJson(posts, userLang)
     return posts
 
 
@@ -257,3 +260,24 @@ def translate(data: translateData, request: Request):
     print("made it here")
     print(result)
     return JSONResponse({"result": result}, status_code=200)
+
+@app.post("/addTranslation", summary="Add a translation to the post entry for later retrieval")
+def addTranslation(data: translationAddition, request: Request):
+    translatedText = data.translatedText
+    userLang = data.userLang
+    postID = data.postID
+    DBManager.addTranslationToPost(translatedText=translatedText, userLang=userLang, postID=postID)
+    return JSONResponse({"message": "Translation Added"}, status_code=200)
+
+
+@app.get("/getUserByID", summary = "A way to get a User's information by their ID")
+def getUserByID(data: userid, request: Request):
+    userID = data.userID
+    user = DBManager.getUserById(userID)
+    pfpUrl = user.profilePicture['url']
+    pfpFileId = user.profilePicture['fileId']
+    userDict = user.__dict__
+    returnedDict = {'_id': str(userDict['_id']), 'email': userDict['email'], 'language': userDict['language'], 'nationality': userDict['nationality'], 'username': userDict['username'], 'profilePicture.url': pfpUrl, 'profilePicture.fileId' : pfpFileId}
+    return JSONResponse(content = returnedDict, status_code = 200)
+
+
