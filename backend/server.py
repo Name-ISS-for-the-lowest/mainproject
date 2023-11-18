@@ -6,6 +6,7 @@ from JSONmodels.postdata import postdata
 from JSONmodels.postfetcher import postfetcher
 from JSONmodels.userid import userid
 from JSONmodels.translationAddition import translationAddition
+from JSONmodels.postid import postid
 from classes.PasswordHasher import PassHasher
 from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -244,12 +245,10 @@ def getPosts(data: postfetcher, request: Request):
 
 ##if post is liked then it will unlike it
 @app.post("/likePost", summary="Like a post, if already liked it will be unliked")
-def likePost(data: postdata, request: Request):
+def likePost(data: postid, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
-    postID = data.postID
-    DBManager.likePost(userID, postID)
+    DBManager.likePost(userID, data.postID)
     return JSONResponse({"message": "Post liked"}, status_code=200)
-
 
 @app.get(
     "/translate",
