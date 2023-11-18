@@ -57,6 +57,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.8"
+  country_picker:
+    dependency: "direct main"
+    description:
+      name: country_picker
+      sha256: "931454ceb75c7e1230ac5620bfe601a5a293b4436d8de8bf7fea776a05a9568c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.22"
   csslib:
     dependency: transitive
     description:
@@ -192,6 +200,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.18.1"
+  language_picker:
+    dependency: transitive
+    description:
+      name: language_picker
+      sha256: "1f5293675ec1359b72979dac8f8d4662d18d6d1b0a484343367cfbbbbcfca3f3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.3"
   lints:
     dependency: transitive
     description:
@@ -304,6 +320,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.1"
+  reactive_forms:
+    dependency: transitive
+    description:
+      name: reactive_forms
+      sha256: b7d64d8fe45c19f506c762e219f4c6a3bdcfc4842d6fba98f866be5fca75d8e5
+      url: "https://pub.dev"
+    source: hosted
+    version: "16.1.1"
+  reactive_language_picker:
+    dependency: "direct main"
+    description:
+      name: reactive_language_picker
+      sha256: df22902935607536fa421bd83b583c622979a111a2511f55a49d067d03c359d0
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
+  recase:
+    dependency: transitive
+    description:
+      name: recase
+      sha256: e4eb4ec2dcdee52dcf99cb4ceabaffc631d7424ee55e56f280bc039737f89213
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.0"
   shared_preferences:
     dependency: "direct main"
     description:
