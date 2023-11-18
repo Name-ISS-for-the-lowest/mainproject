@@ -2,8 +2,6 @@ from fastapi import FastAPI, Request, Response, UploadFile
 from fastapi.responses import JSONResponse, HTMLResponse
 from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
-from JSONmodels.postdata import postdata
-from JSONmodels.postfetcher import postfetcher
 from JSONmodels.userid import userid
 from JSONmodels.translationAddition import translationAddition
 from classes.PasswordHasher import PassHasher
@@ -224,60 +222,71 @@ async def uploadPhoto(photo: UploadFile, name: str):
 
 
 @app.post("/createPost")
-def createPost(data: postdata, request: Request):
+def createPost(postBody: str, request: Request):
     id = IdFromCookie(request.cookies["session_cookie"])
-    DBManager.addPost(id, data.postBody)
+    DBManager.addPost(id, postBody)
     return JSONResponse({"message": "Post Added"}, status_code=200)
 
 
 @app.get("/getPosts")
-def getPosts(data: postfetcher, request: Request):
+def getPosts(start: int, end: int, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
     print("userID: ", userID)
-    start = data.start
-    end = data.end
-    userLang = data.userLang
     posts = DBManager.getPosts(start=start, end=end, userID=userID)
-    posts = Post.listToJson(posts, userLang)
+    posts = Post.listToJson(posts)
     return posts
 
 
 ##if post is liked then it will unlike it
 @app.post("/likePost", summary="Like a post, if already liked it will be unliked")
-def likePost(data: postdata, request: Request):
+def likePost(postID: str, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
-    postID = data.postID
-    DBManager.likePost(userID, postID)
-    return JSONResponse({"message": "Post liked"}, status_code=200)
+    postID = postID
+    response = DBManager.likePost(postID, userID)
+    return JSONResponse(response, status_code=200)
 
 
+# both target and source are optional
+# target language defaults to english
+# source language can be infered
 @app.get(
     "/translate",
     summary="Translate a string from one language to another",
 )
-def translate(data: translateData, request: Request):
-    result = Translator.translate(data.content, data.target, data.source)
+def translate(content: str, target: str = "en", source: str = ""):
+    result = Translator.translate(content, target, source)
     print("made it here")
     print(result)
     return JSONResponse({"result": result}, status_code=200)
 
-@app.post("/addTranslation", summary="Add a translation to the post entry for later retrieval")
+
+@app.post(
+    "/addTranslation", summary="Add a translation to the post entry for later retrieval"
+)
 def addTranslation(data: translationAddition, request: Request):
     translatedText = data.translatedText
     userLang = data.userLang
     postID = data.postID
-    DBManager.addTranslationToPost(translatedText=translatedText, userLang=userLang, postID=postID)
+    DBManager.addTranslationToPost(
+        translatedText=translatedText, userLang=userLang, postID=postID
+    )
     return JSONResponse({"message": "Translation Added"}, status_code=200)
 
 
-@app.get("/getUserByID", summary = "A way to get a User's information by their ID")
+@app.get("/getUserByID", summary="A way to get a User's information by their ID")
 def getUserByID(data: userid, request: Request):
     userID = data.userID
     user = DBManager.getUserById(userID)
-    pfpUrl = user.profilePicture['url']
-    pfpFileId = user.profilePicture['fileId']
+    pfpUrl = user.profilePicture["url"]
+    pfpFileId = user.profilePicture["fileId"]
     userDict = user.__dict__
-    returnedDict = {'_id': str(userDict['_id']), 'email': userDict['email'], 'language': userDict['language'], 'nationality': userDict['nationality'], 'username': userDict['username'], 'profilePicture.url': pfpUrl, 'profilePicture.fileId' : pfpFileId}
-    return JSONResponse(content = returnedDict, status_code = 200)
-
-
+    returnedDict = {
+        "_id": str(userDict["_id"]),
+        "email": userDict["email"],
+        "language": userDict["language"],
+        "nationality": userDict["nationality"],
+        "username": userDict["username"],
+        "profilePicture.url": pfpUrl,
+        "profilePicture.fileId": pfpFileId,
+    }
+    return JSONResponse(content=returnedDict, status_code=200)
