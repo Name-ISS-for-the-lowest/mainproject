@@ -132,8 +132,8 @@ class DBManager:
             {"_id": ObjectId(postID)},
             {"$set": {f"translations.{userLang}": translatedText}},
         )
-        # print(result.matchedCount)
-        if result.matchedCount == 1:
+        # print(result.matched_count)
+        if result.matched_count == 1:
             return {"message": "Translation added"}
         else:
             return {"message": "Post not found"}
