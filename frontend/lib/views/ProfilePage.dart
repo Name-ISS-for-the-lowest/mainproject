@@ -63,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 textScaleFactor: 2,
                 ),
               trailing: IconButton(
-                //alignment: ,
+                alignment: Alignment.centerRight,
                 icon: Icon(Icons.edit_note),
                 onPressed: (){
 
