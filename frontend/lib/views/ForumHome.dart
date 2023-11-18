@@ -162,6 +162,7 @@ class _ForumHomeState extends State<ForumHome> {
       }
     } else {
       var translationCall = await PostHelper.getTranslation(originalText);
+      print("translationCall: ");
       print(translationCall);
       if (mounted) {
         setState(() {
@@ -254,7 +255,7 @@ class _ForumHomeState extends State<ForumHome> {
                 double calculatedHeight = (postContent.length / 25 * 14) + 50;
                 if (postTooLong) calculatedHeight += 35;
 
-                return Container(
+                return SizedBox(
                   height: calculatedHeight + 100,
                   child: Stack(
                     children: [

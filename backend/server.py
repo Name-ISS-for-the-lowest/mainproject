@@ -2,10 +2,6 @@ from fastapi import FastAPI, Request, Response, UploadFile
 from fastapi.responses import JSONResponse, HTMLResponse
 from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
-from JSONmodels.postdata import postdata
-from JSONmodels.postfetcher import postfetcher
-from JSONmodels.userid import userid
-from JSONmodels.translationAddition import translationAddition
 from JSONmodels.postid import postid
 from JSONmodels.postsearch import postsearch
 from classes.PasswordHasher import PassHasher
@@ -18,7 +14,6 @@ from models.Post import Post
 from bson import ObjectId
 import migrate
 from classes.Translator import Translator
-from JSONmodels.translateData import translateData
 
 
 app = FastAPI(title="ISS App")
@@ -226,37 +221,38 @@ async def uploadPhoto(photo: UploadFile, name: str):
 
 
 @app.post("/createPost")
-def createPost(data: postdata, request: Request):
+def createPost(postBody: str, request: Request):
     id = IdFromCookie(request.cookies["session_cookie"])
-    DBManager.addPost(id, data.postBody)
+    DBManager.addPost(id, postBody)
     return JSONResponse({"message": "Post Added"}, status_code=200)
 
 
 @app.get("/getPosts")
-def getPosts(data: postfetcher, request: Request):
+def getPosts(start: int, end: int, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
     print("userID: ", userID)
-    start = data.start
-    end = data.end
-    userLang = data.userLang
     posts = DBManager.getPosts(start=start, end=end, userID=userID)
-    posts = Post.listToJson(posts, userLang)
+    posts = Post.listToJson(posts)
     return posts
 
 
 ##if post is liked then it will unlike it
 @app.post("/likePost", summary="Like a post, if already liked it will be unliked")
-def likePost(data: postid, request: Request):
+def likePost(postID: str, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
-    DBManager.likePost(userID, data.postID)
-    return JSONResponse({"message": "Post liked"}, status_code=200)
+    response = DBManager.likePost(postID, userID)
+    return JSONResponse(response, status_code=200)
 
+
+# both target and source are optional
+# target language defaults to english
+# source language can be infered
 @app.get(
     "/translate",
     summary="Translate a string from one language to another",
 )
-def translate(data: translateData, request: Request):
-    result = Translator.translate(data.content, data.target, data.source)
+def translate(content: str, target: str = "en", source: str = ""):
+    result = Translator.translate(content, target, source)
     print("made it here")
     print(result)
     return JSONResponse({"result": result}, status_code=200)
@@ -282,12 +278,11 @@ def getLanguageDictionary(request: Request):
 
 
 
-@app.get("/getUserByID", summary = "A way to get a User's information by their ID")
-def getUserByID(data: userid, request: Request):
-    userID = data.userID
+@app.get("/getUserByID", summary="A way to get a User's information by their ID")
+def getUserByID(userID: str, request: Request):
     user = DBManager.getUserById(userID)
-    pfpUrl = user.profilePicture['url']
-    pfpFileId = user.profilePicture['fileId']
+    pfpUrl = user.profilePicture["url"]
+    pfpFileId = user.profilePicture["fileId"]
     userDict = user.__dict__
     returnedDict = {'_id': str(userDict['_id']), 'email': userDict['email'], 'language': userDict['language'], 'nationality': userDict['nationality'], 'username': userDict['username'], 'profilePicture.url': pfpUrl, 'profilePicture.fileId' : pfpFileId}
     return JSONResponse(content = returnedDict, status_code = 200)

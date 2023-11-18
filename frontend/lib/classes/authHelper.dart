@@ -67,34 +67,17 @@ class AuthHelper {
   }
 
   static Future<bool> isLoggedIn() async {
-    String endPoint = '/login';
-    var url = '$defaultHost$endPoint';
-    Uri uri = Uri.parse(url);
-    List<Cookie> cookies = await RouteHandler.cookieJar.loadForRequest(uri);
-
-    for (var cookie in cookies) {
-      if (cookie.name == 'session_cookie') {
-        var decoded = Uri.decodeFull(cookie.value);
-        decoded = decoded.replaceAll("+", " ");
-        var cookieObject = json.decode(decoded);
-        String expiration = cookieObject['expires'];
-        DateTime now = DateTime.now();
-        DateTime expirationDate =
-            DateFormat('EEE, dd MMM yyyy HH:mm:ss').parse(expiration);
-        if (now.isBefore(expirationDate)) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }
-    return false;
+    var sessionCookie = await readCookie('session_cookie');
+    if (sessionCookie == null) return false;
+    await cacheUserInfo();
+    return true;
   }
 
   static readCookie(String key) async {
     String endPoint = '/login';
     var url = '$defaultHost$endPoint';
     Uri uri = Uri.parse(url);
+    await RouteHandler.init();
     List<Cookie> cookies = await RouteHandler.cookieJar.loadForRequest(uri);
     for (var cookie in cookies) {
       if (cookie.name == key) {
@@ -107,32 +90,17 @@ class AuthHelper {
   }
 
   static cacheUserInfo() async {
-    String endPoint = '/login';
-    String userID;
+    var sessionCookie = await readCookie('session_cookie');
+    String userID = sessionCookie['user_id'];
+    String endPoint = '/getUserByID';
     var url = '$defaultHost$endPoint';
-    Uri uri = Uri.parse(url);
-    var data = {};
-    List<Cookie> cookies = await RouteHandler.cookieJar.loadForRequest(uri);
-
-    for (var cookie in cookies) {
-      if (cookie.name == 'session_cookie') {
-        var decoded = Uri.decodeFull(cookie.value);
-        decoded = decoded.replaceAll("+", " ");
-        var cookieObject = json.decode(decoded);
-        userID = cookieObject['user_id'];
-        print("the user id...");
-        print(userID);
-        data = {'userID': userID};
-        break;
-      }
-    }
-    endPoint = '/getUserByID';
-    url = '$defaultHost$endPoint';
-    uri = Uri.parse(url);
+    var params = {
+      'userID': userID,
+    };
 
     try {
       final response = await RouteHandler.dio.get(url,
-          data: jsonEncode(data),
+          queryParameters: params,
           options: Options(contentType: Headers.jsonContentType));
       var userInfo = response.data;
       userInfoCache['_id'] = userInfo['_id'];

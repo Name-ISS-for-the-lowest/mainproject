@@ -46,7 +46,6 @@ class DBManager:
             return None
         else:
             return User.fromDict(user)
-        
 
     @staticmethod
     def activateAccount(token):
@@ -121,22 +120,36 @@ class DBManager:
     def likePost(postID, userID):
         # check if the user has already liked the post
         comboID = str(postID) + str(userID)
+        postID = ObjectId(postID)
         likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
         if likedResult is None:
             # increment the likes
-            DBManager.db["posts"].update_one({"_id": postID}, {"$inc": {"likes": 1}})
+            result = DBManager.db["posts"].update_one(
+                {"_id": postID}, {"$inc": {"likes": 1}}
+            )
+            # print(result.modified_count)
+
             # add the like to the likes collection
             DBManager.db["likes"].insert_one({"comboID": comboID})
+            return {"message": "Post liked"}
         else:
             # decrement the likes
             DBManager.db["posts"].update_one({"_id": postID}, {"$inc": {"likes": -1}})
             # remove the like from the likes collection
             DBManager.db["likes"].delete_one({"comboID": comboID})
+            return {"message": "Post unliked"}
 
     @staticmethod
     def addTranslationToPost(translatedText, userLang, postID):
-        DBManager.db["posts"].update_one({"_id": ObjectId(postID)}, {"$set": {f"translations.{userLang}": translatedText}})
-
+        result = DBManager.db["posts"].update_one(
+            {"_id": ObjectId(postID)},
+            {"$set": {f"translations.{userLang}": translatedText}},
+        )
+        # print(result.matched_count)
+        if result.matched_count == 1:
+            return {"message": "Translation added"}
+        else:
+            return {"message": "Post not found"}
 
     def insertUserList(users: [User]):
         for user in users:
