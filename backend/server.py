@@ -2,8 +2,6 @@ from fastapi import FastAPI, Request, Response, UploadFile
 from fastapi.responses import JSONResponse, HTMLResponse
 from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
-from JSONmodels.userid import userid
-from JSONmodels.translationAddition import translationAddition
 from classes.PasswordHasher import PassHasher
 from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -14,7 +12,6 @@ from models.Post import Post
 from bson import ObjectId
 import migrate
 from classes.Translator import Translator
-from JSONmodels.translateData import translateData
 
 
 app = FastAPI(title="ISS App")

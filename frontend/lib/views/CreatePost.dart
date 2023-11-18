@@ -12,12 +12,11 @@ class CreatePost extends StatefulWidget {
 }
 
 class _CreatePostState extends State<CreatePost> {
-  @override
   void navigateToPrimaryScreens() {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return Scaffold(
+          return const Scaffold(
             body: CoreTemplate(),
           );
         },
@@ -32,58 +31,46 @@ class _CreatePostState extends State<CreatePost> {
     String currentPostBody = "";
     String userID = userInfo['_id'];
     return Scaffold(
-      backgroundColor: Color(0xffece7d5),
-      body: Container(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 75,
-              width: 412,
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Positioned(
-                    left: 5,
-                    bottom: 5,
-                    child: GestureDetector(
-                      onTap: () {
-                        navigateToPrimaryScreens();
-                      },
-                      child: SvgPicture.asset(
-                        "assets/icon-x.svg",
-                        width: 20,
-                        height: 20,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 5,
-                    child: Text(
-                      "New Post",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+      appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.black),
+          leading: GestureDetector(
+            child: const Icon(
+              Icons.close,
+              color: Colors.black,
+              size: 30,
             ),
-            Container(
+            onTap: () => navigateToPrimaryScreens(),
+          ),
+          title: const Text(
+            "New Post",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.black,
+            ),
+          ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1.0),
+            child: Container(
               height: 1.0, // Set the desired height of the line
-              color: Color(0x5f000000),
-              margin: EdgeInsets.symmetric(vertical: 0),
+              color: const Color(0x5f000000),
             ),
-            Container(
-              width: 412,
-              height: 814,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 10,
-                    top: 10,
-                    child: Container(
+          )),
+      backgroundColor: const Color(0xffece7d5),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
@@ -96,68 +83,72 @@ class _CreatePostState extends State<CreatePost> {
                         ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    left: 34.5,
-                    top: 70,
-                    child: Container(
-                      width: 1,
-                      height: 200,
-                      color: Color(0x5f000000),
-                      margin: EdgeInsets.symmetric(vertical: 0),
-                    ),
-                  ),
-                  Positioned(
-                    top: 22.5,
-                    left: 70,
-                    child: Text(
-                      screenName,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    right: 20,
-                    top: 22.5,
-                    child: GestureDetector(
-                      onTap: () async {
-                        var response = await PostHelper.createPost(
-                            userID, currentPostBody);
-                        navigateToPrimaryScreens();
-                      },
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        "Publish Post",
-                        style: TextStyle(
-                          color: Color(0xff007EF1),
+                        screenName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    var response =
+                        await PostHelper.createPost(userID, currentPostBody);
+                    navigateToPrimaryScreens();
+                  },
+                  child: const Text(
+                    "Publish Post",
+                    style: TextStyle(
+                      color: Color(0xff007EF1),
+                    ),
                   ),
-                  Positioned(
-                    left: 50,
-                    top: 50,
-                    child: Container(
-                        width: 280,
-                        height: 500,
-                        child: TextField(
-                          controller: TextEditingController(),
-                          decoration: InputDecoration(
-                            hintText: 'Begin Typing',
-                            border: InputBorder.none,
-                          ),
-                          keyboardType: TextInputType.multiline,
-                          maxLines: null,
-                          onChanged: (text) {
-                            currentPostBody = text;
-                          },
-                        )),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          Row(
+            children: [
+              Container(
+                width: 45,
+                height: 200,
+                decoration: const BoxDecoration(
+                  //only set right border
+                  border: Border(
+                    right: BorderSide(
+                      color: Color(0x5f000000),
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  height: 200,
+                  child: TextField(
+                    controller: TextEditingController(),
+                    decoration: const InputDecoration(
+                      hintText: 'Begin Typing',
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(
+                          vertical: 15.0, horizontal: 10.0),
+                    ),
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    onChanged: (text) {
+                      currentPostBody = text;
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
