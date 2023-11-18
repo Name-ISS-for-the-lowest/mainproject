@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/postHelper.dart';
+import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 
 class CreatePost extends StatefulWidget {
@@ -25,9 +26,11 @@ class _CreatePostState extends State<CreatePost> {
   }
 
   Widget build(BuildContext context) {
-    String profilePicture = 'assets/DefaultPFPs/pfp-mrwhiskers.png';
-    String screenName = 'Mr. Whiskers';
+    var userInfo = AuthHelper.userInfoCache;
+    String imageURL = userInfo['profilePicture.url'];
+    String screenName = userInfo['username'];
     String currentPostBody = "";
+    String userID = userInfo['_id'];
     return Scaffold(
       backgroundColor: Color(0xffece7d5),
       body: Container(
@@ -80,10 +83,18 @@ class _CreatePostState extends State<CreatePost> {
                   Positioned(
                     left: 10,
                     top: 10,
-                    child: Image.asset(
-                      profilePicture,
-                      height: 50,
+                    child: Container(
                       width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          fit: BoxFit.fill,
+                          image: NetworkImage(
+                            "$imageURL?tr=w-50,h-50,fo-auto",
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                   Positioned(
@@ -112,7 +123,7 @@ class _CreatePostState extends State<CreatePost> {
                     child: GestureDetector(
                       onTap: () async {
                         var response = await PostHelper.createPost(
-                            '655007dd8b56155f6e11fb55', currentPostBody);
+                            userID, currentPostBody);
                         navigateToPrimaryScreens();
                       },
                       child: Text(

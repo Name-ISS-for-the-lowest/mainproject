@@ -1,8 +1,7 @@
 import 'dart:convert';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:cookie_jar/cookie_jar.dart';
+
 import 'package:dio/dio.dart';
-import 'package:intl/intl.dart';
+import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/routeHandler.dart';
 
 class PostHelper {
@@ -28,7 +27,11 @@ class PostHelper {
   }
 
   static getPosts(int start, int end) async {
-    final data = {'start': start, 'end': end};
+    final data = {
+      'start': start,
+      'end': end,
+      'userLang': AuthHelper.userInfoCache['language']
+    };
     String endPoint = '/getPosts';
     final url = '$defaultHost$endPoint';
     try {
@@ -45,8 +48,28 @@ class PostHelper {
     }
   }
 
+  static likePost(String postID) async {
+    final data = {'postID': postID};
+    String endPoint = '/likePost';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.post(url,
+          data: jsonEncode(data),
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': 'post machine broke lil bro'},
+        statusCode: 500,
+      );
+    }
+  }
+
   static getTranslation(String input) async {
-    final data = {'source': 'en', 'target': 'es', 'content': input};
+    String targetLang = AuthHelper.userInfoCache['language'];
+    print(targetLang);
+    final data = {'source': 'en', 'target': targetLang, 'content': input};
     String endPoint = '/translate';
     final url = '$defaultHost$endPoint';
     try {
@@ -54,6 +77,29 @@ class PostHelper {
           data: jsonEncode(data),
           options: Options(contentType: Headers.jsonContentType));
       return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': 'post machine broke lil bro'},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static storeTranslation(String translatedText, String postID) async {
+    String userLang = AuthHelper.userInfoCache['language'];
+    final data = {
+      'translatedText': translatedText,
+      'userLang': userLang,
+      'postID': postID
+    };
+    String endPoint = '/addTranslation';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.post(url,
+          data: jsonEncode(data),
+          options: Options(contentType: Headers.jsonContentType));
+      return response;
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),

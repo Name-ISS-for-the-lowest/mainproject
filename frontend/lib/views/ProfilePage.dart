@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:country_picker/country_picker.dart';
+import 'package:reactive_language_picker/reactive_language_picker.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -13,6 +16,7 @@ class _ProfilePageState extends State<ProfilePage> {
     String profilePicture = "assets/DefaultPFPs/pfp-mrwhiskers.png";
     String displayName = "Mr. Whiskers";
     String nationality = "Brazilian";
+    String language = "English";
     String emailAddress = "mrwhiskers@csus.edu";
 
     return Scaffold(
@@ -35,64 +39,115 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Positioned.fill(
                   left: 140,
-                  child: Align(
+                  child: Align(                      
                       alignment: Alignment.bottomCenter,
-                      child: const Icon(
-                        Icons.camera_alt,
-                        size: 50,
-                      )),
+                      child: IconButton(
+                        icon: Icon(Icons.camera_alt),
+                        iconSize: 50,
+                        onPressed: (){
+                          
+                        },
+                      ),
+                  ),
                 ),
-              ],
-            ),
+            ],
+          ),
 
-            // Container(
-            //   child: Image.asset(
-            //     profilePicture,
-            //     height: 150,
-            //     width: 150,
-            //     //trailing: Icon(Icons.camera_alt),
-            //   ),
+          //USERNAME
+          Container( 
+            child: ListTile(
+              //leading: Icon(Icons.person),
+              title: Text(
+                displayName, 
+                textAlign: TextAlign.center,
+                textScaleFactor: 2,
+                ),
+              trailing: IconButton(
+                //alignment: ,
+                icon: Icon(Icons.edit_note),
+                onPressed: (){
 
-            // ),
-
-            //USERNAME
-            Container(
-              child: ListTile(
-                leading: Icon(Icons.person),
-                title: Text('Display Name'),
-                subtitle: Text(displayName),
-                trailing: Icon(Icons.edit_note),
+                },
+                
               ),
             ),
+          ),
 
-            //NATIONALITY
-            Container(
-              child: ListTile(
-                leading: Icon(Icons.flag),
-                title: Text('Nationality'),
-                subtitle: Text(nationality),
-                trailing: Icon(Icons.edit_note),
+          //NATIONALITY
+          Container(
+            child: ListTile(
+              leading: Icon(Icons.flag),
+              title: Text('Nationality'),
+              subtitle: Text(nationality),
+              trailing: IconButton(
+                icon: Icon(Icons.edit_note),
+
+                onPressed: (){
+                  showCountryPicker(
+                    context: context,
+                    favorite: <String>['US', 'CN', 'MX', 'IN'],
+                    //exclude: <String>['FR'],
+                    countryListTheme: CountryListThemeData(
+                      backgroundColor: Color(0xffece7d5),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(0),
+                        topRight: Radius.circular(0),
+                      ),
+                    ),
+                    onSelect: (Country country) {
+                    print('Select country: ${country.displayName}');
+                    },
+                  );
+                },
               ),
             ),
+          ),
 
-            Container(
-              child: ListTile(
-                leading: Icon(Icons.mail),
-                title: Text('Email Address'),
-                subtitle: Text(emailAddress),
+          //Language
+          Container(
+            child: ListTile(
+              leading: Icon(Icons.chat_rounded),
+              title: Text('Language'),
+              subtitle: Text(language),
+              trailing: IconButton(
+                icon: Icon(Icons.edit_note),
+                onPressed: (){
+                  
+                },
               ),
             ),
+          ),
 
-            Container(
-              child: ListTile(
-                leading: Icon(Icons.delete),
-                iconColor: Colors.redAccent,
-                title: Text('Delete Account'),
-                subtitle: Text('This action cannot be restored.'),
-                textColor: Colors.redAccent,
-              ),
+          //EMAIL ADDRESS
+          Container(
+            child: ListTile(
+              leading: Icon(Icons.mail),
+              title: Text('Email Address'),
+              subtitle: Text(emailAddress),
             ),
-          ],
-        ));
+          ),
+
+          //DELETE ACCOUNT
+          Container(
+            child: ListTile(
+              leading: Icon(Icons.delete),
+              iconColor: Colors.redAccent,
+              title: Text('Delete Account'),
+              subtitle: Text('This action cannot be restored.'),
+              textColor: Colors.redAccent,
+
+              onTap: (){
+
+              },
+            ),
+          ),
+
+        ],
+      )
+
+
+
+
+    );
   }
 }
