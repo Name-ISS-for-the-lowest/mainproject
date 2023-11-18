@@ -128,10 +128,15 @@ class DBManager:
 
     @staticmethod
     def addTranslationToPost(translatedText, userLang, postID):
-        DBManager.db["posts"].update_one(
+        result = DBManager.db["posts"].update_one(
             {"_id": ObjectId(postID)},
             {"$set": {f"translations.{userLang}": translatedText}},
         )
+        # print(result.matchedCount)
+        if result.matchedCount == 1:
+            return {"message": "Translation added"}
+        else:
+            return {"message": "Post not found"}
 
     def insertUserList(users: [User]):
         for user in users:

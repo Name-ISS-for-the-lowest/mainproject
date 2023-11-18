@@ -106,12 +106,9 @@ class AuthHelper {
   }
 
   static cacheUserInfo() async {
-    String endPoint = '/login';
     String userID;
-    var url = '$defaultHost$endPoint';
-    Uri uri = Uri.parse(url);
     var data = {};
-    List<Cookie> cookies = await RouteHandler.cookieJar.loadForRequest(uri);
+    String sessionCookie = readCookie('session_cookie');
 
     for (var cookie in cookies) {
       if (cookie.name == 'session_cookie') {
@@ -125,9 +122,9 @@ class AuthHelper {
         break;
       }
     }
-    endPoint = '/getUserByID';
-    url = '$defaultHost$endPoint';
-    uri = Uri.parse(url);
+    String endPoint = '/getUserByID';
+    var url = '$defaultHost$endPoint';
+    var uri = Uri.parse(url);
 
     try {
       final response = await RouteHandler.dio.get(url,

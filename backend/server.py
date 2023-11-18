@@ -263,19 +263,15 @@ def translate(content: str, target: str = "en", source: str = ""):
 @app.post(
     "/addTranslation", summary="Add a translation to the post entry for later retrieval"
 )
-def addTranslation(data: translationAddition, request: Request):
-    translatedText = data.translatedText
-    userLang = data.userLang
-    postID = data.postID
-    DBManager.addTranslationToPost(
+def addTranslation(translatedText: str, userLang: str, postID: str, request: Request):
+    response = DBManager.addTranslationToPost(
         translatedText=translatedText, userLang=userLang, postID=postID
     )
-    return JSONResponse({"message": "Translation Added"}, status_code=200)
+    return JSONResponse(response, status_code=200)
 
 
 @app.get("/getUserByID", summary="A way to get a User's information by their ID")
-def getUserByID(data: userid, request: Request):
-    userID = data.userID
+def getUserByID(userID: str, request: Request):
     user = DBManager.getUserById(userID)
     pfpUrl = user.profilePicture["url"]
     pfpFileId = user.profilePicture["fileId"]

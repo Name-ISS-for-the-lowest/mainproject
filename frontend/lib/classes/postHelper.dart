@@ -71,7 +71,7 @@ class PostHelper {
 
   static storeTranslation(String translatedText, String postID) async {
     String userLang = AuthHelper.userInfoCache['language'];
-    final data = {
+    final params = {
       'translatedText': translatedText,
       'userLang': userLang,
       'postID': postID
@@ -80,13 +80,13 @@ class PostHelper {
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.post(url,
-          data: jsonEncode(data),
+          queryParameters: params,
           options: Options(contentType: Headers.jsonContentType));
       return response;
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),
-        data: {'message': 'post machine broke lil bro'},
+        data: {'message': e},
         statusCode: 500,
       );
     }
