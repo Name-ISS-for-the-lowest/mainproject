@@ -64,6 +64,20 @@ class _ForumHomeState extends State<ForumHome> {
     }
   }
 
+  String formatLargeNumber(int number) {
+    if (number < 1000) {
+      return number.toString();
+    }
+    double num = number / 1000.0;
+    String suffix = 'K';
+
+    if (num >= 1000) {
+      num /= 1000.0;
+      suffix = 'M';
+    }
+    return '${num.toStringAsFixed(1)}$suffix';
+  }
+
   void reload() {
     addData();
   }
@@ -115,6 +129,9 @@ class _ForumHomeState extends State<ForumHome> {
           String imageURL = postData[index]["profilePicture"]['url'];
           String posterName = postData[index]["username"];
           String postContent = postData[index]["content"];
+          String postID = postData[index]["_id"];
+          late int likes = postData[index]['likes'];
+          String formattedLikes = formatLargeNumber(likes);
           postContent = postContent.replaceAll('\n', ' ');
           bool postTooLong = false;
           if (postContent.length > 200) {
@@ -208,9 +225,12 @@ class _ForumHomeState extends State<ForumHome> {
                   bottom: 33,
                   left: 50,
                   child: GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Heart Tapped")));
+                          const SnackBar(content: Text("Heart Tapped")));
+                      var response = await PostHelper.likePost(postID);
+                      likes = postData[index]['likes'];
+                      print(postID);
                     },
                     child: SvgPicture.asset(
                       "assets/PostUI/icon-heart.svg",
@@ -220,8 +240,15 @@ class _ForumHomeState extends State<ForumHome> {
                   ),
                 ),
                 Positioned(
+                  bottom: 15,
+                  left: 45,
+                  child: Text(
+                    likes.toString(),
+                    style: TextStyle(fontSize: 11)),
+                ),
+                Positioned(
                   bottom: 33,
-                  left: 80,
+                  left:85,
                   child: GestureDetector(
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
