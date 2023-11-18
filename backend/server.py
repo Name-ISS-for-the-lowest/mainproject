@@ -2,6 +2,8 @@ from fastapi import FastAPI, Request, Response, UploadFile
 from fastapi.responses import JSONResponse, HTMLResponse
 from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
+from JSONmodels.postid import postid
+from JSONmodels.postsearch import postsearch
 from classes.PasswordHasher import PassHasher
 from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -238,7 +240,6 @@ def getPosts(start: int, end: int, request: Request):
 @app.post("/likePost", summary="Like a post, if already liked it will be unliked")
 def likePost(postID: str, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
-    postID = postID
     response = DBManager.likePost(postID, userID)
     return JSONResponse(response, status_code=200)
 
@@ -256,15 +257,25 @@ def translate(content: str, target: str = "en", source: str = ""):
     print(result)
     return JSONResponse({"result": result}, status_code=200)
 
+@app.post("/addTranslation", summary="Add a translation to the post entry for later retrieval")
+def addTranslation(data: translationAddition, request: Request):
+    translatedText = data.translatedText
+    userLang = data.userLang
+    postID = data.postID
+    DBManager.addTranslationToPost(translatedText=translatedText, userLang=userLang, postID=postID)
+    return JSONResponse({"message": "Translation Added"}, status_code=200)
 
-@app.post(
-    "/addTranslation", summary="Add a translation to the post entry for later retrieval"
-)
-def addTranslation(translatedText: str, userLang: str, postID: str, request: Request):
-    response = DBManager.addTranslationToPost(
-        translatedText=translatedText, userLang=userLang, postID=postID
-    )
-    return JSONResponse(response, status_code=200)
+@app.get("/getLanguageDictionary", summary="We have a situation where 2 character language codes are the norm for storage and translation, but for actual display we don't wanna use them. This gets the dictionary.")
+def getLanguageDictionary(request: Request):
+    file = open('supportedLanguages.json')
+    data = json.load(file)
+    returned_data = {}
+    for elem in data:
+        lang_code = elem['language']
+        lang_name = elem['name']
+        returned_data[lang_code] = lang_name
+    return JSONResponse(content = json.dumps(returned_data), status_code=200)
+
 
 
 @app.get("/getUserByID", summary="A way to get a User's information by their ID")
@@ -273,13 +284,17 @@ def getUserByID(userID: str, request: Request):
     pfpUrl = user.profilePicture["url"]
     pfpFileId = user.profilePicture["fileId"]
     userDict = user.__dict__
-    returnedDict = {
-        "_id": str(userDict["_id"]),
-        "email": userDict["email"],
-        "language": userDict["language"],
-        "nationality": userDict["nationality"],
-        "username": userDict["username"],
-        "profilePicture.url": pfpUrl,
-        "profilePicture.fileId": pfpFileId,
-    }
-    return JSONResponse(content=returnedDict, status_code=200)
+    returnedDict = {'_id': str(userDict['_id']), 'email': userDict['email'], 'language': userDict['language'], 'nationality': userDict['nationality'], 'username': userDict['username'], 'profilePicture.url': pfpUrl, 'profilePicture.fileId' : pfpFileId}
+    return JSONResponse(content = returnedDict, status_code = 200)
+
+@app.post("/searchPosts", summary="Search Posts using a String input")
+def searchPosts(data: postsearch, request: Request):
+    start = data.start
+    end = data.end
+    search = data.search
+    userID = data.userID
+    posts = DBManager.searchPosts(start, end, search, userID)
+    posts = Post.listToJson(posts)
+    return posts
+
+

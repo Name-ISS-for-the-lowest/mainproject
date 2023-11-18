@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 class AuthHelper {
   static String defaultHost = RouteHandler.defaultHost;
   static Map<String, dynamic> userInfoCache = Map();
+  static Map<String, dynamic> languageNames = Map();
 
   static Future<Response> login(String email, String password) async {
     final data = {'email': email, 'password': password};
@@ -110,9 +111,20 @@ class AuthHelper {
       userInfoCache['profilePicture.url'] = userInfo['profilePicture.url'];
       userInfoCache['profilePicture.fileId'] =
           userInfo['profilePicture.fileId'];
-      print(userInfoCache);
+      try {
+        endPoint = '/getLanguageDictionary';
+        url = '$defaultHost$endPoint';
+        uri = Uri.parse(url);
+        final response2 = await RouteHandler.dio.get(url);
+        languageNames = json.decode(response2.data);
+      } on DioException catch (e) {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'post machine broke lil bro'},
+          statusCode: 500,
+        );
+      }
     } on DioException catch (e) {
-      print(e);
       return Response(
         requestOptions: RequestOptions(path: url),
         data: {'message': 'post machine broke lil bro'},

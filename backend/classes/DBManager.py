@@ -102,6 +102,19 @@ class DBManager:
                 post.liked = True
             returnPosts.append(post)
         return returnPosts
+    
+    @staticmethod
+    def searchPosts(start, end, search, userID):
+        posts = DBManager.db['posts'].find({'content': {'$regex': search, '$options': 'i'}}).sort("_id", -1).skip(start).limit(end)
+        returnPosts = []
+        for elem in posts:
+            post = Post.fromDict(elem)
+            comboID = str(post._id) + str(userID)
+            likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
+            if likedResult is not None:
+                post.liked = True
+            returnPosts.append(post)
+        return returnPosts
 
     @staticmethod
     def likePost(postID, userID):
