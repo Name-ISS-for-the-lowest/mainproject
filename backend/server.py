@@ -258,10 +258,7 @@ def translate(content: str, target: str = "en", source: str = ""):
     return JSONResponse({"result": result}, status_code=200)
 
 @app.post("/addTranslation", summary="Add a translation to the post entry for later retrieval")
-def addTranslation(data: translationAddition, request: Request):
-    translatedText = data.translatedText
-    userLang = data.userLang
-    postID = data.postID
+def addTranslation(translatedText: str, userLang: str, postID: str, request: Request):
     DBManager.addTranslationToPost(translatedText=translatedText, userLang=userLang, postID=postID)
     return JSONResponse({"message": "Translation Added"}, status_code=200)
 

@@ -114,7 +114,7 @@ class AuthHelper {
       try {
         endPoint = '/getLanguageDictionary';
         url = '$defaultHost$endPoint';
-        uri = Uri.parse(url);
+        Uri uri = Uri.parse(url);
         final response2 = await RouteHandler.dio.get(url);
         languageNames = json.decode(response2.data);
       } on DioException catch (e) {
