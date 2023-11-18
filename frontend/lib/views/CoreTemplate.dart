@@ -47,6 +47,7 @@ class _CoreTemplateState extends State<CoreTemplate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Color(0xffece7d5),
         body: Column(
           children: [

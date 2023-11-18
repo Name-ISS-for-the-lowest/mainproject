@@ -96,8 +96,7 @@ class _CreatePostState extends State<CreatePost> {
                 ),
                 GestureDetector(
                   onTap: () async {
-                    var response =
-                        await PostHelper.createPost(userID, currentPostBody);
+                    await PostHelper.createPost(userID, currentPostBody);
                     navigateToPrimaryScreens();
                   },
                   child: const Text(

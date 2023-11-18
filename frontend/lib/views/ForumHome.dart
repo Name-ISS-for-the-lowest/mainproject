@@ -124,6 +124,7 @@ class _ForumHomeState extends State<ForumHome> {
           String imageURL = postData[index]["profilePicture"]['url'];
           String posterName = postData[index]["username"];
           String postContent = postData[index]["content"];
+          print(postData);
           postContent = postContent.replaceAll('\n', ' ');
           bool postTooLong = false;
           if (postContent.length > 200) {
@@ -219,7 +220,7 @@ class _ForumHomeState extends State<ForumHome> {
                   child: GestureDetector(
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Heart Tapped")));
+                          SnackBar(content: const Text("Heart Tapped")));
                     },
                     child: SvgPicture.asset(
                       "assets/PostUI/icon-heart.svg",
