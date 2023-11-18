@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class CreatePost extends StatefulWidget {
   const CreatePost({super.key});
@@ -84,15 +86,19 @@ class _CreatePostState extends State<CreatePost> {
                     left: 10,
                     top: 10,
                     child: Container(
-                      width: 50,
-                      height: 50,
+                      width: 50, // Set your desired width
+                      height: 50, // Set your desired height
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        image: DecorationImage(
+                      ),
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
                           fit: BoxFit.fill,
-                          image: NetworkImage(
-                            "$imageURL?tr=w-50,h-50,fo-auto",
-                          ),
                         ),
                       ),
                     ),
