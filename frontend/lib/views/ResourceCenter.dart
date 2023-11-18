@@ -225,7 +225,7 @@ class _ResourceCenterState extends State<ResourceCenter> {
                   IconButton(
                     onPressed: () {
                       _launchURL(Uri.parse(
-                          "https://www.csus.edu/student-life/health-counseling/"));
+                          "https://www-csus-edu.translate.goog/student-life/health-counseling/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp"));
                     },
                     icon: SvgPicture.asset(
                         "assets/ResourceCenter/icon-heart.svg"),

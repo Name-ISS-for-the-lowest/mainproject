@@ -268,6 +268,18 @@ def addTranslation(data: translationAddition, request: Request):
     DBManager.addTranslationToPost(translatedText=translatedText, userLang=userLang, postID=postID)
     return JSONResponse({"message": "Translation Added"}, status_code=200)
 
+@app.get("/getLanguageDictionary", summary="We have a situation where 2 character language codes are the norm for storage and translation, but for actual display we don't wanna use them. This gets the dictionary.")
+def getLanguageDictionary(request: Request):
+    file = open('supportedLanguages.json')
+    data = json.load(file)
+    returned_data = {}
+    for elem in data:
+        lang_code = elem['language']
+        lang_name = elem['name']
+        returned_data[lang_code] = lang_name
+    return JSONResponse(content = json.dumps(returned_data), status_code=200)
+
+
 
 @app.get("/getUserByID", summary = "A way to get a User's information by their ID")
 def getUserByID(data: userid, request: Request):
