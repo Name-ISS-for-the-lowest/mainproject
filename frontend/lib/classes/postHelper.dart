@@ -48,6 +48,29 @@ class PostHelper {
     }
   }
 
+  static searchPosts(int start, int end, String search, String userID) async {
+    final data = {
+      'start': start,
+      'end': end,
+      'search': search,
+      'userID': userID,
+    };
+    String endPoint = '/searchPosts';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.post(url,
+          data: jsonEncode(data),
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': 'post machine broke lil bro'},
+        statusCode: 500,
+      );
+    }
+  }
+
   static likePost(String postID) async {
     final data = {'postID': postID};
     String endPoint = '/likePost';

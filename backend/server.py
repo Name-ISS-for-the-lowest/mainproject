@@ -7,6 +7,7 @@ from JSONmodels.postfetcher import postfetcher
 from JSONmodels.userid import userid
 from JSONmodels.translationAddition import translationAddition
 from JSONmodels.postid import postid
+from JSONmodels.postsearch import postsearch
 from classes.PasswordHasher import PassHasher
 from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -290,5 +291,15 @@ def getUserByID(data: userid, request: Request):
     userDict = user.__dict__
     returnedDict = {'_id': str(userDict['_id']), 'email': userDict['email'], 'language': userDict['language'], 'nationality': userDict['nationality'], 'username': userDict['username'], 'profilePicture.url': pfpUrl, 'profilePicture.fileId' : pfpFileId}
     return JSONResponse(content = returnedDict, status_code = 200)
+
+@app.post("/searchPosts", summary="Search Posts using a String input")
+def searchPosts(data: postsearch, request: Request):
+    start = data.start
+    end = data.end
+    search = data.search
+    userID = data.userID
+    posts = DBManager.searchPosts(start, end, search, userID)
+    posts = Post.listToJson(posts)
+    return posts
 
 
