@@ -71,18 +71,18 @@ class PostHelper {
   }
 
   static likePost(String postID) async {
-    final data = {'postID': postID};
+    final params = {'postID': postID};
     String endPoint = '/likePost';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.post(url,
-          data: jsonEncode(data),
+          queryParameters: params,
           options: Options(contentType: Headers.jsonContentType));
       return response.data;
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),
-        data: {'message': 'post machine broke lil bro'},
+        data: {'message': e},
         statusCode: 500,
       );
     }

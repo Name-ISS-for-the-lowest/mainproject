@@ -114,20 +114,19 @@ class AuthHelper {
       try {
         endPoint = '/getLanguageDictionary';
         url = '$defaultHost$endPoint';
-        uri = Uri.parse(url);
         final response2 = await RouteHandler.dio.get(url);
         languageNames = json.decode(response2.data);
       } on DioException catch (e) {
         return Response(
           requestOptions: RequestOptions(path: url),
-          data: {'message': 'post machine broke lil bro'},
+          data: {'message': e},
           statusCode: 500,
         );
       }
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),
-        data: {'message': 'post machine broke lil bro'},
+        data: {'message': e},
         statusCode: 500,
       );
     }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/authHelper.dart';
@@ -205,12 +206,13 @@ class _ForumHomeState extends State<ForumHome> {
                     ),
                     keyboardType: TextInputType.text,
                     maxLines: 1,
-                    onChanged: (text) {
-                      currentSearch = text;
-                    },
-                    onSubmitted: (value) async {
+                    // onChanged: (text) {
+                    //   currentSearch = text;
+                    // },
+                    onChanged: (value) async {
+                      currentSearch = value;
                       if (value == "") {
-                        currentSearch = "";
+                        // currentSearch = "";
                         await loadData();
                       } else {
                         await searchPosts(currentSearch);
@@ -224,11 +226,14 @@ class _ForumHomeState extends State<ForumHome> {
               itemCount: postData.length,
               controller: scrollController,
               itemBuilder: (BuildContext context, int index) {
+                print(postData);
                 String imageURL = postData[index]["profilePicture"]['url'];
                 String posterName = postData[index]["username"];
                 String postContent = postData[index]["content"];
                 String postID = postData[index]["_id"];
                 late int likes = postData[index]['likes'];
+                var liked = postData[index]['liked'];
+                // bool liked = postData[index]['liked'];
                 String formattedLikes = formatLargeNumber(likes);
                 postContent = postContent.replaceAll('\n', ' ');
                 bool postTooLong = false;
@@ -327,19 +332,27 @@ class _ForumHomeState extends State<ForumHome> {
                         bottom: 33,
                         left: 50,
                         child: GestureDetector(
-                          onTap: () async {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Heart Tapped")));
-                            var response = await PostHelper.likePost(postID);
-                            likes = postData[index]['likes'];
-                            print(postID);
-                          },
-                          child: SvgPicture.asset(
-                            "assets/PostUI/icon-heart.svg",
-                            height: 20,
-                            width: 20,
-                          ),
-                        ),
+                            onTap: () async {
+                              var response = await PostHelper.likePost(postID);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(response['message'])));
+                              setState(() {
+                                postData[index]['liked'] = !liked;
+
+                                liked = !liked;
+
+                                if (liked) {
+                                  postData[index]['likes']++;
+                                } else {
+                                  postData[index]['likes']--;
+                                }
+                              });
+                            },
+                            child: Icon(
+                              liked ? Icons.favorite : Icons.favorite_border,
+                              color: liked ? Colors.red : Colors.black,
+                              size: 20,
+                            )),
                       ),
                       Positioned(
                         bottom: 15,

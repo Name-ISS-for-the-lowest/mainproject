@@ -102,10 +102,16 @@ class DBManager:
                 post.liked = True
             returnPosts.append(post)
         return returnPosts
-    
+
     @staticmethod
     def searchPosts(start, end, search, userID):
-        posts = DBManager.db['posts'].find({'content': {'$regex': search, '$options': 'i'}}).sort("_id", -1).skip(start).limit(end)
+        posts = (
+            DBManager.db["posts"]
+            .find({"content": {"$regex": search, "$options": "i"}})
+            .sort("_id", -1)
+            .skip(start)
+            .limit(end)
+        )
         returnPosts = []
         for elem in posts:
             post = Post.fromDict(elem)
@@ -127,10 +133,11 @@ class DBManager:
             result = DBManager.db["posts"].update_one(
                 {"_id": postID}, {"$inc": {"likes": 1}}
             )
-            # print(result.modified_count)
+            print(result.modified_count)
 
             # add the like to the likes collection
             DBManager.db["likes"].insert_one({"comboID": comboID})
+            print("liked")
             return {"message": "Post liked"}
         else:
             # decrement the likes

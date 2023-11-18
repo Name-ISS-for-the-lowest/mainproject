@@ -21,6 +21,7 @@ class Post:
         self.user_id = user_id
         self.date = datetime.datetime.now()
         self.likes = 0
+        self.liked = False
         # if parent is none then post is not a reply
         # otherwise the post is a reply to parent
         self.parent_id = parent_id
@@ -51,6 +52,6 @@ class Post:
             if targetLang in post.translations:
                 post.translations = str(post.translations[targetLang])
             else:
-                post.translations = ''
+                post.translations = ""
             post = Post.toJson(post)
         return posts
