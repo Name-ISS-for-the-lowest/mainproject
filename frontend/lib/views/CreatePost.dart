@@ -7,7 +7,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class CreatePost extends StatefulWidget {
-  const CreatePost({super.key});
+  final bool isEditing;
+  final String? originalText;
+  final String? postID;
+  const CreatePost(
+      {super.key, required this.isEditing, this.originalText, this.postID});
 
   @override
   State<CreatePost> createState() => _CreatePostState();
@@ -28,10 +32,25 @@ class _CreatePostState extends State<CreatePost> {
 
   Widget build(BuildContext context) {
     var userInfo = AuthHelper.userInfoCache;
+    bool isEditing = widget.isEditing;
+    String? originalText = widget.originalText;
+    String? originalID = widget.postID;
     String imageURL = userInfo['profilePicture.url'];
     String screenName = userInfo['username'];
-    String currentPostBody = "";
+    String currentPostBody;
+    String postID;
+    if (originalText == null) {
+      currentPostBody = "";
+    } else {
+      currentPostBody = originalText;
+    }
+    if (originalID == null) {
+      postID = "";
+    } else {
+      postID = originalID;
+    }
     String userID = userInfo['_id'];
+
     return Scaffold(
       appBar: AppBar(
           centerTitle: true,
@@ -46,8 +65,8 @@ class _CreatePostState extends State<CreatePost> {
             ),
             onTap: () => navigateToPrimaryScreens(),
           ),
-          title: const Text(
-            "New Post",
+          title: Text(
+            (isEditing) ? "Edit Post" : "New Post",
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -102,8 +121,14 @@ class _CreatePostState extends State<CreatePost> {
                 ),
                 GestureDetector(
                   onTap: () async {
-                    var response =
-                        await PostHelper.createPost(userID, currentPostBody);
+                    if (isEditing) {
+                      var response =
+                          await PostHelper.editPost(postID, currentPostBody);
+                    } else {
+                      var response =
+                          await PostHelper.createPost(userID, currentPostBody);
+                    }
+
                     navigateToPrimaryScreens();
                   },
                   child: const Text(
@@ -137,7 +162,7 @@ class _CreatePostState extends State<CreatePost> {
                   width: MediaQuery.of(context).size.width * 0.8,
                   height: 200,
                   child: TextField(
-                    controller: TextEditingController(),
+                    controller: TextEditingController(text: currentPostBody),
                     decoration: const InputDecoration(
                       hintText: 'Begin Typing',
                       border: InputBorder.none,

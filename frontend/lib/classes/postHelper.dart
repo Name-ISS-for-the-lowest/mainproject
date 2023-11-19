@@ -26,6 +26,25 @@ class PostHelper {
     }
   }
 
+  static Future<Response> editPost(String postID, String postBody) async {
+    final params = {'postID': postID, 'postBody': postBody};
+    String endPoint = '/editPost';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.post(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response;
+    } on DioException catch (e) {
+      print(e);
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
   static getPosts(int start, int end) async {
     final params = {
       'start': start,

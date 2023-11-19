@@ -14,6 +14,8 @@ class Post:
     likes: int
     imagelinks: list
     liked: bool = False
+    edited: bool
+    contentHistory: []
     translations: {}
 
     def __init__(self, content, user_id, parent_id=None):
@@ -25,6 +27,8 @@ class Post:
         # otherwise the post is a reply to parent
         self.parent_id = parent_id
         self.translations = {}
+        self.edited = False
+        self.contentHistory = []
 
     @staticmethod
     def fromDict(dict):
@@ -32,6 +36,21 @@ class Post:
         for key in dict:
             setattr(post, key, dict[key])
         return post
+    
+    @staticmethod
+    def contentHistoryToString(post):
+        if len(post.contentHistory) == 0:
+            return '[]'
+        else:
+            history = '['
+            i = 0
+            for elem in post.contentHistory:
+                history += elem
+                if i != len(post.contentHistory):
+                    history += ','
+                i += 1
+            history += ']'
+        return history
 
     @staticmethod
     def toJson(post):
@@ -39,6 +58,8 @@ class Post:
         post.date = str(post.date)
         post._id = str(post._id)
         post.user_id = str(post.user_id)
+        post.edited = str(post.edited)
+        post.contentHistory = Post.contentHistoryToString(post)
         return json.dumps(post.__dict__)
 
     @staticmethod
@@ -48,6 +69,8 @@ class Post:
             post.date = str(post.date)
             post._id = str(post._id)
             post.user_id = str(post.user_id)
+            post.edited = str(post.edited)
+            post.contentHistory = Post.contentHistoryToString(post)
             if targetLang in post.translations:
                 post.translations = str(post.translations[targetLang])
             else:
