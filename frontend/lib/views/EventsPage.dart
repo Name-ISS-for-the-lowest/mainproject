@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/eventHelper.dart';
 import 'package:frontend/classes/routeHandler.dart';
+import 'package:frontend/views/SearchBar.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:url_launcher/url_launcher.dart';
@@ -147,112 +148,13 @@ class _EventsPageState extends State<EventsPage> {
       appBar: AppBar(
         backgroundColor: const Color(0xffece7d5),
         automaticallyImplyLeading: false,
-        title: SearchBar(
+        title: SearchBarWidget(
           listSetState: setState,
           list: EventHelper.events,
         ),
         toolbarHeight: 40,
       ),
       body: _buildList(),
-    );
-  }
-}
-
-class SearchBar extends StatefulWidget {
-  final Function listSetState;
-  List list;
-  final Function listFetcher;
-
-  static dummyFetcher(String value) async {}
-
-  SearchBar(
-      {super.key,
-      required this.listSetState,
-      required this.list,
-      this.listFetcher = dummyFetcher});
-
-  @override
-  State<SearchBar> createState() => _SearchBarState();
-}
-
-class _SearchBarState extends State<SearchBar> {
-  final TextEditingController _controller = TextEditingController();
-  final Set<dynamic> defaultList = {};
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  //what to do we want to do?
-
-  void performSearch(String value) async {
-    //add all items to set
-    await addAllItemsToSet();
-    print(value.length);
-    print(defaultList.length);
-    if (value.isEmpty) {
-      widget.listSetState(() {
-        widget.list.clear();
-        for (var item in defaultList) {
-          widget.list.add(item);
-        }
-      });
-      return;
-    }
-    String type = inferListItemsType();
-    List newList = [];
-    if (type == "map") {
-      //output, all strings in list
-      for (var item in defaultList) {
-        for (var entry in item.entries) {
-          //lower case both values
-          if (entry.value.toLowerCase().contains(value.toLowerCase())) {
-            newList.add(item);
-            break;
-          }
-        }
-      }
-      widget.list.clear();
-      for (var item in newList) {
-        widget.list.add(item);
-      }
-      print(widget.list);
-      widget.listSetState(() {});
-    }
-  }
-
-  String inferListItemsType() {
-    if (defaultList.elementAt(0) is Map) {
-      return "map";
-    } else if (defaultList.elementAt(0) is String) {
-      return "string";
-    } else {
-      //output error
-      throw Exception("List items are not of type map or string");
-    }
-  }
-
-  addAllItemsToSet() async {
-    for (var item in widget.list) {
-      defaultList.add(item);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: _controller,
-      onChanged: (value) {
-        performSearch(_controller.text);
-      },
-      decoration: const InputDecoration(
-        hintText: 'Search',
-        prefixIcon: Icon(Icons.search),
-        border: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.black),
-        ),
-      ),
     );
   }
 }

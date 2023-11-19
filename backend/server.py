@@ -17,7 +17,7 @@ from classes.Translator import Translator
 
 
 app = FastAPI(title="ISS App")
-# migrate.migrate()
+migrate.migrate()
 
 
 class CookiesMiddleWare(BaseHTTPMiddleware):
