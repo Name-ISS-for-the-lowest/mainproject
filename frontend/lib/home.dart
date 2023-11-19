@@ -13,7 +13,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    RouteHandler.init();
+    // RouteHandler.init();
   }
 
   @override
