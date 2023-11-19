@@ -41,12 +41,12 @@ class _EventsPageState extends State<EventsPage> {
   Widget _buildList() {
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
-      itemBuilder: (context, item) {
-        if (item.isOdd) return const Divider();
-
-        final index = item ~/ 2;
+      itemBuilder: (context, index) {
         //if at bottom of list show loading indicator
         if (index == EventHelper.events.length) {
+          if (EventHelper.fetched == true) {
+            return null;
+          }
           return const Center(
             child: CircularProgressIndicator(),
           );
@@ -65,71 +65,76 @@ class _EventsPageState extends State<EventsPage> {
       onTap: () => {
         _launchURL(Uri.parse(event['url']!)),
       },
-      child: Row(
+      child: Column(
         children: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Text(
-                    event['day']!,
-                    style: const TextStyle(
-                      fontSize: 27,
-                    ),
-                  ),
-                  Text(
-                    event['month']!,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Wrap(
-                    children: <Widget>[
+          Row(
+            children: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
                       Text(
-                        "${event['title']}",
-                        // maxLines: 1,
+                        event['day']!,
                         style: const TextStyle(
-                          fontFamily: 'Inter',
-                          // overflow: TextOverflow.ellipsis,
-                          fontSize: 18,
+                          fontSize: 27,
+                        ),
+                      ),
+                      Text(
+                        event['month']!,
+                        style: const TextStyle(
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      Text(
-                        "${event['date']}",
-                        // maxLines: 4,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      Text(
-                        "${event['location']}",
-                        // maxLines: 2,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          // overflow: TextOverflow.ellipsis
-                        ),
-                      )
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-          )
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        children: <Widget>[
+                          Text(
+                            "${event['title']}",
+                            // maxLines: 1,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              // overflow: TextOverflow.ellipsis,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            "${event['date']}",
+                            // maxLines: 4,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            "${event['location']}",
+                            // maxLines: 2,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                              // overflow: TextOverflow.ellipsis
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const Divider()
         ],
       ),
     );
@@ -139,7 +144,115 @@ class _EventsPageState extends State<EventsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffece7d5),
+      appBar: AppBar(
+        backgroundColor: const Color(0xffece7d5),
+        automaticallyImplyLeading: false,
+        title: SearchBar(
+          listSetState: setState,
+          list: EventHelper.events,
+        ),
+        toolbarHeight: 40,
+      ),
       body: _buildList(),
+    );
+  }
+}
+
+class SearchBar extends StatefulWidget {
+  final Function listSetState;
+  List list;
+  final Function listFetcher;
+
+  static dummyFetcher(String value) async {}
+
+  SearchBar(
+      {super.key,
+      required this.listSetState,
+      required this.list,
+      this.listFetcher = dummyFetcher});
+
+  @override
+  State<SearchBar> createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<SearchBar> {
+  final TextEditingController _controller = TextEditingController();
+  final Set<dynamic> defaultList = {};
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  //what to do we want to do?
+
+  void performSearch(String value) async {
+    //add all items to set
+    await addAllItemsToSet();
+    print(value.length);
+    print(defaultList.length);
+    if (value.isEmpty) {
+      widget.listSetState(() {
+        widget.list.clear();
+        for (var item in defaultList) {
+          widget.list.add(item);
+        }
+      });
+      return;
+    }
+    String type = inferListItemsType();
+    List newList = [];
+    if (type == "map") {
+      //output, all strings in list
+      for (var item in defaultList) {
+        for (var entry in item.entries) {
+          //lower case both values
+          if (entry.value.toLowerCase().contains(value.toLowerCase())) {
+            newList.add(item);
+            break;
+          }
+        }
+      }
+      widget.list.clear();
+      for (var item in newList) {
+        widget.list.add(item);
+      }
+      print(widget.list);
+      widget.listSetState(() {});
+    }
+  }
+
+  String inferListItemsType() {
+    if (defaultList.elementAt(0) is Map) {
+      return "map";
+    } else if (defaultList.elementAt(0) is String) {
+      return "string";
+    } else {
+      //output error
+      throw Exception("List items are not of type map or string");
+    }
+  }
+
+  addAllItemsToSet() async {
+    for (var item in widget.list) {
+      defaultList.add(item);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: _controller,
+      onChanged: (value) {
+        performSearch(_controller.text);
+      },
+      decoration: const InputDecoration(
+        hintText: 'Search',
+        prefixIcon: Icon(Icons.search),
+        border: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.black),
+        ),
+      ),
     );
   }
 }
