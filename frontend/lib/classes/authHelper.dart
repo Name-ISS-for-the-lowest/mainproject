@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 
 class AuthHelper {
   static String defaultHost = RouteHandler.defaultHost;
+  static Map<String, dynamic> userInfoCache = Map();
+  static Map<String, dynamic> languageNames = Map();
 
   static Future<Response> login(String email, String password) async {
     final data = {'email': email, 'password': password};
@@ -21,6 +23,7 @@ class AuthHelper {
         data: jsonEncode(data),
         options: Options(contentType: Headers.jsonContentType),
       );
+      await cacheUserInfo();
       return response;
 
       //on anything but a 200 response this code will run
@@ -64,34 +67,17 @@ class AuthHelper {
   }
 
   static Future<bool> isLoggedIn() async {
-    String endPoint = '/login';
-    var url = '$defaultHost$endPoint';
-    Uri uri = Uri.parse(url);
-    List<Cookie> cookies = await RouteHandler.cookieJar.loadForRequest(uri);
-
-    for (var cookie in cookies) {
-      if (cookie.name == 'session_cookie') {
-        var decoded = Uri.decodeFull(cookie.value);
-        decoded = decoded.replaceAll("+", " ");
-        var cookieObject = json.decode(decoded);
-        String expiration = cookieObject['expires'];
-        DateTime now = DateTime.now();
-        DateTime expirationDate =
-            DateFormat('EEE, dd MMM yyyy HH:mm:ss').parse(expiration);
-        if (now.isBefore(expirationDate)) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }
-    return false;
+    var sessionCookie = await readCookie('session_cookie');
+    if (sessionCookie == null) return false;
+    await cacheUserInfo();
+    return true;
   }
 
   static readCookie(String key) async {
     String endPoint = '/login';
     var url = '$defaultHost$endPoint';
     Uri uri = Uri.parse(url);
+    await RouteHandler.init();
     List<Cookie> cookies = await RouteHandler.cookieJar.loadForRequest(uri);
     for (var cookie in cookies) {
       if (cookie.name == key) {
@@ -100,6 +86,49 @@ class AuthHelper {
         decoded = decoded.replaceAll("+", " ");
         return json.decode(decoded);
       }
+    }
+  }
+
+  static cacheUserInfo() async {
+    var sessionCookie = await readCookie('session_cookie');
+    String userID = sessionCookie['user_id'];
+    String endPoint = '/getUserByID';
+    var url = '$defaultHost$endPoint';
+    var params = {
+      'userID': userID,
+    };
+
+    try {
+      final response = await RouteHandler.dio.get(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      var userInfo = response.data;
+      userInfoCache['_id'] = userInfo['_id'];
+      userInfoCache['email'] = userInfo['email'];
+      userInfoCache['username'] = userInfo['username'];
+      userInfoCache['language'] = userInfo['language'];
+      userInfoCache['nationality'] = userInfo['nationality'];
+      userInfoCache['profilePicture.url'] = userInfo['profilePicture.url'];
+      userInfoCache['profilePicture.fileId'] =
+          userInfo['profilePicture.fileId'];
+      try {
+        endPoint = '/getLanguageDictionary';
+        url = '$defaultHost$endPoint';
+        final response2 = await RouteHandler.dio.get(url);
+        languageNames = json.decode(response2.data);
+      } on DioException catch (e) {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': e},
+          statusCode: 500,
+        );
+      }
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
     }
   }
 }
