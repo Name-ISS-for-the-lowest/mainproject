@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frontend/views/AddToProfilePic.dart';
+import 'package:frontend/views/AddProfilePic.dart';
 
 class ConfirmPassword extends StatefulWidget {
   const ConfirmPassword({super.key});
@@ -45,6 +45,8 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
             IconThemeData(color: Colors.white), // Set the back arrow color
       ),
       body: SingleChildScrollView(
+        physics:
+            const NeverScrollableScrollPhysics(), // This line makes it non-scrollable
         child: Stack(
           children: [
             Column(

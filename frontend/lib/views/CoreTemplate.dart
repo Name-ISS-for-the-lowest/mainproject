@@ -15,6 +15,7 @@ class CoreTemplate extends StatefulWidget {
 
 class _CoreTemplateState extends State<CoreTemplate> {
   int selectedIndex = 0;
+  bool isKeyBoardVisable = false;
   final screens = [
     ForumHome(),
     ResourceCenter(),
@@ -22,6 +23,7 @@ class _CoreTemplateState extends State<CoreTemplate> {
     EventsPage(),
     ProfilePage(),
   ];
+
   void onItemTapped(int index) {
     setState(() {
       if (index != 2) {
@@ -47,116 +49,114 @@ class _CoreTemplateState extends State<CoreTemplate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Color(0xffece7d5),
-        body: Column(
-          children: [
-            SizedBox(
-              height: 75,
-              width: 75,
-              child: SvgPicture.asset("assets/iss-small.svg"),
-            ),
-            Container(
-              height: 1.0, // Set the desired height of the line
-              color: Color(0x5f000000),
-              margin: EdgeInsets.symmetric(vertical: 0),
-            ),
-            Container(
-              height: 734,
-              width: 412,
-              child: screens[selectedIndex],
-            ),
-          ],
-        ),
-        bottomNavigationBar: SizedBox(
-          height: 80,
-          child: BottomNavigationBar(
-              backgroundColor: Color(0xff08231A),
-              type: BottomNavigationBarType.fixed,
-              showSelectedLabels: false,
-              showUnselectedLabels: false,
-              selectedItemColor: Color(0xffFFE89A),
-              unselectedItemColor: Color(0xff89875A),
-              items: <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Container(
-                    width: 40,
-                    height: 40,
-                    child: SvgPicture.asset('assets/NavBarUI/icon-home.svg',
-                        color: Color(0xff89875A)),
-                  ),
-                  activeIcon: Container(
-                    width: 40,
-                    height: 40,
-                    child: SvgPicture.asset('assets/NavBarUI/icon-home.svg',
-                        color: Color(0xffFFE89A)),
-                  ),
-                  label: '',
+      backgroundColor: Color(0xffece7d5),
+      resizeToAvoidBottomInset: false,
+      body: Column(
+        children: [
+          SizedBox(
+            height: 75,
+            width: 75,
+            child: SvgPicture.asset("assets/iss-small.svg"),
+          ),
+          Container(
+            height: 1.0, // Set the desired height of the line
+            color: Color(0x5f000000),
+            margin: EdgeInsets.symmetric(vertical: 0),
+          ),
+          Container(
+            height: 734,
+            width: 412,
+            child: screens[selectedIndex],
+          ),
+        ],
+      ),
+      bottomNavigationBar: SizedBox(
+        height: 80,
+        child: BottomNavigationBar(
+            backgroundColor: Color(0xff08231A),
+            type: BottomNavigationBarType.fixed,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            selectedItemColor: Color(0xffFFE89A),
+            unselectedItemColor: Color(0xff89875A),
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Container(
+                  width: 40,
+                  height: 40,
+                  child: SvgPicture.asset('assets/NavBarUI/icon-home.svg',
+                      color: Color(0xff89875A)),
                 ),
-                BottomNavigationBarItem(
-                  icon: Container(
-                    width: 40,
-                    height: 40,
-                    child: SvgPicture.asset('assets/NavBarUI/icon-search.svg'),
-                  ),
-                  activeIcon: Container(
-                    width: 40,
-                    height: 40,
-                    child: SvgPicture.asset('assets/NavBarUI/icon-search.svg',
-                        color: Color(0xffFFE89A)),
-                  ),
-                  label: '',
+                activeIcon: Container(
+                  width: 40,
+                  height: 40,
+                  child: SvgPicture.asset('assets/NavBarUI/icon-home.svg',
+                      color: Color(0xffFFE89A)),
                 ),
-                BottomNavigationBarItem(
-                  icon: Container(
-                    width: 40,
-                    height: 40,
-                    child:
-                        SvgPicture.asset('assets/NavBarUI/icon-createpost.svg'),
-                  ),
-                  activeIcon: Container(
-                    width: 40,
-                    height: 40,
-                    child: SvgPicture.asset(
-                        'assets/NavBarUI/icon-createpost.svg',
-                        color: Color(0xffFFE89A)),
-                  ),
-                  label: '',
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: Container(
+                  width: 40,
+                  height: 40,
+                  child: SvgPicture.asset('assets/NavBarUI/icon-search.svg'),
                 ),
-                BottomNavigationBarItem(
-                  icon: Container(
-                    width: 40,
-                    height: 40,
-                    child: SvgPicture.asset(
-                        'assets/NavBarUI/icon-resources.svg',
-                        color: Color(0xff89875A)),
-                  ),
-                  activeIcon: Container(
-                    width: 40,
-                    height: 40,
-                    child: SvgPicture.asset(
-                        'assets/NavBarUI/icon-resources.svg',
-                        color: Color(0xffFFE89A)),
-                  ),
-                  label: '',
+                activeIcon: Container(
+                  width: 40,
+                  height: 40,
+                  child: SvgPicture.asset('assets/NavBarUI/icon-search.svg',
+                      color: Color(0xffFFE89A)),
                 ),
-                BottomNavigationBarItem(
-                  icon: Container(
-                    width: 40,
-                    height: 40,
-                    child: SvgPicture.asset('assets/NavBarUI/icon-profile.svg'),
-                  ),
-                  activeIcon: Container(
-                    width: 40,
-                    height: 40,
-                    child: SvgPicture.asset('assets/NavBarUI/icon-profile.svg',
-                        color: Color(0xffFFE89A)),
-                  ),
-                  label: '',
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: Container(
+                  width: 40,
+                  height: 40,
+                  child:
+                      SvgPicture.asset('assets/NavBarUI/icon-createpost.svg'),
                 ),
-              ],
-              onTap: onItemTapped,
-              currentIndex: selectedIndex),
-        ));
+                activeIcon: Container(
+                  width: 40,
+                  height: 40,
+                  child: SvgPicture.asset('assets/NavBarUI/icon-createpost.svg',
+                      color: Color(0xffFFE89A)),
+                ),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: Container(
+                  width: 40,
+                  height: 40,
+                  child: SvgPicture.asset('assets/NavBarUI/icon-resources.svg',
+                      color: Color(0xff89875A)),
+                ),
+                activeIcon: Container(
+                  width: 40,
+                  height: 40,
+                  child: SvgPicture.asset('assets/NavBarUI/icon-resources.svg',
+                      color: Color(0xffFFE89A)),
+                ),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: Container(
+                  width: 40,
+                  height: 40,
+                  child: SvgPicture.asset('assets/NavBarUI/icon-profile.svg'),
+                ),
+                activeIcon: Container(
+                  width: 40,
+                  height: 40,
+                  child: SvgPicture.asset('assets/NavBarUI/icon-profile.svg',
+                      color: Color(0xffFFE89A)),
+                ),
+                label: '',
+              ),
+            ],
+            onTap: onItemTapped,
+            currentIndex: selectedIndex),
+      ),
+    );
   }
 }

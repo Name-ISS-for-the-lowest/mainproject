@@ -53,6 +53,7 @@ class _PasswordState extends State<PasswordSetUp> {
             IconThemeData(color: Colors.white), // Set the back arrow color
       ),
       body: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
         child: Stack(
           children: [
             Column(
@@ -109,20 +110,6 @@ class _PasswordState extends State<PasswordSetUp> {
                   child: Center(
                     child: Text(
                       "For security purposes, please make sure that your password contains a series of numbers, letters, and other special characters.",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(230, 183, 17, 1),
-                      ),
-                      textAlign: TextAlign.center, // Center-align the text
-                    ),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      "DON’T share your password with other users or third-parties. It should only be known by the owner of the account",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -197,7 +184,7 @@ class _PasswordState extends State<PasswordSetUp> {
                     Column(
                       children: [
                         const SizedBox(
-                          height: 130,
+                          height: 200,
                         ),
                         Column(
                           children: [
