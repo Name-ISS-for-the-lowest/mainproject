@@ -106,119 +106,118 @@ class _SignUpState extends State<SignUp> {
         iconTheme:
             IconThemeData(color: Colors.white), // Set the back arrow color
       ),
-      body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.75,
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.75,
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.40,
+                child: SvgPicture.asset(
+                  'assets/BackGround.svg',
+                  fit: BoxFit.fitWidth,
                 ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.40,
-                  child: SvgPicture.asset(
-                    'assets/BackGround.svg',
-                    fit: BoxFit.fitWidth,
+              ),
+            ],
+          ),
+          Column(
+            children: [
+              //spacer for top
+              const SizedBox(
+                height: 120,
+              ),
+              //Log in title
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Center(
+                  child: Text(
+                    "Welcome to the I.S.S.!",
+                    style: TextStyle(
+                      fontSize: 50,
+                      fontWeight: FontWeight.w700,
+                      color: Color.fromRGBO(230, 183, 17, 1),
+                    ),
+                    textAlign: TextAlign.center, // Center-align the text
                   ),
                 ),
-              ],
-            ),
-            Column(
-              children: [
-                //spacer for top
-                const SizedBox(
-                  height: 120,
-                ),
-                //Log in title
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      "Welcome to the I.S.S.!",
-                      style: TextStyle(
-                        fontSize: 50,
-                        fontWeight: FontWeight.w700,
-                        color: Color.fromRGBO(230, 183, 17, 1),
-                      ),
-                      textAlign: TextAlign.center, // Center-align the text
+              ),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Center(
+                  child: Text(
+                    "Before we begin, please enter a valid Sacramento State email",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromRGBO(230, 183, 17, 1),
                     ),
+                    textAlign: TextAlign.center, // Center-align the text
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      "Before we begin, please enter a valid Sacramento State email",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(230, 183, 17, 1),
-                      ),
-                      textAlign: TextAlign.center, // Center-align the text
+              ),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Center(
+                  child: Text(
+                    "These can be identified by the “@csus.edu” handle near the end like this:",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromRGBO(230, 183, 17, 1),
                     ),
+                    textAlign: TextAlign.center, // Center-align the text
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      "These can be identified by the “@csus.edu” handle near the end like this:",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(230, 183, 17, 1),
-                      ),
-                      textAlign: TextAlign.center, // Center-align the text
+              ),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Center(
+                  child: Text(
+                    "“Example@csus.edu”",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromRGBO(230, 183, 17, 1),
                     ),
+                    textAlign: TextAlign.center, // Center-align the text
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      "“Example@csus.edu”",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(230, 183, 17, 1),
-                      ),
-                      textAlign: TextAlign.center, // Center-align the text
-                    ),
+              ),
+              //Input fields
+              Column(
+                children: [
+                  const SizedBox(
+                    height: 50,
                   ),
-                ),
-                //Input fields
-                Column(
-                  children: [
-                    const SizedBox(
-                      height: 50,
-                    ),
-                    Column(
-                      children: [
-                        Column(
-                          children: [
-                            SizedBox(
-                              width: 340,
-                              child: TextField(
-                                controller: emailController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  labelText: 'Email',
-                                  contentPadding: const EdgeInsets.all(18),
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.never,
+                  Column(
+                    children: [
+                      Column(
+                        children: [
+                          SizedBox(
+                            width: 340,
+                            child: TextField(
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
                                 ),
+                                labelText: 'Email',
+                                contentPadding: const EdgeInsets.all(18),
+                                fillColor: Colors.white,
+                                filled: true,
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.never,
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        /*
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      /*
                         Column(
                           children: [
                             SizedBox(
@@ -242,59 +241,58 @@ class _SignUpState extends State<SignUp> {
                           ],
                         ),
                         */
-                      ],
-                    ),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Column(
-                      children: [
-                        const SizedBox(
-                          height: 180,
-                        ),
-                        Column(
-                          children: [
-                            Center(
-                              child: SizedBox(
-                                width: 340,
-                                height: 50,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    elevation: 10,
-                                    backgroundColor:
-                                        const Color.fromRGBO(230, 183, 17, 1),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
+                    ],
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  Column(
+                    children: [
+                      const SizedBox(
+                        height: 180,
+                      ),
+                      Column(
+                        children: [
+                          Center(
+                            child: SizedBox(
+                              width: 340,
+                              height: 50,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  elevation: 10,
+                                  backgroundColor:
+                                      const Color.fromRGBO(230, 183, 17, 1),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                  onPressed: () => {
-                                    navigateToPassWordSetUp(),
-                                  },
-                                  child: const Text(
-                                    "Next",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color.fromARGB(255, 53, 53, 53),
-                                    ),
+                                ),
+                                onPressed: () => {
+                                  navigateToPassWordSetUp(),
+                                },
+                                child: const Text(
+                                  "Next",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color.fromARGB(255, 53, 53, 53),
                                   ),
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
