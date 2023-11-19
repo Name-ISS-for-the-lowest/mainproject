@@ -8,6 +8,7 @@ import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:frontend/views/CreatePost.dart';
 
 class ForumHome extends StatefulWidget {
   const ForumHome({super.key});
@@ -128,12 +129,45 @@ class _ForumHomeState extends State<ForumHome> {
     );
   }
 
+  void navigateToEditPost(String postContent, String postID) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: CreatePost(
+                isEditing: true, originalText: postContent, postID: postID),
+          );
+        },
+      ),
+    );
+  }
+
+  void deletePost(String postID) {
+    loadDelete(postID);
+  }
+
+  Future<void> loadDelete(String postID) async {
+    await PostHelper.deletePost(postID);
+    var dataCall = await PostHelper.getPosts(0, searchParams["postsFetched"]);
+    if (mounted) {
+      setState(() {
+        postData.clear();
+        postData.addAll(dataCall);
+        num fetchedLength = dataCall.length;
+        int convertedFetch = fetchedLength.toInt();
+        searchParams["postsFetched"] = convertedFetch;
+      });
+    }
+  }
+
   Widget _buildPost(int index) {
     String imageURL = postData[index]["profilePicture"]['url'];
     String posterName = postData[index]["username"];
     String postContent = postData[index]["content"];
     String postID = postData[index]["_id"];
+    String posterID = postData[index]['user_id'];
     late int likes = postData[index]['likes'];
+    bool isEdited = false;
     var liked = postData[index]['liked'];
     String formattedLikes = formatLargeNumber(likes);
     postContent = postContent.replaceAll('\n', ' ');
@@ -148,13 +182,161 @@ class _ForumHomeState extends State<ForumHome> {
       width: 280,
       child: Builder(
         builder: (BuildContext context) {
-          return Text(
-            (currentlyTranslated.containsKey(postContent))
-                ? currentlyTranslated[postContent]!
-                : postContent,
+          return RichText(
             softWrap: true,
+            text: TextSpan(
+              children: [
+                TextSpan(
+                    text: (currentlyTranslated.containsKey(postContent))
+                        ? currentlyTranslated[postContent]!
+                        : postContent,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'Inter',
+                    )),
+                if (isEdited)
+                  TextSpan(
+                    text: ' (Edited)',
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
+                    ),
+                  ),
+              ],
+            ),
           );
         },
+      ),
+    );
+
+    PopupMenuButton<String> threeDotMenu = PopupMenuButton<String>(
+      onSelected: (String result) {
+        // Handle the selected option
+        if (result == 'closeMenu') {
+          // Closes menu and does absolutely nothing
+        } else if (result == 'editPost') {
+          navigateToEditPost(postData[index]["content"], postID);
+        } else if (result == 'deletePost') {
+          deletePost(postID);
+        } else if (result == 'reportPost') {
+          // Handle option 2
+        }
+      },
+      itemBuilder: (BuildContext context) {
+        List<PopupMenuEntry<String>> menuItems = [];
+
+        menuItems.add(
+          PopupMenuItem<String>(
+            value: 'closeMenu',
+            child: Row(
+              children: [
+                Container(
+                  height: 15,
+                  width: 15,
+                  child: SvgPicture.asset(
+                    'assets/icon-x.svg',
+                  ),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Text('Close Menu'),
+              ],
+            ),
+          ),
+        );
+
+        if (posterID == AuthHelper.userInfoCache['_id']) {
+          menuItems.add(
+            PopupMenuItem<String>(
+              value: 'editPost',
+              child: Row(
+                children: [
+                  Container(
+                    height: 15,
+                    width: 15,
+                    child: SvgPicture.asset(
+                      'assets/PostUI/icon-editpost.svg',
+                      color: Color(0xff0094FF),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    'Edit Post',
+                    style: TextStyle(
+                      color: Color(0xff0094FF),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+
+          menuItems.add(
+            PopupMenuItem<String>(
+              value: 'deletePost',
+              child: Row(
+                children: [
+                  Container(
+                    height: 15,
+                    width: 15,
+                    child: SvgPicture.asset(
+                      'assets/PostUI/icon-trash.svg',
+                      color: Colors.red,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    'Delete Post',
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        } else {
+          menuItems.add(
+            PopupMenuItem<String>(
+              value: 'reportPost',
+              child: Row(
+                children: [
+                  Container(
+                    height: 15,
+                    width: 15,
+                    child: SvgPicture.asset(
+                      'assets/PostUI/icon-flag.svg',
+                      color: Colors.red,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    'Report Post',
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return menuItems;
+      },
+      color: Color(0xffffffff),
+      child: SvgPicture.asset(
+        "assets/PostUI/icon-3dots.svg",
+        width: 20,
+        height: 5,
+        color: Colors.black,
       ),
     );
 
@@ -199,20 +381,7 @@ class _ForumHomeState extends State<ForumHome> {
               left: 350,
               top: 22.5,
               child: Container(
-                child: SizedBox(
-                  child: GestureDetector(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("3 Dots Tapped")));
-                    },
-                    child: SvgPicture.asset(
-                      "assets/PostUI/icon-3dots.svg",
-                      width: 20,
-                      height: 5,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
+                child: threeDotMenu,
               ),
             ),
             Positioned(
@@ -258,7 +427,7 @@ class _ForumHomeState extends State<ForumHome> {
             Positioned(
               bottom: 15,
               left: 45,
-              child: Text(likes.toString(), style: TextStyle(fontSize: 11)),
+              child: Text(formattedLikes, style: TextStyle(fontSize: 11)),
             ),
             Positioned(
               bottom: 33,

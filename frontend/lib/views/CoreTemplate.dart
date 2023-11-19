@@ -18,7 +18,7 @@ class _CoreTemplateState extends State<CoreTemplate> {
   final screens = [
     ForumHome(),
     ResourceCenter(),
-    CreatePost(),
+    CreatePost(isEditing: false),
     EventsPage(),
     ProfilePage(),
   ];
@@ -37,7 +37,9 @@ class _CoreTemplateState extends State<CoreTemplate> {
       MaterialPageRoute(
         builder: (BuildContext context) {
           return Scaffold(
-            body: CreatePost(),
+            body: CreatePost(
+              isEditing: false,
+            ),
           );
         },
       ),
