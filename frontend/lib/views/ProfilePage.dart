@@ -100,6 +100,42 @@ class _ProfilePageState extends State<ProfilePage> {
               itemBuilder: _buildDialogItem)),
   );
 
+
+  showAlertDialog(BuildContext context) {
+
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Cancel"),
+      onPressed:  () {
+
+        return;
+      },
+    );
+    Widget continueButton = TextButton(
+      child: Text("Continue"),
+      onPressed:  () {},
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("ACCOUNT DELETION"),
+      content: Text("THIS ACTION IS IRREVERSABLE. ARE YOU SURE YOU WANT TO CONTINUE?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+  
+
     return Scaffold(
         backgroundColor: Color(0xffece7d5),
         // body: Center(child: Text("Profile Page")),
@@ -215,7 +251,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 title: Text('Delete Account'),
                 subtitle: Text('This action cannot be restored.'),
                 textColor: Colors.redAccent,
-                onTap: () {},
+                onTap: () {
+
+                showAlertDialog(context);
+                  
+                },
               ),
             ),
           ],
