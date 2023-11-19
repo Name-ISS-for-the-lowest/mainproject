@@ -91,8 +91,27 @@ class DBManager:
         DBManager.db["posts"].insert_one(newPost.__dict__)
 
     @staticmethod
+    def editPost(postID, postBody):
+        postID = ObjectId(postID)
+        post = DBManager.db["posts"].find_one({"_id": postID})
+        contentHistory = post.get("contentHistory")
+        currentContent = post.get("content")
+        if postBody == currentContent:
+            translations = post.get("translations")
+        else:
+            translations = {}
+        contentHistory.append(currentContent)
+        DBManager.db["posts"].update_one({"_id": postID},{"$set": {"edited": True, "content": postBody, "contentHistory": contentHistory, "translations" : translations}})
+
+    @staticmethod
+    def deletePost(postID):
+        postID = ObjectId(postID)
+        DBManager.db["posts"].update_one({"_id": postID},{"$set": {"deleted": True}})
+        
+
+    @staticmethod
     def getPosts(start, end, userID=None):
-        posts = DBManager.db["posts"].find().sort("_id", -1).skip(start).limit(end)
+        posts = DBManager.db["posts"].find({"deleted" : False}).sort("_id", -1).skip(start).limit(end)
         returnPosts = []
         for elem in posts:
             post = Post.fromDict(elem)
@@ -103,6 +122,11 @@ class DBManager:
             returnPosts.append(post)
         return returnPosts
 
+    @staticmethod
+    def getPostByID(postID):
+        post = DBManager.db["posts"].find_one({"_id": postID})
+        return post
+    
     @staticmethod
     def searchPosts(start, end, search, userID):
         posts = (

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/postHelper.dart';
+import 'package:frontend/views/CreatePost.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:frontend/views/CreatePost.dart';
@@ -169,6 +170,9 @@ class _ForumHomeState extends State<ForumHome> {
     late int likes = postData[index]['likes'];
     bool isEdited = false;
     var liked = postData[index]['liked'];
+    if (postData[index]['edited'] == 'True') {
+      isEdited = true;
+    }
     String formattedLikes = formatLargeNumber(likes);
     postContent = postContent.replaceAll('\n', ' ');
     bool postTooLong = false;

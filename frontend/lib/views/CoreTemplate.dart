@@ -37,9 +37,7 @@ class _CoreTemplateState extends State<CoreTemplate> {
       MaterialPageRoute(
         builder: (BuildContext context) {
           return Scaffold(
-            body: CreatePost(
-              isEditing: false,
-            ),
+            body: CreatePost(isEditing: false),
           );
         },
       ),
