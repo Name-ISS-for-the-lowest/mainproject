@@ -146,6 +146,25 @@ class _ForumHomeState extends State<ForumHome> {
     addSearchedPosts(currentSearch);
   }
 
+  void deletePost(String postID) {
+    loadDelete(postID);
+  }
+
+  Future<void> loadDelete(String postID) async {
+    await PostHelper.deletePost(postID);
+    var dataCall = await PostHelper.getPosts(0, postsFetched);
+    if (mounted) {
+      setState(() {
+        print("dataCall: $dataCall");
+        print(dataCall[0]['profilePicture']['url']);
+        postData = dataCall;
+        num fetchedLength = dataCall.length;
+        int convertedFetch = fetchedLength.toInt();
+        postsFetched = convertedFetch;
+      });
+    }
+  }
+
   Future<void> addData() async {
     //Add a sleep here to simulate loading
     // await Future.delayed(const Duration(seconds: 5));
@@ -297,7 +316,7 @@ class _ForumHomeState extends State<ForumHome> {
                     } else if (result == 'editPost') {
                       navigateToEditPost(postData[index]["content"], postID);
                     } else if (result == 'deletePost') {
-                      // Handle option 2
+                      deletePost(postID);
                     } else if (result == 'reportPost') {
                       // Handle option 2
                     }

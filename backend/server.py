@@ -229,7 +229,12 @@ def createPost(postBody: str, request: Request):
 @app.post("/editPost")
 def editPost(postID: str, postBody: str, request:Request):
     DBManager.editPost(postID, postBody)
-    return JSONResponse({"message": "Post Added"}, status_code=200)
+    return JSONResponse({"message": "Post Edited"}, status_code=200)
+
+@app.post("/deletePost")
+def deletePost(postID: str, request:Request):
+    DBManager.deletePost(postID)
+    return JSONResponse({"message": "Post Deleted"}, status_code=200)
 
 
 @app.get("/getPosts")

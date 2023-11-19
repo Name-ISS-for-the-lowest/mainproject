@@ -15,6 +15,7 @@ class Post:
     imagelinks: list
     liked: bool = False
     edited: bool
+    deleted: bool
     contentHistory: []
     translations: {}
 
@@ -29,6 +30,7 @@ class Post:
         self.translations = {}
         self.edited = False
         self.contentHistory = []
+        self.deleted = False
 
     @staticmethod
     def fromDict(dict):
@@ -60,6 +62,7 @@ class Post:
         post.user_id = str(post.user_id)
         post.edited = str(post.edited)
         post.contentHistory = Post.contentHistoryToString(post)
+        post.deleted = str(post.deleted)
         return json.dumps(post.__dict__)
 
     @staticmethod
@@ -71,6 +74,7 @@ class Post:
             post.user_id = str(post.user_id)
             post.edited = str(post.edited)
             post.contentHistory = Post.contentHistoryToString(post)
+            post.deleted = str(post.deleted)
             if targetLang in post.translations:
                 post.translations = str(post.translations[targetLang])
             else:

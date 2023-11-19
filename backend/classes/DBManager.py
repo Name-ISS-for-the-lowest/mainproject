@@ -102,11 +102,16 @@ class DBManager:
             translations = {}
         contentHistory.append(currentContent)
         DBManager.db["posts"].update_one({"_id": postID},{"$set": {"edited": True, "content": postBody, "contentHistory": contentHistory, "translations" : translations}})
+
+    @staticmethod
+    def deletePost(postID):
+        postID = ObjectId(postID)
+        DBManager.db["posts"].update_one({"_id": postID},{"$set": {"deleted": True}})
         
 
     @staticmethod
     def getPosts(start, end, userID=None):
-        posts = DBManager.db["posts"].find().sort("_id", -1).skip(start).limit(end)
+        posts = DBManager.db["posts"].find({"deleted" : False}).sort("_id", -1).skip(start).limit(end)
         returnPosts = []
         for elem in posts:
             post = Post.fromDict(elem)
