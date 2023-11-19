@@ -1,14 +1,10 @@
 import 'dart:async';
-import 'dart:html';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:frontend/views/CreatePost.dart';
 
 class ForumHome extends StatefulWidget {
@@ -53,7 +49,22 @@ class _ForumHomeState extends State<ForumHome> {
     if (search == "") {
       var dataCall = await PostHelper.getPosts(
           searchParams["postsFetched"], postsPerFetch);
-      postData.addAll(dataCall);
+      Map dataCallMap = {};
+      for (var item in dataCall) {
+        dataCallMap[item['_id']] = item;
+      }
+      var arrayOfCurrentIds = [];
+      for (var item in postData) {
+        arrayOfCurrentIds.add(item['_id']);
+      }
+
+      for (var item in dataCall) {
+        //only input items with unique id's
+        if (!arrayOfCurrentIds.contains(item['_id'])) {
+          postData.add(item);
+        }
+      }
+
       int fetchedLength = dataCall.length;
       searchParams["postsFetched"] += fetchedLength;
       if (firstLoad) {
@@ -65,8 +76,21 @@ class _ForumHomeState extends State<ForumHome> {
     } else {
       var dataCall = await PostHelper.searchPosts(searchParams["postsFetched"],
           postsPerFetch, search, AuthHelper.userInfoCache["_id"]);
-      postData.addAll(dataCall);
-      print(dataCall);
+      Map dataCallMap = {};
+      for (var item in dataCall) {
+        dataCallMap[item['_id']] = item;
+      }
+      var arrayOfCurrentIds = [];
+      for (var item in postData) {
+        arrayOfCurrentIds.add(item['_id']);
+      }
+
+      for (var item in dataCall) {
+        //only input items with unique id's
+        if (!arrayOfCurrentIds.contains(item['_id'])) {
+          postData.add(item);
+        }
+      }
       int fetchedLength = dataCall.length;
       searchParams["postsFetched"] += fetchedLength;
       searching = false;
@@ -110,26 +134,6 @@ class _ForumHomeState extends State<ForumHome> {
     }
   }
 
-  Widget _buildList() {
-    return ListView.builder(
-      itemBuilder: (BuildContext context, int index) {
-        print("Current Index:$index");
-        print("Current Length:${postData.length}");
-        if (postData.isEmpty && index == 0) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-
-        if (index >= postData.length) {
-          searchPosts(searchParams["search"], scrolling: true);
-          return null;
-        }
-        return _buildPost(index);
-      },
-    );
-  }
-
   void navigateToEditPost(String postContent, String postID) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -145,6 +149,27 @@ class _ForumHomeState extends State<ForumHome> {
 
   void deletePost(String postID) {
     loadDelete(postID);
+  }
+
+  Widget _buildList() {
+    return ListView.builder(
+      itemBuilder: (BuildContext context, int index) {
+        print("Current Index:$index");
+        print("Current Length:${postData.length}");
+        print("Current Posts Fetched:${postData}");
+        if (postData.isEmpty && index == 0) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        if (index >= postData.length) {
+          searchPosts(searchParams["search"], scrolling: true);
+          return null;
+        }
+        return _buildPost(index);
+      },
+    );
   }
 
   Future<void> loadDelete(String postID) async {
