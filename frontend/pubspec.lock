@@ -241,7 +241,7 @@ packages:
     source: hosted
     version: "0.18.1"
   language_picker:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: language_picker
       sha256: "1f5293675ec1359b72979dac8f8d4662d18d6d1b0a484343367cfbbbbcfca3f3"
@@ -392,22 +392,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.1"
-  reactive_forms:
-    dependency: transitive
-    description:
-      name: reactive_forms
-      sha256: b7d64d8fe45c19f506c762e219f4c6a3bdcfc4842d6fba98f866be5fca75d8e5
-      url: "https://pub.dev"
-    source: hosted
-    version: "16.1.1"
-  reactive_language_picker:
-    dependency: "direct main"
-    description:
-      name: reactive_language_picker
-      sha256: df22902935607536fa421bd83b583c622979a111a2511f55a49d067d03c359d0
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   recase:
     dependency: transitive
     description:
