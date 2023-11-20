@@ -107,6 +107,7 @@ class _SignUpState extends State<SignUp> {
             IconThemeData(color: Colors.white), // Set the back arrow color
       ),
       body: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
         child: Stack(
           children: [
             Column(
