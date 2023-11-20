@@ -54,6 +54,7 @@ class _PasswordState extends State<PasswordSetUp> {
             IconThemeData(color: Colors.white), // Set the back arrow color
       ),
       body: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
         child: Stack(
           children: [
             Column(
@@ -201,7 +202,7 @@ class _PasswordState extends State<PasswordSetUp> {
                     Column(
                       children: [
                         const SizedBox(
-                          height: 130,
+                          height: 200,
                         ),
                         Column(
                           children: [

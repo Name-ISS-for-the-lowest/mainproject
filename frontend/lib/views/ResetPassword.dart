@@ -54,6 +54,7 @@ class _ResetPasswordState extends State<ResetPassword> {
             IconThemeData(color: Colors.white), // Set the back arrow color
       ),
       body: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
         child: Stack(
           children: [
             Column(
@@ -157,7 +158,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     Column(
                       children: [
                         const SizedBox(
-                          height: 5,
+                          height: 10,
                         ),
                         Column(
                           children: [

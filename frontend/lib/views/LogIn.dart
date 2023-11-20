@@ -98,6 +98,7 @@ class _LogInState extends State<LogIn> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
         child: Stack(
           children: [
             Column(
