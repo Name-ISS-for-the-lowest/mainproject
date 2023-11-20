@@ -39,21 +39,21 @@ class Post:
         for key in dict:
             setattr(post, key, dict[key])
         return post
-    
+
     @staticmethod
     def contentHistoryToString(post):
         print(post.contentHistory)
         if len(post.contentHistory) == 0:
-            return '[]'
+            return "[]"
         else:
-            history = '['
+            history = "["
             i = 1
             for elem in post.contentHistory:
                 history += elem
                 if i != len(post.contentHistory):
-                    history += ','
+                    history += ","
                 i += 1
-            history += ']'
+            history += "]"
         return history
 
     @staticmethod
