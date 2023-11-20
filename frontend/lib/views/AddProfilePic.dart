@@ -3,6 +3,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/authHelper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class AddToProfilePic extends StatefulWidget {
   const AddToProfilePic({super.key});
@@ -12,6 +14,48 @@ class AddToProfilePic extends StatefulWidget {
 }
 
 class _AddToProfilePicState extends State<AddToProfilePic> {
+  File? _image;
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final pickedFile = await ImagePicker().pickImage(source: source);
+
+      if (pickedFile != null) {
+        // You can use the pickedFile.path to access the selected image file
+        // Do something with the selected image (e.g., update profile picture)
+      }
+    } catch (e) {
+      print("Error picking image: $e");
+    }
+  }
+
+  void _showImagePickerDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text("Choose an option"),
+          children: [
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+                _pickImage(ImageSource.camera);
+              },
+              child: Text("Take a photo"),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+                _pickImage(ImageSource.gallery);
+              },
+              child: Text("Choose from gallery"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     String imageURL = "";
@@ -109,16 +153,16 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                                 child: Container(
                                   width: 150, // set your desired width
                                   height: 150, // set your desired height
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
                                   ),
                                   child: ClipOval(
                                     child: Image.asset(
                                       imageURL.isNotEmpty
-                                          ? "$imageURL?tr=w-150,h-150,fo-auto"
-                                          : 'assets/profile.png', // Provide a placeholder image URL or local asset,
-                                      width: 150,
-                                      height: 150,
+                                          ? "$imageURL?tr=w-200,h-200,fo-auto"
+                                          : 'assets/Default_pfp.png', // Provide a placeholder image URL or local asset,
+                                      width: 200,
+                                      height: 200,
                                       fit: BoxFit.fill,
                                     ),
                                   ),
@@ -130,10 +174,11 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                               child: Align(
                                 alignment: Alignment.bottomCenter,
                                 child: IconButton(
-                                  icon: Icon(Icons.camera_alt),
-                                  iconSize: 50,
-                                  onPressed: () {},
-                                ),
+                                    icon: Icon(Icons.camera_alt),
+                                    iconSize: 50,
+                                    onPressed: () {
+                                      _showImagePickerDialog(context);
+                                    }),
                               ),
                             ),
                           ],
