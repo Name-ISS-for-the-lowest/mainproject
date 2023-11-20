@@ -14,19 +14,22 @@ class AddToProfilePic extends StatefulWidget {
 }
 
 class _AddToProfilePicState extends State<AddToProfilePic> {
-  File? _image;
+  String imageURL = 'assets/Default_pfp.png'; // Default image
 
   Future<void> _pickImage(ImageSource source) async {
     try {
       final pickedFile = await ImagePicker().pickImage(source: source);
 
       if (pickedFile != null) {
-        // You can use the pickedFile.path to access the selected image file
-        // Do something with the selected image (e.g., update profile picture)
+        setState(() {
+          imageURL = pickedFile.path;
+          print("Image URL after picking: $imageURL");
+        });
       }
     } catch (e) {
       print("Error picking image: $e");
     }
+    setState(() {}); // Explicitly call setState to trigger a rebuild
   }
 
   void _showImagePickerDialog(BuildContext context) {
@@ -37,14 +40,14 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
           title: Text("Choose an option"),
           children: [
             SimpleDialogOption(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(context); // Close the dialog
                 _pickImage(ImageSource.camera);
               },
               child: Text("Take a photo"),
             ),
             SimpleDialogOption(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(context); // Close the dialog
                 _pickImage(ImageSource.gallery);
               },
@@ -58,7 +61,6 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
 
   @override
   Widget build(BuildContext context) {
-    String imageURL = "";
     return Scaffold(
       extendBodyBehindAppBar: true, // Extend content behind the AppBar
       appBar: AppBar(
@@ -150,20 +152,23 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                             Positioned(
                               child: Align(
                                 alignment: Alignment.center,
-                                child: Container(
-                                  width: 150, // set your desired width
-                                  height: 150, // set your desired height
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: ClipOval(
-                                    child: Image.asset(
-                                      imageURL.isNotEmpty
-                                          ? "$imageURL?tr=w-200,h-200,fo-auto"
-                                          : 'assets/Default_pfp.png', // Provide a placeholder image URL or local asset,
-                                      width: 200,
-                                      height: 200,
-                                      fit: BoxFit.fill,
+                                child: Hero(
+                                  tag: 'profile_pic',
+                                  child: Container(
+                                    width: 150, // set your desired width
+                                    height: 150, // set your desired height
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: ClipOval(
+                                      child: Image.asset(
+                                        imageURL.isNotEmpty
+                                            ? imageURL
+                                            : 'assets/Default_pfp.png', // Provide a placeholder image URL or local asset,
+                                        width: 200,
+                                        height: 200,
+                                        fit: BoxFit.fill,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -176,7 +181,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                                 child: IconButton(
                                     icon: Icon(Icons.camera_alt),
                                     iconSize: 50,
-                                    onPressed: () {
+                                    onPressed: () async {
                                       _showImagePickerDialog(context);
                                     }),
                               ),
