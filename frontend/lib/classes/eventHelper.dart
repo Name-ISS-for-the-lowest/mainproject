@@ -6,6 +6,7 @@ import 'package:html/parser.dart' show parse;
 class EventHelper {
   static final events = <Map<String, String>>[];
   static bool mounted = true;
+  static bool fetched = false;
 
   static Future fetchEvents(Function setState) async {
     if (events.isNotEmpty) {
@@ -45,16 +46,26 @@ class EventHelper {
               'day': dateTime.day.toString(),
               'month': monthsOfYear[dateTime.month]!,
               'url': event['permaLinkUrl'],
+              'description': _parseHtmlString(event['description']),
             });
           }
         });
       }
-
+      fetched = true;
       return response;
     } on DioException catch (e) {
       print(e);
       // Handle the error, you might want to throw an exception or return a default response
       throw e;
     }
+  }
+
+  static String _parseHtmlString(String htmlString) {
+    final document = parse(htmlString);
+    if (document.body == null) return '';
+    final String? parsedString =
+        parse(document.body?.text).documentElement?.text;
+    if (parsedString == null) return htmlString;
+    return parsedString;
   }
 }

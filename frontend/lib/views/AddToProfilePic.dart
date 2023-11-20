@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/Localize.dart';
 
 class AddToProfilePic extends StatefulWidget {
   const AddToProfilePic({super.key});
@@ -45,11 +46,11 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                   height: 100,
                 ),
                 //Log in title
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Add Profile Picture",
+                      Localize("Add Profile Picture"),
                       style: TextStyle(
                         fontSize: 50,
                         fontWeight: FontWeight.w700,
@@ -59,11 +60,12 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                     ),
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Finally, add an image that you want to use to represent yourself ",
+                      Localize(
+                          "Finally, add an image that you want to use to represent yourself"),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -73,11 +75,12 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                     ),
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Please be mindful of other users, Avoid using images that may be considered disturbing or offensive. Images should be inline with Sac State’s Hornet Honor Code policy",
+                      Localize(
+                          "Please be mindful of other users, Avoid using images that may be considered disturbing or offensive. Images should be inline with Sac State's Hornet Honor Code policy"),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -106,7 +109,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                  labelText: 'Password',
+                                  labelText: Localize('Password'),
                                   contentPadding: const EdgeInsets.all(18),
                                   fillColor: Colors.white,
                                   filled: true,
@@ -173,8 +176,8 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                                   onPressed: () => {
                                     // enter logic to go to confirm password screen
                                   },
-                                  child: const Text(
-                                    "Next",
+                                  child: Text(
+                                    Localize("Next"),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,

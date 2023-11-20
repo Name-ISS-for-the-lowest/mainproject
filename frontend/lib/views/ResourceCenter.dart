@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:frontend/classes/authHelper.dart';
 
@@ -24,7 +25,7 @@ class _ResourceCenterState extends State<ResourceCenter> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Student Resources",
+          Text(Localize("Student Resources"),
               style: DefaultTextStyle.of(context)
                   .style
                   .apply(fontSizeFactor: 2.0)),
@@ -42,7 +43,8 @@ class _ResourceCenterState extends State<ResourceCenter> {
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: Column(children: [
-                  Text("Housing", style: TextStyle(color: Colors.white)),
+                  Text(Localize("Housing"),
+                      style: TextStyle(color: Colors.white)),
                   IconButton(
                     onPressed: () {
                       _launchURL(Uri.parse(
@@ -64,7 +66,8 @@ class _ResourceCenterState extends State<ResourceCenter> {
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: Column(children: [
-                  Text("F1/J1 Status", style: TextStyle(color: Colors.white)),
+                  Text(Localize("F1/J1 Status"),
+                      style: TextStyle(color: Colors.white)),
                   IconButton(
                     onPressed: () {
                       _launchURL(Uri.parse(
@@ -86,7 +89,8 @@ class _ResourceCenterState extends State<ResourceCenter> {
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: Column(children: [
-                  Text("F1/J1 Jobs", style: TextStyle(color: Colors.white)),
+                  Text(Localize("F1/J1 Jobs"),
+                      style: TextStyle(color: Colors.white)),
                   IconButton(
                     onPressed: () {
                       _launchURL(Uri.parse(
@@ -115,8 +119,8 @@ class _ResourceCenterState extends State<ResourceCenter> {
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: Column(children: [
-                  Text("Research", style: TextStyle(color: Colors.white)),
-                  Text("Scholar", style: TextStyle(color: Colors.white)),
+                  Text(Localize("Research Scholar"),
+                      style: TextStyle(color: Colors.white)),
                   IconButton(
                     onPressed: () {
                       _launchURL(Uri.parse(
@@ -143,8 +147,8 @@ class _ResourceCenterState extends State<ResourceCenter> {
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: Column(children: [
-                  Text("Multicultural", style: TextStyle(color: Colors.white)),
-                  Text("Center", style: TextStyle(color: Colors.white)),
+                  Text(Localize("Multicultural Center"),
+                      style: TextStyle(color: Colors.white)),
                   IconButton(
                     onPressed: () {
                       _launchURL(Uri.parse(
@@ -166,7 +170,8 @@ class _ResourceCenterState extends State<ResourceCenter> {
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: Column(children: [
-                  Text("Serna Center", style: TextStyle(color: Colors.white)),
+                  Text(Localize("Serna Center"),
+                      style: TextStyle(color: Colors.white)),
                   Spacer(),
                   IconButton(
                     onPressed: () {
@@ -197,8 +202,8 @@ class _ResourceCenterState extends State<ResourceCenter> {
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: Column(children: [
-                  Text("APIDA", style: TextStyle(color: Colors.white)),
-                  Text("Center", style: TextStyle(color: Colors.white)),
+                  Text(Localize("APIDA Center"),
+                      style: TextStyle(color: Colors.white)),
                   IconButton(
                     onPressed: () {
                       _launchURL(Uri.parse(
@@ -220,8 +225,8 @@ class _ResourceCenterState extends State<ResourceCenter> {
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: Column(children: [
-                  Text("Health and", style: TextStyle(color: Colors.white)),
-                  Text("Counseling", style: TextStyle(color: Colors.white)),
+                  Text(Localize("Health and Counseling"),
+                      style: TextStyle(color: Colors.white)),
                   IconButton(
                     onPressed: () {
                       _launchURL(Uri.parse(
@@ -243,7 +248,8 @@ class _ResourceCenterState extends State<ResourceCenter> {
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: Column(children: [
-                  Text("Basic Needs", style: TextStyle(color: Colors.white)),
+                  Text(Localize("Basic Needs"),
+                      style: TextStyle(color: Colors.white)),
                   Spacer(),
                   IconButton(
                     onPressed: () {

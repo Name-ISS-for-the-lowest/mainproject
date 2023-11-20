@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class CreatePost extends StatefulWidget {
-  const CreatePost({super.key});
+  final bool isEditing;
+  final String? originalText;
+  final String? postID;
+  const CreatePost(
+      {super.key, required this.isEditing, this.originalText, this.postID});
 
   @override
   State<CreatePost> createState() => _CreatePostState();
@@ -28,10 +31,25 @@ class _CreatePostState extends State<CreatePost> {
 
   Widget build(BuildContext context) {
     var userInfo = AuthHelper.userInfoCache;
+    bool isEditing = widget.isEditing;
+    String? originalText = widget.originalText;
+    String? originalID = widget.postID;
     String imageURL = userInfo['profilePicture.url'];
     String screenName = userInfo['username'];
-    String currentPostBody = "";
+    String currentPostBody;
+    String postID;
+    if (originalText == null) {
+      currentPostBody = "";
+    } else {
+      currentPostBody = originalText;
+    }
+    if (originalID == null) {
+      postID = "";
+    } else {
+      postID = originalID;
+    }
     String userID = userInfo['_id'];
+
     return Scaffold(
       appBar: AppBar(
           centerTitle: true,
@@ -46,8 +64,8 @@ class _CreatePostState extends State<CreatePost> {
             ),
             onTap: () => navigateToPrimaryScreens(),
           ),
-          title: const Text(
-            "New Post",
+          title: Text(
+            (isEditing) ? Localize("Edit Post") : Localize("New Post"),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -102,11 +120,18 @@ class _CreatePostState extends State<CreatePost> {
                 ),
                 GestureDetector(
                   onTap: () async {
-                    await PostHelper.createPost(userID, currentPostBody);
+                    if (isEditing) {
+                      var response =
+                          await PostHelper.editPost(postID, currentPostBody);
+                    } else {
+                      var response =
+                          await PostHelper.createPost(userID, currentPostBody);
+                    }
+
                     navigateToPrimaryScreens();
                   },
-                  child: const Text(
-                    "Publish Post",
+                  child: Text(
+                    Localize("Publish Post"),
                     style: TextStyle(
                       color: Color(0xff007EF1),
                     ),
@@ -136,11 +161,11 @@ class _CreatePostState extends State<CreatePost> {
                   width: MediaQuery.of(context).size.width * 0.8,
                   height: 200,
                   child: TextField(
-                    controller: TextEditingController(),
-                    decoration: const InputDecoration(
-                      hintText: 'Begin Typing',
+                    controller: TextEditingController(text: currentPostBody),
+                    decoration: InputDecoration(
+                      hintText: Localize("Begin Typing"),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(
+                      contentPadding: const EdgeInsets.symmetric(
                           vertical: 15.0, horizontal: 10.0),
                     ),
                     keyboardType: TextInputType.multiline,
