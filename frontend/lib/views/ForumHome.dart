@@ -53,6 +53,7 @@ class _ForumHomeState extends State<ForumHome> {
     if (search == "") {
       var dataCall = await PostHelper.getPosts(
           searchParams["postsFetched"], postsPerFetch);
+      print("Data Call:$dataCall");
       Map dataCallMap = {};
       for (var item in dataCall) {
         dataCallMap[item['_id']] = item;
