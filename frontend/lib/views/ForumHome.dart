@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/views/CreatePost.dart';
@@ -16,7 +17,7 @@ class ForumHome extends StatefulWidget {
 
 class _ForumHomeState extends State<ForumHome> {
   final List postData = [];
-  final int postsPerFetch = 5;
+  final int postsPerFetch = 15;
   Map searchParams = {"search": "", "postsFetched": 0};
   bool init = false;
   bool searching = false;
@@ -35,6 +36,9 @@ class _ForumHomeState extends State<ForumHome> {
   }
 
 //searches posts, append to posts searched if search is empty, returns all posts
+//Notes, I want to turn this into websockets, because it will speed up search,
+//and we can prob add real timeness to it
+
   Future searchPosts(String search, {bool scrolling = false}) async {
     print("fethching posts $search");
     if (searching) return;
@@ -57,7 +61,6 @@ class _ForumHomeState extends State<ForumHome> {
       for (var item in postData) {
         arrayOfCurrentIds.add(item['_id']);
       }
-
       for (var item in dataCall) {
         //only input items with unique id's
         if (!arrayOfCurrentIds.contains(item['_id'])) {
@@ -156,7 +159,6 @@ class _ForumHomeState extends State<ForumHome> {
       itemBuilder: (BuildContext context, int index) {
         print("Current Index:$index");
         print("Current Length:${postData.length}");
-        print("Current Posts Fetched:${postData}");
         if (postData.isEmpty && index == 0) {
           return const Center(
             child: CircularProgressIndicator(),
@@ -652,8 +654,8 @@ class _SearchBarState extends State<SearchBarWidget> {
       onChanged: (value) {
         performSearch(_controller.text);
       },
-      decoration: const InputDecoration(
-        hintText: 'Search',
+      decoration: InputDecoration(
+        hintText: Localize('Search'),
         prefixIcon: Icon(Icons.search),
         border: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black),

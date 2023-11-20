@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class CreatePost extends StatefulWidget {
   final bool isEditing;
@@ -66,7 +65,7 @@ class _CreatePostState extends State<CreatePost> {
             onTap: () => navigateToPrimaryScreens(),
           ),
           title: Text(
-            (isEditing) ? "Edit Post" : "New Post",
+            (isEditing) ? Localize("Edit Post") : Localize("New Post"),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -131,8 +130,8 @@ class _CreatePostState extends State<CreatePost> {
 
                     navigateToPrimaryScreens();
                   },
-                  child: const Text(
-                    "Publish Post",
+                  child: Text(
+                    Localize("Publish Post"),
                     style: TextStyle(
                       color: Color(0xff007EF1),
                     ),
@@ -163,10 +162,10 @@ class _CreatePostState extends State<CreatePost> {
                   height: 200,
                   child: TextField(
                     controller: TextEditingController(text: currentPostBody),
-                    decoration: const InputDecoration(
-                      hintText: 'Begin Typing',
+                    decoration: InputDecoration(
+                      hintText: Localize("Begin Typing"),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(
+                      contentPadding: const EdgeInsets.symmetric(
                           vertical: 15.0, horizontal: 10.0),
                     ),
                     keyboardType: TextInputType.multiline,

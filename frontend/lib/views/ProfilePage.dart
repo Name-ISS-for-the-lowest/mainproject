@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:language_picker/language_picker.dart';
 import 'package:language_picker/languages.dart';
 import 'package:frontend/classes/authHelper.dart';
@@ -13,12 +14,6 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-
-
-
-
-
-
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
@@ -31,74 +26,65 @@ class _ProfilePageState extends State<ProfilePage> {
     String emailAddress = AuthHelper.userInfoCache['email'];
     Language _selectedDialogLanguage = Languages.english;
 
-
 //COUNTRY SELECTOR
-  void countryselect()
-  {
-    showCountryPicker(
-      context: context,
-      favorite: <String>['US', 'CN', 'MX', 'IN'],
-      //exclude: <String>['FR'],
-      countryListTheme: CountryListThemeData(
-        backgroundColor: Color(0xffece7d5),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(0),
-          topRight: Radius.circular(0),
+    void countryselect() {
+      showCountryPicker(
+        context: context,
+        favorite: <String>['US', 'CN', 'MX', 'IN'],
+        //exclude: <String>['FR'],
+        countryListTheme: CountryListThemeData(
+          backgroundColor: Color(0xffece7d5),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(0),
+            topRight: Radius.circular(0),
+          ),
         ),
-      ),
-      onSelect: (Country country) {
-        print('Select country: ${country.displayName}');
-      },
-    );
-  }
+        onSelect: (Country country) {
+          print('Select country: ${country.displayName}');
+        },
+      );
+    }
 
-  Widget _buildDialogItem(Language language){
-    return Row(
-      children: <Widget>[
-        SizedBox(
-          width: 0.0,
-        ),
-        Text("${language.name}"),
-        //Text("${language.name} ({$language.isoCode})"),
-      ],
-    );
-  }
+    Widget _buildDialogItem(Language language) {
+      return Row(
+        children: <Widget>[
+          SizedBox(
+            width: 0.0,
+          ),
+          Text("${language.name}"),
+          //Text("${language.name} ({$language.isoCode})"),
+        ],
+      );
+    }
 
-  //Language WHITELIST
-  final supportedLanguages = [
-    Languages.english,
-    Languages.korean,
-
-
-
-
-
-
-
-
-
-  ];
+    //Language WHITELIST
+    final supportedLanguages = [
+      Languages.english,
+      Languages.korean,
+    ];
 
 //LANGUAGE SELECTOR
-  void _openLanguagePickerDialog() => showDialog(
-      context: context,
-      builder: (context) => Theme(
-          data: Theme.of(context).copyWith(primaryColor: Colors.pink),
-          child: LanguagePickerDialog(
-              //languages: supportedLanguages,
-              titlePadding: EdgeInsets.all(8.0),
-              //searchCursorColor: Colors.pinkAccent,
-              searchInputDecoration: InputDecoration(hintText: 'Search'),
-              isSearchable: true,
-              
-              title: Text('Select your language'),
-              onValuePicked: (Language language) => setState(() {
-                    _selectedDialogLanguage = language;
-                    print(_selectedDialogLanguage.name);
-                    print(_selectedDialogLanguage.isoCode);
-                  }),
-              itemBuilder: _buildDialogItem)),
-  );
+    void _openLanguagePickerDialog() => showDialog(
+          context: context,
+          builder: (context) => Theme(
+              data: Theme.of(context).copyWith(primaryColor: Colors.pink),
+              child: LanguagePickerDialog(
+                  //languages: supportedLanguages,
+                  titlePadding: EdgeInsets.all(8.0),
+                  //searchCursorColor: Colors.pinkAccent,
+                  searchInputDecoration:
+                      InputDecoration(hintText: Localize('Search')),
+                  isSearchable: true,
+                  title: Text(Localize('Select your language')),
+                  onValuePicked: (Language language) => setState(() {
+                        print(AuthHelper.userInfoCache['language']);
+                        AuthHelper.userInfoCache['language'] = language.isoCode;
+                        _selectedDialogLanguage = language;
+                        // print(_selectedDialogLanguage.name);
+                        // print(_selectedDialogLanguage.isoCode);
+                      }),
+                  itemBuilder: _buildDialogItem)),
+        );
 
     return Scaffold(
         backgroundColor: Color(0xffece7d5),
@@ -153,25 +139,19 @@ class _ProfilePageState extends State<ProfilePage> {
                   textAlign: TextAlign.center,
                   textScaleFactor: 2,
                 ),
-              trailing: IconButton(
-                alignment: Alignment.centerRight,
-                icon: Icon(Icons.edit_note),
-                onPressed: (){
-                    
-
-
-
-                },
-                
+                trailing: IconButton(
+                  alignment: Alignment.centerRight,
+                  icon: Icon(Icons.edit_note),
+                  onPressed: () {},
+                ),
               ),
             ),
-          ),
 
             //NATIONALITY
             Container(
               child: ListTile(
                 leading: Icon(Icons.flag),
-                title: Text('Nationality'),
+                title: Text(Localize('Nationality')),
                 subtitle: Text(nationality),
                 trailing: IconButton(
                   icon: Icon(Icons.edit_note),
@@ -186,7 +166,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Container(
               child: ListTile(
                 leading: Icon(Icons.chat_rounded),
-                title: Text('Language'),
+                title: Text(Localize('Language')),
                 subtitle: Text(language),
                 trailing: IconButton(
                   icon: Icon(Icons.edit_note),
@@ -202,7 +182,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Container(
               child: ListTile(
                 leading: Icon(Icons.mail),
-                title: Text('Email Address'),
+                title: Text(Localize('Email Address')),
                 subtitle: Text(emailAddress),
               ),
             ),
@@ -212,8 +192,8 @@ class _ProfilePageState extends State<ProfilePage> {
               child: ListTile(
                 leading: Icon(Icons.delete),
                 iconColor: Colors.redAccent,
-                title: Text('Delete Account'),
-                subtitle: Text('This action cannot be restored.'),
+                title: Text(Localize('Delete Account')),
+                subtitle: Text(Localize('This action cannot be restored.')),
                 textColor: Colors.redAccent,
                 onTap: () {},
               ),

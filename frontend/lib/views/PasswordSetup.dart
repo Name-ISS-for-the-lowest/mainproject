@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/views/ConfirmPassword.dart';
 
 class PasswordSetUp extends StatefulWidget {
@@ -76,11 +77,11 @@ class _PasswordState extends State<PasswordSetUp> {
                   height: 100,
                 ),
                 //Log in title
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Password Setup",
+                      Localize("Password Setup"),
                       style: TextStyle(
                         fontSize: 50,
                         fontWeight: FontWeight.w700,
@@ -90,11 +91,12 @@ class _PasswordState extends State<PasswordSetUp> {
                     ),
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Next, please create a suitable password for your new account. ",
+                      Localize(
+                          "Next, please create a suitable password for your new account."),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -104,11 +106,12 @@ class _PasswordState extends State<PasswordSetUp> {
                     ),
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "For security purposes, please make sure that your password contains a series of numbers, letters, and other special characters.",
+                      Localize(
+                          "For security purposes, please make sure that your password contains a series of numbers, letters, and other special characters."),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -118,11 +121,12 @@ class _PasswordState extends State<PasswordSetUp> {
                     ),
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "DON’T share your password with other users or third-parties. It should only be known by the owner of the account",
+                      Localize(
+                          "DON'T share your password with other users or third-parties. It should only be known by the owner of the account"),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -150,7 +154,7 @@ class _PasswordState extends State<PasswordSetUp> {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                  labelText: 'Password',
+                                  labelText: Localize('Password'),
                                   contentPadding: const EdgeInsets.all(18),
                                   fillColor: Colors.white,
                                   filled: true,
@@ -217,8 +221,8 @@ class _PasswordState extends State<PasswordSetUp> {
                                   onPressed: () => {
                                     navigateToConfirmPassword(),
                                   },
-                                  child: const Text(
-                                    "Next",
+                                  child: Text(
+                                    Localize("Next"),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
