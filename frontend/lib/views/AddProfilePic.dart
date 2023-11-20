@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class AddToProfilePic extends StatefulWidget {
   const AddToProfilePic({super.key});
@@ -14,22 +15,23 @@ class AddToProfilePic extends StatefulWidget {
 }
 
 class _AddToProfilePicState extends State<AddToProfilePic> {
-  String imageURL = 'assets/Default_pfp.png'; // Default image
+  bool imageSpecified = false;
+  Widget imageWidget = Image.asset('assets/Default_pfp.png',
+      width: 200, height: 200, fit: BoxFit.fill);
 
-  Future<void> _pickImage(ImageSource source) async {
+  Future<void> pickImage(ImageSource source) async {
     try {
       final pickedFile = await ImagePicker().pickImage(source: source);
-
       if (pickedFile != null) {
+        File getImage = File(pickedFile.path);
         setState(() {
-          imageURL = pickedFile.path;
-          print("Image URL after picking: $imageURL");
+          imageWidget = Image.file(getImage, fit: BoxFit.fill);
+          imageSpecified = true;
         });
       }
     } catch (e) {
       print("Error picking image: $e");
     }
-    setState(() {}); // Explicitly call setState to trigger a rebuild
   }
 
   void _showImagePickerDialog(BuildContext context) {
@@ -42,14 +44,14 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
             SimpleDialogOption(
               onPressed: () async {
                 Navigator.pop(context); // Close the dialog
-                _pickImage(ImageSource.camera);
+                await pickImage(ImageSource.camera);
               },
               child: Text("Take a photo"),
             ),
             SimpleDialogOption(
               onPressed: () async {
                 Navigator.pop(context); // Close the dialog
-                _pickImage(ImageSource.gallery);
+                await pickImage(ImageSource.gallery);
               },
               child: Text("Choose from gallery"),
             ),
@@ -161,14 +163,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                                       shape: BoxShape.circle,
                                     ),
                                     child: ClipOval(
-                                      child: Image.asset(
-                                        imageURL.isNotEmpty
-                                            ? imageURL
-                                            : 'assets/Default_pfp.png', // Provide a placeholder image URL or local asset,
-                                        width: 200,
-                                        height: 200,
-                                        fit: BoxFit.fill,
-                                      ),
+                                      child: imageWidget,
                                     ),
                                   ),
                                 ),
