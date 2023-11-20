@@ -292,6 +292,7 @@ def getLanguageDictionary():
         lang_code = elem["language"]
         lang_name = elem["name"]
         returned_data[lang_code] = lang_name
+    print(returned_data)
     return JSONResponse(content=json.dumps(returned_data), status_code=200)
 
 

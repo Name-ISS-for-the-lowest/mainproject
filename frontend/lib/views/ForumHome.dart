@@ -191,7 +191,7 @@ class _ForumHomeState extends State<ForumHome> {
     String posterName = postData[index]["username"];
     String postContent = postData[index]["content"];
     String postID = postData[index]["_id"];
-    String posterID = postData[index]['user_id'];
+    String posterID = postData[index]['userID'];
     late int likes = postData[index]['likes'];
     bool isEdited = false;
     var liked = postData[index]['liked'];

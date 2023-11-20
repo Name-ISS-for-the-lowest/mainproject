@@ -19,7 +19,7 @@ def insertUserList(users: [User]):
 def insertPostList(posts: [Post]):
     for post in posts:
         postJson = post.__dict__
-        postJson["user_id"] = ObjectId(postJson["user_id"]["$oid"])
+        postJson["userID"] = ObjectId(postJson["userID"]["$oid"])
         postJson["_id"] = ObjectId(postJson["_id"]["$oid"])
         DBManager.db["posts"].update_one(
             {"_id": postJson["_id"]},
@@ -50,7 +50,7 @@ def insertPosts():
     # turn the data into user object
     for i in range(len(data)):
         data[i] = Post.fromDict(data[i])
-        user = DBManager.getUserById(ObjectId(data[i].user_id["$oid"]))
+        user = DBManager.getUserById(ObjectId(data[i].userID["$oid"]))
         data[i].username = user.username
         data[i].profilePicture = user.profilePicture
         data[i].translations = {}
