@@ -86,8 +86,6 @@ class DBManager:
     def addPost(userID, content):
         newPost = Post(content, userID)
         user = DBManager.getUserById(userID)
-        newPost.username = user.username
-        newPost.profilePicture = user.profilePicture
         DBManager.db["posts"].insert_one(newPost.__dict__)
 
     @staticmethod
@@ -115,10 +113,14 @@ class DBManager:
         returnPosts = []
         for elem in posts:
             post = Post.fromDict(elem)
+            user = DBManager.db["users"].find_one({"_id": ObjectId(post.userID)})
+            post.profilePicture = user.get("profilePicture")
+            post.username = user.get("username")
             comboID = str(post._id) + str(userID)
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
             if likedResult is not None:
                 post.liked = True
+           
             returnPosts.append(post)
         return returnPosts
 
@@ -187,9 +189,20 @@ class DBManager:
             userJson = user.__dict__
             DBManager.db["users"].insert_one(userJson)
 
+    def setAdmins(adminEmails):
+        allUsers = DBManager.db["users"].find()
+        for user in allUsers:
+            userEmail = user['email']
+            isAdmin = False
+            if userEmail in adminEmails:
+                isAdmin = True
+            DBManager.db['users'].update_one({"_id": user["_id"]}, {"$set": {"admin": isAdmin}})
+        print("Admin privilleges assigned successfully!")
+
+
     @staticmethod
     def insertPostList(posts: [Post]):
         for post in posts:
             postJson = post.__dict__
-            postJson["user_id"] = ObjectId(postJson["user_id"]["$oid"])
+            postJson["userID"] = ObjectId(postJson["userID"]["$oid"])
             DBManager.db["posts"].insert_one(postJson)
