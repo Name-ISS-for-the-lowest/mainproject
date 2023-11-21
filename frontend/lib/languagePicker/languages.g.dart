@@ -138,7 +138,7 @@ class Languages {
   static Language get yiddish => Language('yi', 'Yiddish');
   static Language get yoruba => Language('yo', 'Yoruba');
   static Language get zulu => Language('zu', 'Zulu');
-  static Language get gottem => Language('thisNuts', 'Gottem');
+  static Language get gottem => Language('deezNuts', 'Gottem');
 
   static List<Language> defaultLanguages = [
     Languages.afrikaans,
