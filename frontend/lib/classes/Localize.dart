@@ -17,6 +17,6 @@ class Localizer {
 
 String Localize(String text) {
   //get defualt language
-  String defaultLanguage = 'ja';
+  String defaultLanguage = 'fr';
   return Localizer.localize(text, defaultLanguage);
 }

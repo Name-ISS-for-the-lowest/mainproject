@@ -71,8 +71,28 @@ class AuthHelper {
     // return false;
     var sessionCookie = await readCookie('session_cookie');
     if (sessionCookie == null) return false;
-    await cacheUserInfo();
-    return true;
+
+    //I want to make a request to the protected endpoint and check the response code
+    String endPoint = '/protected';
+    var url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.get(
+        url,
+        options: Options(contentType: Headers.jsonContentType),
+      );
+      if (response.statusCode == 200) {
+        await cacheUserInfo();
+        return true;
+      } else {
+        return false;
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return false;
+      } else {
+        return false;
+      }
+    }
   }
 
   static readCookie(String key) async {
