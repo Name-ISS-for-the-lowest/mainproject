@@ -15,6 +15,7 @@ class User:
     nationality = "N/A"
     profilePicture = Picture()
     username: str = ""
+    admin: bool
 
     def __init__(self, email, passwordHash, salt, token=None):
         self.email = email
@@ -27,6 +28,7 @@ class User:
         self.profilePicture = self.profilePicture.__dict__
         self.language = "en"
         self.nationality = "N/A"
+        self.admin = False
 
     @staticmethod
     def fromDict(dict):

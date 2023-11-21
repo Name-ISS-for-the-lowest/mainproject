@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:frontend/classes/Data.dart';
 import 'package:frontend/classes/routeHandler.dart';
 import 'package:intl/intl.dart';
 
@@ -9,7 +10,7 @@ import 'package:intl/intl.dart';
 class AuthHelper {
   static String defaultHost = RouteHandler.defaultHost;
   static Map<String, dynamic> userInfoCache = Map();
-  static Map<String, dynamic> languageNames = Map();
+  static Map<String, dynamic> languageNames = Data.languageNames;
 
   static Future<Response> login(String email, String password) async {
     final data = {'email': email, 'password': password};
@@ -67,10 +68,31 @@ class AuthHelper {
   }
 
   static Future<bool> isLoggedIn() async {
+    // return false;
     var sessionCookie = await readCookie('session_cookie');
     if (sessionCookie == null) return false;
-    await cacheUserInfo();
-    return true;
+
+    //I want to make a request to the protected endpoint and check the response code
+    String endPoint = '/protected';
+    var url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.get(
+        url,
+        options: Options(contentType: Headers.jsonContentType),
+      );
+      if (response.statusCode == 200) {
+        await cacheUserInfo();
+        return true;
+      } else {
+        return false;
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return false;
+      } else {
+        return false;
+      }
+    }
   }
 
   static readCookie(String key) async {
@@ -111,18 +133,6 @@ class AuthHelper {
       userInfoCache['profilePicture.url'] = userInfo['profilePicture.url'];
       userInfoCache['profilePicture.fileId'] =
           userInfo['profilePicture.fileId'];
-      try {
-        endPoint = '/getLanguageDictionary';
-        url = '$defaultHost$endPoint';
-        final response2 = await RouteHandler.dio.get(url);
-        languageNames = json.decode(response2.data);
-      } on DioException catch (e) {
-        return Response(
-          requestOptions: RequestOptions(path: url),
-          data: {'message': e},
-          statusCode: 500,
-        );
-      }
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),

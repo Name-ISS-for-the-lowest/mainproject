@@ -51,6 +51,7 @@ dependencies:
   cached_network_image: ^3.3.0
   flutter_cache_manager: ^3.3.1
   path_provider: ^2.1.1
+  image_picker: ^1.0.4
 
 dev_dependencies:
   flutter_test:
@@ -80,6 +81,7 @@ flutter:
     - assets/PostUI/
     - assets/DefaultPFPs/
     - assets/ResourceCenter/
+    - assets/json/
     # - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
