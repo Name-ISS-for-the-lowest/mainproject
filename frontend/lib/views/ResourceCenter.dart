@@ -24,33 +24,42 @@ class _ResourceCenterState extends State<ResourceCenter> {
   }
 
   Widget _IconBuilder(String text, String iconPath, String url) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.black,
-        border: Border.all(color: Color(0x0008231A)),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
+    return GestureDetector(
+      onTap: () {
+        _launchURL(Uri.parse(url));
+      },
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          border: Border.all(color: const Color(0x0008231A)),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 38,
+                width: 100,
+                child: Text(
+                    textAlign: TextAlign.center,
+                    text,
+                    style: const TextStyle(color: Colors.white)),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: SvgPicture.asset(
+                      iconPath,
+                      semanticsLabel: text,
+                    )),
+              )
+            ]),
       ),
-      child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 35,
-              child: Text(
-                  textAlign: TextAlign.center,
-                  text,
-                  style: TextStyle(color: Colors.white)),
-            ),
-            IconButton(
-              onPressed: () {
-                _launchURL(Uri.parse(url));
-              },
-              icon: SvgPicture.asset(iconPath),
-              color: Colors.white,
-            ),
-          ]),
     );
   }
 
@@ -61,87 +70,89 @@ class _ResourceCenterState extends State<ResourceCenter> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(Localize("Student Resources"),
-              style: DefaultTextStyle.of(context)
-                  .style
-                  .apply(fontSizeFactor: 2.0)),
+          Text(
+            Localize("Student Resources"),
+            style:
+                DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(
             height: 60,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Spacer(),
+              const Spacer(),
               _IconBuilder(
                   Localize("Housing"),
                   "assets/ResourceCenter/icon-homehome.svg",
                   "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/housing.html?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp"),
-              Spacer(),
+              const Spacer(),
               _IconBuilder(
                 Localize("F1/J1 Status"),
                 "assets/ResourceCenter/icon-visavisa.svg",
                 "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/maintaining-status.html?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
-              Spacer(),
+              const Spacer(),
               _IconBuilder(
                 Localize("F1/J1 Jobs"),
                 "assets/ResourceCenter/icon-jobjob.svg",
                 "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/employment.html?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
-              Spacer(),
+              const Spacer(),
             ],
           ),
-          Spacer(),
+          const Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Spacer(),
+              const Spacer(),
               _IconBuilder(
                 Localize("Research Scholar"),
                 "assets/ResourceCenter/icon-research.svg",
                 "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/international-visiting-research-scholars.html?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
-              Spacer(),
+              const Spacer(),
               _IconBuilder(
                 Localize("Multicultural Center"),
                 "assets/ResourceCenter/icon-earthearth.svg",
                 "https://www-csus-edu.translate.goog/student-affairs/centers-programs/multi-cultural-center/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
-              Spacer(),
+              const Spacer(),
               _IconBuilder(
                 Localize("Serna Center"),
                 "assets/ResourceCenter/icon-serna.svg",
                 "https://www-csus-edu.translate.goog/student-affairs/centers-programs/serna-center/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
-              Spacer(),
+              const Spacer(),
             ],
           ),
-          Spacer(),
+          const Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Spacer(),
+              const Spacer(),
               _IconBuilder(
                 Localize("APIDA Center"),
                 "assets/ResourceCenter/icon-apida.svg",
                 "https://www-csus-edu.translate.goog/student-affairs/centers-programs/asian-pacific-islander-desi-american-student-center/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
-              Spacer(),
+              const Spacer(),
               _IconBuilder(
                 Localize("Health and Counseling"),
                 "assets/ResourceCenter/icon-heart.svg",
                 "https://www-csus-edu.translate.goog/student-life/health-counseling/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
-              Spacer(),
+              const Spacer(),
               _IconBuilder(
                 Localize("Basic Needs"),
                 "assets/ResourceCenter/icon-basic.svg",
                 "https://www-csus-edu.translate.goog/student-life/health-counseling/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
-              Spacer(),
+              const Spacer(),
             ],
           ),
-          Spacer(),
+          const Spacer(),
         ]);
   }
 }
