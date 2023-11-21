@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:frontend/classes/Localize.dart';
-import 'package:language_picker/language_picker.dart';
-import 'package:language_picker/languages.dart';
+// import 'package:language_picker/language_picker.dart';
+// import 'package:language_picker/languages.dart';
+import '../languagePicker/languages.dart';
+import '../languagePicker/language_picker.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
