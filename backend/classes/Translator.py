@@ -28,7 +28,6 @@ class Translator:
                 "source": source_language,
             },
         )
-        print(results.json())
         return results.json()["data"]["translations"][0]["translatedText"]
 
     @staticmethod

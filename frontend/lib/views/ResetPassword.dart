@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/Localize.dart';
 
 class ResetPassword extends StatefulWidget {
   final String email = "";
@@ -33,8 +34,8 @@ class _ResetPasswordState extends State<ResetPassword> {
     if (!validEmail) {
       //show error message
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid email, must be a CSUS email'),
+        SnackBar(
+          content: Text(Localize('Invalid email, must be a CSUS email')),
         ),
       );
       return;
@@ -53,6 +54,7 @@ class _ResetPasswordState extends State<ResetPassword> {
             IconThemeData(color: Colors.white), // Set the back arrow color
       ),
       body: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
         child: Stack(
           children: [
             Column(
@@ -74,11 +76,11 @@ class _ResetPasswordState extends State<ResetPassword> {
                 const SizedBox(
                   height: 120,
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Reset Password",
+                      Localize("Reset Password"),
                       style: TextStyle(
                         fontSize: 50,
                         fontWeight: FontWeight.w700,
@@ -88,11 +90,11 @@ class _ResetPasswordState extends State<ResetPassword> {
                     ),
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Forgot your password?",
+                      Localize("Forgot Password?"),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -102,11 +104,12 @@ class _ResetPasswordState extends State<ResetPassword> {
                     ),
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Just enter your account’s email and a recovery link will be sent right to you!",
+                      Localize(
+                          "Just enter your account's email and a recovery link will be sent right to you!"),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -132,7 +135,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                  labelText: 'Email',
+                                  labelText: Localize('Email'),
                                   contentPadding: const EdgeInsets.all(18),
                                   fillColor: Colors.white,
                                   filled: true,
@@ -155,7 +158,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     Column(
                       children: [
                         const SizedBox(
-                          height: 5,
+                          height: 10,
                         ),
                         Column(
                           children: [
@@ -177,8 +180,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                                         emailController.text);
                                     // Add your logic for sending recovery email
                                   },
-                                  child: const Text(
-                                    "Send Recovery Email",
+                                  child: Text(
+                                    Localize("Send Recovery Email"),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,

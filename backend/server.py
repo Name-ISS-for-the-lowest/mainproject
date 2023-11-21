@@ -17,7 +17,7 @@ from classes.Translator import Translator
 
 
 app = FastAPI(title="ISS App")
-# migrate.migrate()
+migrate.migrate()
 
 
 class CookiesMiddleWare(BaseHTTPMiddleware):
@@ -227,6 +227,18 @@ def createPost(postBody: str, request: Request):
     return JSONResponse({"message": "Post Added"}, status_code=200)
 
 
+@app.post("/editPost")
+def editPost(postID: str, postBody: str, request: Request):
+    DBManager.editPost(postID, postBody)
+    return JSONResponse({"message": "Post Edited"}, status_code=200)
+
+
+@app.post("/deletePost")
+def deletePost(postID: str, request: Request):
+    DBManager.deletePost(postID)
+    return JSONResponse({"message": "Post Deleted"}, status_code=200)
+
+
 @app.get("/getPosts")
 def getPosts(start: int, end: int, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
@@ -280,6 +292,7 @@ def getLanguageDictionary():
         lang_code = elem["language"]
         lang_name = elem["name"]
         returned_data[lang_code] = lang_name
+    print(returned_data)
     return JSONResponse(content=json.dumps(returned_data), status_code=200)
 
 

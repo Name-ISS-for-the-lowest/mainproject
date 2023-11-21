@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/eventHelper.dart';
 import 'package:frontend/classes/routeHandler.dart';
+import 'package:frontend/views/SearchBar.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:url_launcher/url_launcher.dart';
@@ -41,12 +42,12 @@ class _EventsPageState extends State<EventsPage> {
   Widget _buildList() {
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
-      itemBuilder: (context, item) {
-        if (item.isOdd) return const Divider();
-
-        final index = item ~/ 2;
+      itemBuilder: (context, index) {
         //if at bottom of list show loading indicator
         if (index == EventHelper.events.length) {
+          if (EventHelper.fetched == true) {
+            return null;
+          }
           return const Center(
             child: CircularProgressIndicator(),
           );
@@ -65,71 +66,76 @@ class _EventsPageState extends State<EventsPage> {
       onTap: () => {
         _launchURL(Uri.parse(event['url']!)),
       },
-      child: Row(
+      child: Column(
         children: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Text(
-                    event['day']!,
-                    style: const TextStyle(
-                      fontSize: 27,
-                    ),
-                  ),
-                  Text(
-                    event['month']!,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Wrap(
-                    children: <Widget>[
+          Row(
+            children: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
                       Text(
-                        "${event['title']}",
-                        // maxLines: 1,
+                        event['day']!,
                         style: const TextStyle(
-                          fontFamily: 'Inter',
-                          // overflow: TextOverflow.ellipsis,
-                          fontSize: 18,
+                          fontSize: 27,
+                        ),
+                      ),
+                      Text(
+                        event['month']!,
+                        style: const TextStyle(
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      Text(
-                        "${event['date']}",
-                        // maxLines: 4,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      Text(
-                        "${event['location']}",
-                        // maxLines: 2,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          // overflow: TextOverflow.ellipsis
-                        ),
-                      )
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-          )
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        children: <Widget>[
+                          Text(
+                            "${event['title']}",
+                            // maxLines: 1,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              // overflow: TextOverflow.ellipsis,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            "${event['date']}",
+                            // maxLines: 4,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            "${event['location']}",
+                            // maxLines: 2,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                              // overflow: TextOverflow.ellipsis
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const Divider()
         ],
       ),
     );
@@ -139,6 +145,15 @@ class _EventsPageState extends State<EventsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffece7d5),
+      appBar: AppBar(
+        backgroundColor: const Color(0xffece7d5),
+        automaticallyImplyLeading: false,
+        title: SearchBarWidget(
+          listSetState: setState,
+          list: EventHelper.events,
+        ),
+        toolbarHeight: 40,
+      ),
       body: _buildList(),
     );
   }
