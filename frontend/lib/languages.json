@@ -132,8 +132,5 @@
   { "isoCode": "yi", "name": "Yiddish" },
   { "isoCode": "yo", "name": "Yoruba" },
   { "isoCode": "zu", "name": "Zulu" },
-  { "isoCode": "he", "name": "Hebrew" },
-  { "isoCode": "jv", "name": "Javanese" },
-  { "isoCode": "zh-CN", "name": "Chinese (Simplified)" },
   { "isoCode": "thisNuts", "name": "Gottem" }
 ]

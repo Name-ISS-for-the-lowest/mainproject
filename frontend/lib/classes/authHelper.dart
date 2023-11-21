@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 
 class AuthHelper {
   static String defaultHost = RouteHandler.defaultHost;
-  static Map<String, dynamic> userInfoCache = Map();
+  static Map<String, dynamic> userInfoCache = {};
   static Map<String, dynamic> languageNames = Data.languageNames;
 
   static Future<Response> login(String email, String password) async {
@@ -125,13 +125,14 @@ class AuthHelper {
           queryParameters: params,
           options: Options(contentType: Headers.jsonContentType));
       var userInfo = response.data;
-      userInfoCache['_id'] = userInfo['_id'];
-      userInfoCache['email'] = userInfo['email'];
-      userInfoCache['username'] = userInfo['username'];
-      userInfoCache['language'] = userInfo['language'];
-      userInfoCache['nationality'] = userInfo['nationality'];
-      userInfoCache['profilePicture.url'] = userInfo['profilePicture.url'];
-      userInfoCache['profilePicture.fileId'] =
+      AuthHelper.userInfoCache['_id'] = userInfo['_id'];
+      AuthHelper.userInfoCache['email'] = userInfo['email'];
+      AuthHelper.userInfoCache['username'] = userInfo['username'];
+      AuthHelper.userInfoCache['language'] = userInfo['language'];
+      AuthHelper.userInfoCache['nationality'] = userInfo['nationality'];
+      AuthHelper.userInfoCache['profilePicture.url'] =
+          userInfo['profilePicture.url'];
+      AuthHelper.userInfoCache['profilePicture.fileId'] =
           userInfo['profilePicture.fileId'];
     } on DioException catch (e) {
       return Response(

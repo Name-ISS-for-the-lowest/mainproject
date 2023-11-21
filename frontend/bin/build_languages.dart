@@ -30,7 +30,7 @@ static List<Language> defaultLanguages =
 
   final staticClass = '''
 // This is a generated file. See DEVELOPMENT_NOTES.md.
-import 'languages.dart';
+import './languages.dart';
 
 class Languages {
 ${getters.join('\n')}
