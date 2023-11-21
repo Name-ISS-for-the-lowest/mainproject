@@ -52,7 +52,8 @@ class _ProfilePageState extends State<ProfilePage> {
             width: 0.0,
           ),
           Text("${language.name}"),
-          //Text("${language.name} ({$language.isoCode})"),
+          //Text("${language.name}"),
+          //Text("${language.name} (${language.isoCode})"),
         ],
       );
     }
@@ -77,9 +78,13 @@ class _ProfilePageState extends State<ProfilePage> {
 			Language.fromIsoCode("ca"),
 			//Language.fromIsoCode("ceb"),
 			Language.fromIsoCode("ny"),
-			//Language.fromIsoCode("zh"),
+			
+      //Language.fromIsoCode("zh"),
+      Languages.chineseSimplified, //Returns zh_Hans
 			//Language.fromIsoCode("zh-TW"),
-			Language.fromIsoCode("co"),
+      Languages.chineseTraditional, //returns zh_Hant
+			
+      Language.fromIsoCode("co"),
 			Language.fromIsoCode("hr"),
 			Language.fromIsoCode("cs"),
 			Language.fromIsoCode("da"),
@@ -104,7 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
 			Language.fromIsoCode("ht"),
 			Language.fromIsoCode("ha"),
 			//Language.fromIsoCode("haw"),
-			//Language.fromIsoCode("iw"),
+			//Language.fromIsoCode("iw"), HEBREW HE REDUNDANCY
 			Language.fromIsoCode("hi"),
 			//Language.fromIsoCode("hmn"),
 			Language.fromIsoCode("hu"),
@@ -194,7 +199,10 @@ class _ProfilePageState extends State<ProfilePage> {
 			Language.fromIsoCode("zu"),
 			Language.fromIsoCode("he"),
 			Language.fromIsoCode("jv"),
-			//Language.fromIsoCode("zh-CN"),
+			
+      //Language.fromIsoCode("zh-CN"), REDUNDANCY WITH ZH
+      //Languages.chineseSimplified,
+      
     ];
 
 //LANGUAGE SELECTOR
@@ -212,7 +220,20 @@ class _ProfilePageState extends State<ProfilePage> {
                   title: Text(Localize('Select your language')),
                   onValuePicked: (Language language) => setState(() {
                         print(AuthHelper.userInfoCache['language']);
-                        AuthHelper.userInfoCache['language'] = language.isoCode;
+                        
+                        if ("zh_Hans".compareTo(language.isoCode) == 0)
+                        {
+                          AuthHelper.userInfoCache['language'] = 'zh-CN';
+                        }
+                        else if ("zh_Hant".compareTo(language.isoCode) == 0)
+                        {
+                          AuthHelper.userInfoCache['language'] = 'zh-TW';
+                        }
+                        else
+                        {
+                          AuthHelper.userInfoCache['language'] = language.isoCode;
+                        }
+
                         _selectedDialogLanguage = language;
                         // print(_selectedDialogLanguage.name);
                         // print(_selectedDialogLanguage.isoCode);
@@ -221,8 +242,7 @@ class _ProfilePageState extends State<ProfilePage> {
         );
 
 
-  showAlertDialog(BuildContext context) {
-
+  showDeleteAlertDialog(BuildContext context) {
     // set up the buttons
     Widget cancelButton = TextButton(
       child: Text("Cancel"),
@@ -254,6 +274,40 @@ class _ProfilePageState extends State<ProfilePage> {
       },
     );
   }
+
+  showLogoutAlertDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Cancel"),
+      onPressed:  () {
+
+        return;
+      },
+    );
+    Widget continueButton = TextButton(
+      child: Text("Continue"),
+      onPressed:  () {},
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Log Out"),
+      content: Text("You will be returned to the login screen. Continue?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   
 
     return Scaffold(
@@ -357,6 +411,24 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
 
+            //LOG OUT
+            Container(
+              child: ListTile(
+                leading: Icon(Icons.logout),
+
+                //LOCALIZE NOT FUNCTIONING AT THE MOMENT
+                //title: Text(Localize('Log Out')),
+                //subtitle: Text(Localize('Sign out of the current account.')),
+                title: Text('Log Out'),
+                subtitle: Text('Sign out of the current account.'),
+                onTap: () {
+
+                showLogoutAlertDialog(context);
+                  
+                },
+              ),
+            ),
+
             //DELETE ACCOUNT
             Container(
               child: ListTile(
@@ -367,7 +439,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 textColor: Colors.redAccent,
                 onTap: () {
 
-                showAlertDialog(context);
+                showDeleteAlertDialog(context);
                   
                 },
               ),
