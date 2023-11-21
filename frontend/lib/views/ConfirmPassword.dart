@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/views/AddProfilePic.dart';
 
 class ConfirmPassword extends StatefulWidget {
@@ -70,11 +71,11 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                   height: 100,
                 ),
                 //Log in title
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Confirm Password",
+                      Localize("Confirm Password"),
                       style: TextStyle(
                         fontSize: 50,
                         fontWeight: FontWeight.w700,
@@ -84,11 +85,12 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                     ),
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Almost there! Please confirm the password you just created by entering it one more time. ",
+                      Localize(
+                          "Almost there! Please confirm the password you just created by entering it one more time."),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -116,7 +118,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                  labelText: 'Password',
+                                  labelText: Localize('Password'),
                                   contentPadding: const EdgeInsets.all(18),
                                   fillColor: Colors.white,
                                   filled: true,
@@ -181,8 +183,8 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                     ),
                                   ),
                                   onPressed: () => {navigateToAddProfilePic()},
-                                  child: const Text(
-                                    "Next",
+                                  child: Text(
+                                    Localize("Next"),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/ResetPassword.dart';
 import 'package:frontend/views/SignUp.dart';
@@ -121,11 +122,11 @@ class _LogInState extends State<LogIn> {
                   height: 120,
                 ),
                 //Log in title
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Log In",
+                      Localize("Log In"),
                       style: TextStyle(
                         fontSize: 50,
                         fontWeight: FontWeight.w700,
@@ -152,7 +153,7 @@ class _LogInState extends State<LogIn> {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                  labelText: 'Email',
+                                  labelText: Localize('Email'),
                                   contentPadding: const EdgeInsets.all(18),
                                   fillColor: Colors.white,
                                   filled: true,
@@ -177,7 +178,7 @@ class _LogInState extends State<LogIn> {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                  labelText: 'Password',
+                                  labelText: Localize('Password'),
                                   contentPadding: const EdgeInsets.all(18),
                                   fillColor: Colors.white,
                                   filled: true,
@@ -218,8 +219,8 @@ class _LogInState extends State<LogIn> {
                                     executeLogin(context, emailController.text,
                                         passwordController.text),
                                   },
-                                  child: const Text(
-                                    "Login",
+                                  child: Text(
+                                    Localize("Login"),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
@@ -252,8 +253,8 @@ class _LogInState extends State<LogIn> {
                                   onPressed: () => {
                                     navigateToSignUp(),
                                   },
-                                  child: const Text(
-                                    "Sign Up",
+                                  child: Text(
+                                    Localize("Sign Up"),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
@@ -279,8 +280,8 @@ class _LogInState extends State<LogIn> {
                       onPressed: () => {
                         navigateToResetPassword(),
                       },
-                      child: const Text(
-                        "Forgot Password?",
+                      child: Text(
+                        Localize("Forgot Password?"),
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
