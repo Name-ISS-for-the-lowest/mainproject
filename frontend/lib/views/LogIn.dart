@@ -16,6 +16,16 @@ class _LogInState extends State<LogIn> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    AuthHelper.isLoggedIn().then((value) {
+      if (value) {
+        navigateToPrimaryScreens();
+      }
+    });
+  }
+
   void executeLogin(BuildContext context, email, String password) async {
     //do something with the email and password
     var response = await AuthHelper.login(email, password);
@@ -75,7 +85,7 @@ class _LogInState extends State<LogIn> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return Scaffold(
+          return const Scaffold(
             body: CoreTemplate(),
           );
         },

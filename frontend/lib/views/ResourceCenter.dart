@@ -46,7 +46,7 @@ class _ResourceCenterState extends State<ResourceCenter> {
                   IconButton(
                     onPressed: () {
                       _launchURL(Uri.parse(
-                          "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/housing.html?_x_tr_sl=auto&_x_tr_tl=${userLang}}&_x_tr_hl=en&_x_tr_pto=wapp"));
+                          "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/housing.html?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp"));
                     },
                     icon: SvgPicture.asset(
                         "assets/ResourceCenter/icon-homehome.svg"),

@@ -18,6 +18,8 @@ class Translator:
         if source_language == "":
             source_language = Translator.infereLanguage(content)
 
+        if source_language == target_language:
+            return content
         results = requests.post(
             url,
             data={

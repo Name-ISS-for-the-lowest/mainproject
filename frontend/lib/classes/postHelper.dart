@@ -9,33 +9,55 @@ class PostHelper {
   static Map<String, String> cachedTranslations = Map();
 
   static Future<Response> createPost(String userID, String postBody) async {
-    final data = {'userID': userID, 'postBody': postBody};
+    final params = {'postBody': postBody};
     String endPoint = '/createPost';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.post(url,
-          data: jsonEncode(data),
+          queryParameters: params,
           options: Options(contentType: Headers.jsonContentType));
       return response;
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),
-        data: {'message': 'post machine broke lil bro'},
+        data: {'message': e},
         statusCode: 500,
       );
     }
   }
 
   static getPosts(int start, int end) async {
-    final data = {
+    final params = {
       'start': start,
       'end': end,
-      'userLang': AuthHelper.userInfoCache['language']
     };
     String endPoint = '/getPosts';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.get(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static searchPosts(int start, int end, String search, String userID) async {
+    final data = {
+      'start': start,
+      'end': end,
+      'search': search,
+      'userID': userID,
+    };
+    String endPoint = '/searchPosts';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.post(url,
           data: jsonEncode(data),
           options: Options(contentType: Headers.jsonContentType));
       return response.data;
@@ -49,18 +71,18 @@ class PostHelper {
   }
 
   static likePost(String postID) async {
-    final data = {'postID': postID};
+    final params = {'postID': postID};
     String endPoint = '/likePost';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.post(url,
-          data: jsonEncode(data),
+          queryParameters: params,
           options: Options(contentType: Headers.jsonContentType));
       return response.data;
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),
-        data: {'message': 'post machine broke lil bro'},
+        data: {'message': e},
         statusCode: 500,
       );
     }
@@ -69,18 +91,18 @@ class PostHelper {
   static getTranslation(String input) async {
     String targetLang = AuthHelper.userInfoCache['language'];
     print(targetLang);
-    final data = {'source': 'en', 'target': targetLang, 'content': input};
+    final params = {'target': targetLang, 'content': input};
     String endPoint = '/translate';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.get(url,
-          data: jsonEncode(data),
+          queryParameters: params,
           options: Options(contentType: Headers.jsonContentType));
       return response.data;
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),
-        data: {'message': 'post machine broke lil bro'},
+        data: {'message': e},
         statusCode: 500,
       );
     }
@@ -88,7 +110,7 @@ class PostHelper {
 
   static storeTranslation(String translatedText, String postID) async {
     String userLang = AuthHelper.userInfoCache['language'];
-    final data = {
+    final params = {
       'translatedText': translatedText,
       'userLang': userLang,
       'postID': postID
@@ -97,13 +119,13 @@ class PostHelper {
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.post(url,
-          data: jsonEncode(data),
+          queryParameters: params,
           options: Options(contentType: Headers.jsonContentType));
       return response;
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),
-        data: {'message': 'post machine broke lil bro'},
+        data: {'message': e},
         statusCode: 500,
       );
     }
