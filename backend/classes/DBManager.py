@@ -105,17 +105,35 @@ class DBManager:
     def deletePost(postID):
         postID = ObjectId(postID)
         DBManager.db["posts"].update_one({"_id": postID},{"$set": {"deleted": True}})
+
+    @staticmethod
+    def toggleRemovalOfPost(postID):
+        postID = ObjectId(postID)
+        post = DBManager.db["posts"].find_one({"_id": postID})
+        isRemoved = post.get("removed")
+        removalToggle = not isRemoved
+        DBManager.db["posts"].update_one({"_id": postID}, {"$set": {"removed": removalToggle}})
         
 
     @staticmethod
-    def getPosts(start, end, userID=None):
-        posts = DBManager.db["posts"].find({"deleted" : False}).sort("_id", -1).skip(start).limit(end)
+    def getPosts(start, end, showRemoved, showDeleted, showReported, userID=None):
+        specialSearchParams = {}
+        if showRemoved == 'Only':
+            specialSearchParams['removed'] = True
+        elif showRemoved == 'None':
+            specialSearchParams['removed'] = False
+        if showDeleted == 'Only':
+            specialSearchParams['deleted'] = True
+        elif showDeleted == 'None':
+            specialSearchParams['deleted'] = False
+        posts = DBManager.db["posts"].find(specialSearchParams).sort("_id", -1).skip(start).limit(end)
         returnPosts = []
         for elem in posts:
             post = Post.fromDict(elem)
             user = DBManager.db["users"].find_one({"_id": ObjectId(post.userID)})
             post.profilePicture = user.get("profilePicture")
             post.username = user.get("username")
+            post.posterIsAdmin = user.get("admin")
             comboID = str(post._id) + str(userID)
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
             if likedResult is not None:
@@ -130,10 +148,19 @@ class DBManager:
         return post
     
     @staticmethod
-    def searchPosts(start, end, search, userID):
+    def searchPosts(start, end, showRemoved, showDeleted, showReported, search, userID):
+        specialSearchParams = {"content": {"$regex": search, "$options": "i"}}
+        if showRemoved == 'Only':
+            specialSearchParams['removed'] = True
+        elif showRemoved == 'None':
+            specialSearchParams['removed'] = False
+        if showDeleted == 'Only':
+            specialSearchParams['deleted'] = True
+        elif showDeleted == 'None':
+            specialSearchParams['deleted'] = False
         posts = (
             DBManager.db["posts"]
-            .find({"content": {"$regex": search, "$options": "i"}})
+            .find(specialSearchParams)
             .sort("_id", -1)
             .skip(start)
             .limit(end)
@@ -141,6 +168,10 @@ class DBManager:
         returnPosts = []
         for elem in posts:
             post = Post.fromDict(elem)
+            user = DBManager.db["users"].find_one({"_id": ObjectId(post.userID)})
+            post.profilePicture = user.get("profilePicture")
+            post.username = user.get("username")
+            post.posterIsAdmin = user.get("admin")
             comboID = str(post._id) + str(userID)
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
             if likedResult is not None:

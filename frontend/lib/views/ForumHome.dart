@@ -21,7 +21,13 @@ class _ForumHomeState extends State<ForumHome> {
   bool init = false;
   bool searching = false;
   bool firstLoad = true;
+  bool adminOptionsToggled = false;
   final Map<String, String> currentlyTranslated = {};
+  final Map<String, String> specialSearchArgs = {
+    'showReported': 'All',
+    'showRemoved': 'None',
+    'showDeleted': 'None'
+  };
 
   @override
   void initState() {
@@ -74,8 +80,12 @@ class _ForumHomeState extends State<ForumHome> {
       searching = false;
       return dataCall;
     } else {
-      var dataCall = await PostHelper.searchPosts(searchParams["postsFetched"],
-          postsPerFetch, search, AuthHelper.userInfoCache["_id"]);
+      var dataCall = await PostHelper.searchPosts(
+          searchParams["postsFetched"],
+          postsPerFetch,
+          search,
+          AuthHelper.userInfoCache["_id"],
+          specialSearchArgs);
       Map dataCallMap = {};
       for (var item in dataCall) {
         dataCallMap[item['_id']] = item;
@@ -174,7 +184,37 @@ class _ForumHomeState extends State<ForumHome> {
 
   Future<void> loadDelete(String postID) async {
     await PostHelper.deletePost(postID);
-    var dataCall = await PostHelper.getPosts(0, searchParams["postsFetched"]);
+    var dataCall = await PostHelper.getPosts(
+        0, searchParams["postsFetched"], specialSearchArgs);
+    if (mounted) {
+      setState(() {
+        postData.clear();
+        postData.addAll(dataCall);
+        num fetchedLength = dataCall.length;
+        int convertedFetch = fetchedLength.toInt();
+        searchParams["postsFetched"] = convertedFetch;
+      });
+    }
+  }
+
+  Future<void> loadRemovalToggle(String postID) async {
+    await PostHelper.toggleRemoval(postID);
+    var dataCall = await PostHelper.getPosts(
+        0, searchParams['postsFetched'], specialSearchArgs);
+    if (mounted) {
+      setState(() {
+        postData.clear();
+        postData.addAll(dataCall);
+        num fetchedLength = dataCall.length;
+        int convertedFetch = fetchedLength.toInt();
+        searchParams["postsFetched"] = convertedFetch;
+      });
+    }
+  }
+
+  Future<void> loadUpdate() async {
+    var dataCall = await PostHelper.getPosts(
+        0, searchParams['postsFetched'], specialSearchArgs);
     if (mounted) {
       setState(() {
         postData.clear();
@@ -193,11 +233,29 @@ class _ForumHomeState extends State<ForumHome> {
     String postID = postData[index]["_id"];
     String posterID = postData[index]['userID'];
     late int likes = postData[index]['likes'];
+    bool posterIsAdmin = false;
+    bool userIsAdmin = false;
+    //These booleans below may come in handy when we are making admin views
+    bool deleted = false;
+    bool removed = false;
+    if (AuthHelper.userInfoCache['admin'] == 'True') {
+      userIsAdmin = true;
+    }
     bool isEdited = false;
     var liked = postData[index]['liked'];
     if (postData[index]['edited'] == 'True') {
       isEdited = true;
     }
+    if (postData[index]['posterIsAdmin'] == 'True') {
+      posterIsAdmin = true;
+    }
+    if (postData[index]['deleted'] == 'True') {
+      deleted = true;
+    }
+    if (postData[index]['removed'] == 'True') {
+      removed = true;
+    }
+
     String formattedLikes = formatLargeNumber(likes);
     postContent = postContent.replaceAll('\n', ' ');
     bool postTooLong = false;
@@ -399,13 +457,45 @@ class _ForumHomeState extends State<ForumHome> {
             Positioned(
               left: 80,
               top: 14,
-              child: Text(
-                posterName,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
+              child: RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                        text: posterName,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'Inter',
+                        )),
+                    if (posterIsAdmin)
+                      TextSpan(
+                        text: ' [Admin]',
+                        style: TextStyle(
+                          color: Color.fromRGBO(4, 57, 39, 100),
+                        ),
+                      ),
+                  ],
                 ),
               ),
             ),
+            Positioned(
+                left: 80,
+                top: 40,
+                //I'm sorry for my sins
+                child: (userIsAdmin)
+                    ? (deleted)
+                        ? Text(
+                            "[Deleted By User]",
+                            style: TextStyle(color: Colors.red),
+                          )
+                        : (removed)
+                            ? Text(
+                                "[Post Removed]",
+                                style: TextStyle(
+                                  color: Colors.red,
+                                ),
+                              )
+                            : SizedBox()
+                    : SizedBox()),
             Positioned(
               left: 350,
               top: 22.5,
@@ -475,6 +565,49 @@ class _ForumHomeState extends State<ForumHome> {
             ),
             Positioned(
               bottom: 33,
+              left: 120,
+              child: GestureDetector(
+                onTap: () {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text("Flag Tapped")));
+                },
+                child: (userIsAdmin)
+                    ? SvgPicture.asset(
+                        "assets/PostUI/icon-flag.svg",
+                        height: 20,
+                        width: 20,
+                        color: Colors.deepOrange,
+                      )
+                    : SizedBox(),
+              ),
+            ),
+            Positioned(
+              bottom: 33,
+              left: 155,
+              child: (userIsAdmin)
+                  ? (deleted)
+                      ? SizedBox()
+                      : GestureDetector(
+                          onTap: () async {
+                            await loadRemovalToggle(postID);
+                          },
+                          child: (removed)
+                              ? SvgPicture.asset(
+                                  "assets/PostUI/icon-approve.svg",
+                                  height: 20,
+                                  width: 20,
+                                  color: Colors.green,
+                                )
+                              : SvgPicture.asset(
+                                  "assets/PostUI/icon-remove.svg",
+                                  height: 18,
+                                  width: 18,
+                                  color: Colors.red,
+                                ))
+                  : SizedBox(),
+            ),
+            Positioned(
+              bottom: 33,
               left: 280,
               child: GestureDetector(
                 onTap: () async {
@@ -532,8 +665,237 @@ class _ForumHomeState extends State<ForumHome> {
     );
   }
 
+  Widget AdminOptions() {
+    Color toggleColor = Color(0xaa000000);
+    Color unselected = Color(0xaa000000);
+    if (adminOptionsToggled) {
+      toggleColor = Colors.black;
+    }
+    return Container(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              SizedBox(
+                width: (adminOptionsToggled) ? 223 : 225,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  setState(() {
+                    adminOptionsToggled = !adminOptionsToggled;
+                  });
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      (adminOptionsToggled)
+                          ? "Close Admin Options"
+                          : "Open Admin Options",
+                      style: TextStyle(color: toggleColor),
+                    ),
+                    SvgPicture.asset(
+                      "assets/PostUI/icon-adminoptions.svg",
+                      color: toggleColor,
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+          (adminOptionsToggled)
+              ? Container(
+                  height: 150,
+                  width: 400,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        child: Container(
+                          color: Colors.grey,
+                          height: 1,
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        child: Container(
+                          color: Colors.grey,
+                          height: 1,
+                          width: 400,
+                        ),
+                      ),
+                      Positioned(
+                        left: 35,
+                        top: 20,
+                        child: Text("Show Reported Posts"),
+                      ),
+                      Positioned(
+                        left: 35,
+                        top: 60,
+                        child: Text("Show Removed Posts"),
+                      ),
+                      Positioned(
+                        left: 35,
+                        top: 100,
+                        child: Text("Show Deleted Posts"),
+                      ),
+                      Positioned(
+                        left: 210,
+                        top: 20,
+                        child: GestureDetector(
+                          onTap: () async {
+                            specialSearchArgs['showReported'] = 'All';
+                            await loadUpdate();
+                          },
+                          child: Text(
+                            "All",
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showReported'] == 'All')
+                                        ? Colors.black
+                                        : unselected),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 250,
+                        top: 20,
+                        child: GestureDetector(
+                          onTap: () async {
+                            specialSearchArgs['showReported'] = 'Only';
+                            await loadUpdate();
+                          },
+                          child: Text(
+                            "Only",
+                            style: TextStyle(
+                                color: (specialSearchArgs['showReported'] ==
+                                        'Only')
+                                    ? Colors.black
+                                    : unselected),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 210,
+                        top: 60,
+                        child: GestureDetector(
+                          onTap: () async {
+                            specialSearchArgs['showRemoved'] = 'All';
+                            await loadUpdate();
+                          },
+                          child: Text(
+                            "All",
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showRemoved'] == 'All')
+                                        ? Colors.black
+                                        : unselected),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 250,
+                        top: 60,
+                        child: GestureDetector(
+                          onTap: () async {
+                            specialSearchArgs['showRemoved'] = 'Only';
+                            await loadUpdate();
+                          },
+                          child: Text(
+                            "Only",
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showRemoved'] == 'Only')
+                                        ? Colors.black
+                                        : unselected),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 300,
+                        top: 60,
+                        child: GestureDetector(
+                          onTap: () async {
+                            specialSearchArgs['showRemoved'] = 'None';
+                            await loadUpdate();
+                          },
+                          child: Text(
+                            "None",
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showRemoved'] == 'None')
+                                        ? Colors.black
+                                        : unselected),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 210,
+                        top: 100,
+                        child: GestureDetector(
+                          onTap: () async {
+                            specialSearchArgs['showDeleted'] = 'All';
+                            await loadUpdate();
+                          },
+                          child: Text(
+                            "All",
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showDeleted'] == 'All')
+                                        ? Colors.black
+                                        : unselected),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 250,
+                        top: 100,
+                        child: GestureDetector(
+                          onTap: () async {
+                            specialSearchArgs['showDeleted'] = 'Only';
+                            await loadUpdate();
+                          },
+                          child: Text(
+                            "Only",
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showDeleted'] == 'Only')
+                                        ? Colors.black
+                                        : unselected),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 300,
+                        top: 100,
+                        child: GestureDetector(
+                          onTap: () async {
+                            specialSearchArgs['showDeleted'] = 'None';
+                            await loadUpdate();
+                          },
+                          child: Text(
+                            "None",
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showDeleted'] == 'None')
+                                        ? Colors.black
+                                        : unselected),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : const SizedBox(),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    bool userIsAdmin = false;
+    if (AuthHelper.userInfoCache['admin'] == 'True') {
+      userIsAdmin = true;
+    }
     return Scaffold(
       backgroundColor: Color(0xffece7d5),
       appBar: AppBar(
@@ -548,11 +910,18 @@ class _ForumHomeState extends State<ForumHome> {
       ),
       body: Column(
         children: [
-          const SizedBox(
-            height: 15,
-          ),
+          const SizedBox(height: 5),
+          (userIsAdmin)
+              ? AdminOptions()
+              : const SizedBox(
+                  height: 10,
+                ),
           Expanded(
-            child: _buildList(),
+            child: (postData.length > 0)
+                ? _buildList()
+                : Center(
+                    child: Text("No Posts Found"),
+                  ),
           )
         ],
       ),

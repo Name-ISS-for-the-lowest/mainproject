@@ -111,6 +111,7 @@ class AuthHelper {
       userInfoCache['profilePicture.url'] = userInfo['profilePicture.url'];
       userInfoCache['profilePicture.fileId'] =
           userInfo['profilePicture.fileId'];
+      userInfoCache['admin'] = userInfo['admin'];
       try {
         endPoint = '/getLanguageDictionary';
         url = '$defaultHost$endPoint';
