@@ -203,7 +203,11 @@ class _ProfilePageState extends State<ProfilePage> {
     void _openLanguagePickerDialog() => showDialog(
           context: context,
           builder: (context) => Theme(
-              data: Theme.of(context).copyWith(primaryColor: Colors.pink),
+              data: Theme.of(context).copyWith(
+                primaryColor: Colors.pink,
+                dialogBackgroundColor: Color(0xfff7ebe1),
+                
+                ),
               child: LanguagePickerDialog(
                   languages: supportedLanguages,
                   titlePadding: EdgeInsets.all(8.0),
@@ -222,7 +226,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   itemBuilder: _buildDialogItem)),
         );
 
-
+  //DELETE ACCOUNT BUTTON
   showDeleteAlertDialog(BuildContext context) {
     // set up the buttons
     Widget cancelButton = TextButton(
@@ -241,8 +245,11 @@ class _ProfilePageState extends State<ProfilePage> {
       },
     );
 
-    // set up the AlertDialog
     AlertDialog alert = AlertDialog(
+      backgroundColor: Color(0xfff7ebe1),      
+      //backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10.0))),
       title: Text("ACCOUNT DELETION"),
       content: Text("THIS ACTION IS IRREVERSABLE. ARE YOU SURE YOU WANT TO CONTINUE?"),
       actions: [
@@ -251,7 +258,6 @@ class _ProfilePageState extends State<ProfilePage> {
       ],
     );
 
-    // show the dialog
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -260,8 +266,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  //LOGOUT BUTTON
   showLogoutAlertDialog(BuildContext context) {
-    // set up the buttons
     Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed:  () {
@@ -278,8 +284,10 @@ class _ProfilePageState extends State<ProfilePage> {
       },
     );
 
-    // set up the AlertDialog
     AlertDialog alert = AlertDialog(
+      backgroundColor: Color(0xfff7ebe1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10.0))),      
       title: Text("Log Out"),
       content: Text("You will be returned to the login screen. Continue?"),
       actions: [
@@ -288,7 +296,6 @@ class _ProfilePageState extends State<ProfilePage> {
       ],
     );
 
-    // show the dialog
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -298,7 +305,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   
-
+    //ACTUAL PAGE
     return Scaffold(
         backgroundColor: Color(0xffece7d5),
         // body: Center(child: Text("Profile Page")),
