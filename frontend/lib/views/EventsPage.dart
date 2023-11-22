@@ -11,6 +11,7 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsPage> {
+
   //init
   @override
   void initState() {
@@ -38,19 +39,35 @@ class _EventsPageState extends State<EventsPage> {
       builder: (BuildContext context) {
         return Container(
           decoration: const BoxDecoration(
-          color: Color(0xffece7d5),  // Set your desired background color here
-          //borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+          color: Color(0xffece7d5),
           ),
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                event['title']!,
-                style: const TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      event['title']!,
+                      style: const TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  ),
+                  GestureDetector(
+                  onTap: () {
+                    _launchURL(Uri.parse(event['url']!));
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(8.0),
+                    child: const Icon(
+                      Icons.arrow_forward,
+                    ),
+                  ),
                 ),
+                ]
               ),
               const SizedBox(height: 10.0),
               Text(
@@ -109,8 +126,8 @@ class _EventsPageState extends State<EventsPage> {
         _launchURL(Uri.parse(event['url']!)),
       },
       onLongPress: () {
-      showExpandedInformation(event);
-    },
+        showExpandedInformation(event);
+      },
       child: Column(
         children: [
           Row(
