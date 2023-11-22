@@ -1,13 +1,7 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/eventHelper.dart';
-import 'package:frontend/classes/routeHandler.dart';
 import 'package:frontend/views/SearchBar.dart';
-import 'package:html_unescape/html_unescape.dart';
-import 'package:html/parser.dart' show parse;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:memoized/memoized.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -37,6 +31,54 @@ class _EventsPageState extends State<EventsPage> {
     }
   }
 
+  
+  void showExpandedInformation(Map<String, String> event) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: const BoxDecoration(
+          color: Color(0xffece7d5),  // Set your desired background color here
+          //borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+          ),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                event['title']!,
+                style: const TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              Text(
+                event['date']!,
+                style: const TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              Text(
+                event['location']!,
+                style: const TextStyle(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 5.0),
+              Text(
+                event['description']!,
+                style: const TextStyle(fontSize: 14.0),
+              ),
+            ],
+          ),
+        );
+      }
+    );
+  }
 //I need to move this function to events helper where I can make
 //the results memoized by hand since flutter hooks and memoization absolutelty failed me
   Widget _buildList() {
@@ -66,6 +108,9 @@ class _EventsPageState extends State<EventsPage> {
       onTap: () => {
         _launchURL(Uri.parse(event['url']!)),
       },
+      onLongPress: () {
+      showExpandedInformation(event);
+    },
       child: Column(
         children: [
           Row(
@@ -135,11 +180,13 @@ class _EventsPageState extends State<EventsPage> {
               ),
             ],
           ),
-          const Divider()
+          const Divider(),
         ],
       ),
     );
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
