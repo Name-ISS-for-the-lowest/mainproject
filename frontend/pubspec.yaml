@@ -48,6 +48,7 @@ dependencies:
   memoized: ^2.2.1
   country_picker: ^2.0.22
   language_picker: ^0.4.3
+  restart_app: ^1.2.1
   cached_network_image: ^3.3.0
   flutter_cache_manager: ^3.3.1
   path_provider: ^2.1.1

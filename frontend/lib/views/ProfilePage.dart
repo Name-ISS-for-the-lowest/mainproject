@@ -8,6 +8,7 @@ import '../languagePicker/language_picker.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:restart_app/restart_app.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -227,13 +228,17 @@ class _ProfilePageState extends State<ProfilePage> {
     Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed:  () {
-
+          Navigator.pop(context);
         return;
       },
     );
     Widget continueButton = TextButton(
       child: Text("Continue"),
-      onPressed:  () {},
+      onPressed:  () {
+
+
+        Restart.restartApp(webOrigin: '');
+      },
     );
 
     // set up the AlertDialog
@@ -260,13 +265,17 @@ class _ProfilePageState extends State<ProfilePage> {
     Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed:  () {
-
+          Navigator.pop(context);
         return;
       },
     );
     Widget continueButton = TextButton(
       child: Text("Continue"),
-      onPressed:  () {},
+      onPressed:  () {
+        
+        
+        Restart.restartApp(webOrigin: '');
+      },
     );
 
     // set up the AlertDialog
