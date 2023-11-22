@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/views/ConfirmPassword.dart';
+import 'package:frontend/views/AddProfilePic.dart';
 
 class PasswordSetUp extends StatefulWidget {
   const PasswordSetUp({super.key});
@@ -20,8 +21,8 @@ class _PasswordState extends State<PasswordSetUp> {
     return emailRegExp.hasMatch(email);
   }
 
-  void navigateToConfirmPassword() {
-    //navigate to confirm email page
+  void navigateToAddProfilePic() {
+    //navigate to AddProfilePic page
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
@@ -34,7 +35,7 @@ class _PasswordState extends State<PasswordSetUp> {
                   iconTheme: const IconThemeData(color: Colors.white),
                 ),
               ),
-              const ConfirmPassword()
+              const AddToProfilePic()
             ]),
           );
         },
@@ -112,22 +113,7 @@ class _PasswordState extends State<PasswordSetUp> {
                   child: Center(
                     child: Text(
                       Localize(
-                          "For security purposes, please make sure that your password contains a series of numbers, letters, and other special characters."),
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(230, 183, 17, 1),
-                      ),
-                      textAlign: TextAlign.center, // Center-align the text
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      Localize(
-                          "DON'T share your password with other users or third-parties. It should only be known by the owner of the account"),
+                          "Password must be at least 8 characters long, have one uppercase letter, one lowercase letter, and one number"),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -169,19 +155,18 @@ class _PasswordState extends State<PasswordSetUp> {
                         const SizedBox(
                           height: 5,
                         ),
-                        /*
                         Column(
                           children: [
                             SizedBox(
                               width: 340,
                               child: TextField(
                                 obscureText: true,
-                                controller: passwordController,
+                                //controller: passwordController,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                  labelText: 'Password',
+                                  labelText: 'Confirm Password',
                                   contentPadding: const EdgeInsets.all(18),
                                   fillColor: Colors.white,
                                   filled: true,
@@ -192,7 +177,6 @@ class _PasswordState extends State<PasswordSetUp> {
                             ),
                           ],
                         ),
-                        */
                       ],
                     ),
                   ],
@@ -202,7 +186,7 @@ class _PasswordState extends State<PasswordSetUp> {
                     Column(
                       children: [
                         const SizedBox(
-                          height: 200,
+                          height: 150,
                         ),
                         Column(
                           children: [
@@ -219,9 +203,7 @@ class _PasswordState extends State<PasswordSetUp> {
                                       borderRadius: BorderRadius.circular(10.0),
                                     ),
                                   ),
-                                  onPressed: () => {
-                                    navigateToConfirmPassword(),
-                                  },
+                                  onPressed: () => {navigateToAddProfilePic()},
                                   child: Text(
                                     Localize("Next"),
                                     style: TextStyle(
