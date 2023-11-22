@@ -7,6 +7,7 @@ import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:frontend/views/CreatePost.dart';
+import 'package:frontend/views/ReportPage.dart';
 
 class ForumHome extends StatefulWidget {
   const ForumHome({super.key});
@@ -161,6 +162,18 @@ class _ForumHomeState extends State<ForumHome> {
     );
   }
 
+  void navigateToReportPost(String postID) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ReportPage(postID: postID),
+          );
+        },
+      ),
+    );
+  }
+
   void deletePost(String postID) {
     loadDelete(postID);
   }
@@ -309,7 +322,7 @@ class _ForumHomeState extends State<ForumHome> {
         } else if (result == 'deletePost') {
           deletePost(postID);
         } else if (result == 'reportPost') {
-          // Handle option 2
+          navigateToReportPost(postID);
         }
       },
       itemBuilder: (BuildContext context) {
