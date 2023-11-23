@@ -44,21 +44,20 @@ class _ProfilePageState extends State<ProfilePage> {
 //COUNTRY SELECTOR
     void countryselect() {
       showCountryPicker(
-        context: context,
-        favorite: <String>['US', 'CN', 'MX', 'IN'],
-        //exclude: <String>['FR'],
-        countryListTheme: CountryListThemeData(
-          backgroundColor: Color(0xffece7d5),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(0),
-            topRight: Radius.circular(0),
+          context: context,
+          favorite: <String>['US', 'CN', 'MX', 'IN'],
+          //exclude: <String>['FR'],
+          countryListTheme: CountryListThemeData(
+            backgroundColor: Color(0xffece7d5),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(0),
+              topRight: Radius.circular(0),
+            ),
           ),
-        ),
-        onSelect: (Country country) async {
-          AuthHelper.userInfoCache['nationality'] = country.name;
-          await updateUser();
-        },
-      );
+          onSelect: (Country country) async {
+            AuthHelper.userInfoCache['nationality'] = country.name;
+            await updateUser();
+          });
     }
 
     Widget _buildDialogItem(Language language) {
@@ -241,6 +240,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   itemBuilder: _buildDialogItem)),
         );
 
+    //DELETE ACCOUNT BUTTON
     showDeleteAlertDialog(BuildContext context) {
       // set up the buttons
       Widget cancelButton = TextButton(
@@ -257,8 +257,11 @@ class _ProfilePageState extends State<ProfilePage> {
         },
       );
 
-      // set up the AlertDialog
       AlertDialog alert = AlertDialog(
+        backgroundColor: Color(0xfff7ebe1),
+        //backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0))),
         title: Text("ACCOUNT DELETION"),
         content: Text(
             "THIS ACTION IS IRREVERSABLE. ARE YOU SURE YOU WANT TO CONTINUE?"),
@@ -277,10 +280,10 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
+    //LOGOUT BUTTON
     showLogoutAlertDialog(BuildContext context) {
-      // set up the buttons
       Widget cancelButton = TextButton(
-        child: Text("Cancel"),
+        child: Text(Localize("Cancel")),
         onPressed: () {
           Navigator.pop(context);
           return;
@@ -293,10 +296,13 @@ class _ProfilePageState extends State<ProfilePage> {
         },
       );
 
-      // set up the AlertDialog
       AlertDialog alert = AlertDialog(
-        title: Text("Log Out"),
-        content: Text("You will be returned to the login screen. Continue?"),
+        backgroundColor: Color(0xfff7ebe1),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0))),
+        title: Text(Localize("Log Out")),
+        content: Text(
+            Localize("You will be returned to the login screen. Continue?")),
         actions: [
           cancelButton,
           continueButton,
@@ -304,14 +310,6 @@ class _ProfilePageState extends State<ProfilePage> {
       );
 
       // show the dialog
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return alert;
-        },
-      );
-    }
-
       showDialog(
         context: context,
         builder: (BuildContext context) {

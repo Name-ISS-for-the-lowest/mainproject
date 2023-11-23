@@ -485,7 +485,7 @@ class _ForumHomeState extends State<ForumHome> {
                         )),
                     if (posterIsAdmin)
                       TextSpan(
-                        text: ' [Admin]',
+                        text: ' [${Localize("Admin")}]',
                         style: TextStyle(
                           color: Color.fromRGBO(4, 57, 39, 100),
                         ),
@@ -501,12 +501,12 @@ class _ForumHomeState extends State<ForumHome> {
                 child: (userIsAdmin)
                     ? (deleted)
                         ? Text(
-                            "[Deleted By User]",
+                            "[${Localize('Deleted By User')}]",
                             style: TextStyle(color: Colors.red),
                           )
                         : (removed)
                             ? Text(
-                                "[Post Removed]",
+                                "[${Localize('Post Removed')}]",
                                 style: TextStyle(
                                   color: Colors.red,
                                 ),
@@ -686,225 +686,249 @@ class _ForumHomeState extends State<ForumHome> {
   }
 
   Widget AdminOptions() {
-    Color toggleColor = Color(0xaa000000);
+    Widget emptyBox = const SizedBox();
     Color unselected = Color(0xaa000000);
+    Color toggleColor = unselected;
     if (adminOptionsToggled) {
       toggleColor = Colors.black;
     }
     return Container(
-      child: Column(
+      height: (adminOptionsToggled) ? 295 : 25,
+      width: 400,
+      child: Stack(
         children: [
-          Row(
-            children: [
-              SizedBox(
-                width: (adminOptionsToggled) ? 223 : 225,
+          Positioned(
+            child: GestureDetector(
+              onTap: () async {
+                setState(() {
+                  adminOptionsToggled = !adminOptionsToggled;
+                });
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    adminOptionsToggled
+                        ? Localize("Close Admin Options")
+                        : Localize("Open Admin Options"),
+                    style: TextStyle(color: toggleColor),
+                  ),
+                  SvgPicture.asset(
+                    "assets/PostUI/icon-adminoptions.svg",
+                    color: toggleColor,
+                  ),
+                ],
               ),
-              GestureDetector(
-                onTap: () async {
-                  setState(() {
-                    adminOptionsToggled = !adminOptionsToggled;
-                  });
-                },
-                child: Row(
-                  children: [
-                    Text(
-                      (adminOptionsToggled)
-                          ? "Close Admin Options"
-                          : "Open Admin Options",
-                      style: TextStyle(color: toggleColor),
-                    ),
-                    SvgPicture.asset(
-                      "assets/PostUI/icon-adminoptions.svg",
-                      color: toggleColor,
-                    ),
-                  ],
-                ),
-              )
-            ],
+            ),
           ),
           (adminOptionsToggled)
-              ? Container(
-                  height: 150,
+              ? Positioned(
+                  top: 40,
+                  child: Container(
+                    color: Colors.grey,
+                    height: 1,
+                    width: 500,
+                  ),
+                )
+              : emptyBox,
+          (adminOptionsToggled)
+              ? Positioned(
+                  bottom: 0,
+                  child: Container(
+                    color: Colors.grey,
+                    height: 1,
+                    width: 400,
+                  ),
+                )
+              : emptyBox,
+          (adminOptionsToggled)
+              ? Positioned(
+                  top: 60,
                   width: 400,
-                  child: Stack(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Positioned(
-                        child: Container(
-                          color: Colors.grey,
-                          height: 1,
+                      Text(Localize("Show Reported Posts")),
+                    ],
+                  ))
+              : emptyBox,
+          (adminOptionsToggled)
+              ? Positioned(
+                  top: 100,
+                  width: 400,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          specialSearchArgs['showReported'] = 'All';
+                          await loadUpdate();
+                        },
+                        child: Text(
+                          Localize("All"),
+                          style: TextStyle(
+                              color:
+                                  (specialSearchArgs['showReported'] == 'All')
+                                      ? Colors.black
+                                      : unselected),
                         ),
                       ),
-                      Positioned(
-                        bottom: 0,
-                        child: Container(
-                          color: Colors.grey,
-                          height: 1,
-                          width: 400,
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          specialSearchArgs['showReported'] = 'Only';
+                          await loadUpdate();
+                        },
+                        child: Text(
+                          Localize("Only"),
+                          style: TextStyle(
+                              color:
+                                  (specialSearchArgs['showReported'] == 'Only')
+                                      ? Colors.black
+                                      : unselected),
                         ),
                       ),
-                      Positioned(
-                        left: 35,
-                        top: 20,
-                        child: Text("Show Reported Posts"),
-                      ),
-                      Positioned(
-                        left: 35,
-                        top: 60,
-                        child: Text("Show Removed Posts"),
-                      ),
-                      Positioned(
-                        left: 35,
-                        top: 100,
-                        child: Text("Show Deleted Posts"),
-                      ),
-                      Positioned(
-                        left: 210,
-                        top: 20,
-                        child: GestureDetector(
-                          onTap: () async {
-                            specialSearchArgs['showReported'] = 'All';
-                            await loadUpdate();
-                          },
-                          child: Text(
-                            "All",
-                            style: TextStyle(
-                                color:
-                                    (specialSearchArgs['showReported'] == 'All')
-                                        ? Colors.black
-                                        : unselected),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 250,
-                        top: 20,
-                        child: GestureDetector(
-                          onTap: () async {
-                            specialSearchArgs['showReported'] = 'Only';
-                            await loadUpdate();
-                          },
-                          child: Text(
-                            "Only",
-                            style: TextStyle(
-                                color: (specialSearchArgs['showReported'] ==
-                                        'Only')
-                                    ? Colors.black
-                                    : unselected),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 210,
-                        top: 60,
-                        child: GestureDetector(
-                          onTap: () async {
-                            specialSearchArgs['showRemoved'] = 'All';
-                            await loadUpdate();
-                          },
-                          child: Text(
-                            "All",
-                            style: TextStyle(
-                                color:
-                                    (specialSearchArgs['showRemoved'] == 'All')
-                                        ? Colors.black
-                                        : unselected),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 250,
-                        top: 60,
-                        child: GestureDetector(
-                          onTap: () async {
-                            specialSearchArgs['showRemoved'] = 'Only';
-                            await loadUpdate();
-                          },
-                          child: Text(
-                            "Only",
-                            style: TextStyle(
-                                color:
-                                    (specialSearchArgs['showRemoved'] == 'Only')
-                                        ? Colors.black
-                                        : unselected),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 300,
-                        top: 60,
-                        child: GestureDetector(
-                          onTap: () async {
-                            specialSearchArgs['showRemoved'] = 'None';
-                            await loadUpdate();
-                          },
-                          child: Text(
-                            "None",
-                            style: TextStyle(
-                                color:
-                                    (specialSearchArgs['showRemoved'] == 'None')
-                                        ? Colors.black
-                                        : unselected),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 210,
-                        top: 100,
-                        child: GestureDetector(
-                          onTap: () async {
-                            specialSearchArgs['showDeleted'] = 'All';
-                            await loadUpdate();
-                          },
-                          child: Text(
-                            "All",
-                            style: TextStyle(
-                                color:
-                                    (specialSearchArgs['showDeleted'] == 'All')
-                                        ? Colors.black
-                                        : unselected),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 250,
-                        top: 100,
-                        child: GestureDetector(
-                          onTap: () async {
-                            specialSearchArgs['showDeleted'] = 'Only';
-                            await loadUpdate();
-                          },
-                          child: Text(
-                            "Only",
-                            style: TextStyle(
-                                color:
-                                    (specialSearchArgs['showDeleted'] == 'Only')
-                                        ? Colors.black
-                                        : unselected),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 300,
-                        top: 100,
-                        child: GestureDetector(
-                          onTap: () async {
-                            specialSearchArgs['showDeleted'] = 'None';
-                            await loadUpdate();
-                          },
-                          child: Text(
-                            "None",
-                            style: TextStyle(
-                                color:
-                                    (specialSearchArgs['showDeleted'] == 'None')
-                                        ? Colors.black
-                                        : unselected),
-                          ),
-                        ),
-                      ),
+                      Spacer(),
                     ],
                   ),
                 )
-              : const SizedBox(),
+              : emptyBox,
+          (adminOptionsToggled)
+              ? Positioned(
+                  top: 140,
+                  width: 400,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(Localize("Show Removed Posts")),
+                    ],
+                  ))
+              : emptyBox,
+          (adminOptionsToggled)
+              ? Positioned(
+                  top: 180,
+                  width: 400,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          specialSearchArgs['showRemoved'] = 'All';
+                          await loadUpdate();
+                        },
+                        child: Text(
+                          Localize("All"),
+                          style: TextStyle(
+                              color: (specialSearchArgs['showRemoved'] == 'All')
+                                  ? Colors.black
+                                  : unselected),
+                        ),
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          specialSearchArgs['showRemoved'] = 'Only';
+                          await loadUpdate();
+                        },
+                        child: Text(
+                          Localize("Only"),
+                          style: TextStyle(
+                              color:
+                                  (specialSearchArgs['showRemoved'] == 'Only')
+                                      ? Colors.black
+                                      : unselected),
+                        ),
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          specialSearchArgs['showRemoved'] = 'None';
+                          await loadUpdate();
+                        },
+                        child: Text(
+                          Localize("None"),
+                          style: TextStyle(
+                              color:
+                                  (specialSearchArgs['showRemoved'] == 'None')
+                                      ? Colors.black
+                                      : unselected),
+                        ),
+                      ),
+                      Spacer(),
+                    ],
+                  ),
+                )
+              : emptyBox,
+          (adminOptionsToggled)
+              ? Positioned(
+                  top: 220,
+                  width: 400,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(Localize("Show Deleted Posts")),
+                    ],
+                  ),
+                )
+              : emptyBox,
+          (adminOptionsToggled)
+              ? Positioned(
+                  top: 260,
+                  width: 400,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          specialSearchArgs['showDeleted'] = 'All';
+                          await loadUpdate();
+                        },
+                        child: Text(
+                          Localize("All"),
+                          style: TextStyle(
+                              color: (specialSearchArgs['showDeleted'] == 'All')
+                                  ? Colors.black
+                                  : unselected),
+                        ),
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          specialSearchArgs['showDeleted'] = 'Only';
+                          await loadUpdate();
+                        },
+                        child: Text(
+                          Localize("Only"),
+                          style: TextStyle(
+                              color:
+                                  (specialSearchArgs['showDeleted'] == 'Only')
+                                      ? Colors.black
+                                      : unselected),
+                        ),
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          specialSearchArgs['showDeleted'] = 'None';
+                          await loadUpdate();
+                        },
+                        child: Text(
+                          Localize("None"),
+                          style: TextStyle(
+                              color:
+                                  (specialSearchArgs['showDeleted'] == 'None')
+                                      ? Colors.black
+                                      : unselected),
+                        ),
+                      ),
+                      Spacer(),
+                    ],
+                  ),
+                )
+              : emptyBox,
         ],
       ),
     );
@@ -940,7 +964,7 @@ class _ForumHomeState extends State<ForumHome> {
             child: (postData.length > 0)
                 ? _buildList()
                 : Center(
-                    child: Text("No Posts Found"),
+                    child: Text(Localize("No Posts Found")),
                   ),
           )
         ],
