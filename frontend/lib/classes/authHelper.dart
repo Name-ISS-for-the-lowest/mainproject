@@ -143,4 +143,42 @@ class AuthHelper {
       );
     }
   }
+
+  static Future<Response> updateUser() async {
+    final data = {
+      'id': userInfoCache['_id'],
+      'email': userInfoCache['email'],
+      'username': userInfoCache['username'],
+      'language': userInfoCache['language'],
+      'nationality': userInfoCache['nationality'],
+      'profilePictureURL': userInfoCache['profilePicture.url'],
+      'profilePictureFileID': userInfoCache['profilePicture.fileId'],
+    };
+    String endPoint = '/updateUser';
+    var url = '$defaultHost$endPoint';
+
+    //this is the dio library making a post request
+    try {
+      final response = await RouteHandler.dio.post(
+        url,
+        data: jsonEncode(data),
+        options: Options(contentType: Headers.jsonContentType),
+      );
+      return response;
+
+      //on anything but a 200 response this code will run
+    } on DioException catch (e) {
+      print(e);
+      if (e.response != null) {
+        return e.response!;
+      } else {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'Unable to connect to server'},
+          statusCode: 500,
+          statusMessage: 'Unable to connect to server',
+        );
+      }
+    }
+  }
 }

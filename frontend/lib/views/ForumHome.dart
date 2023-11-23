@@ -290,8 +290,8 @@ class _ForumHomeState extends State<ForumHome> {
             text: TextSpan(
               children: [
                 TextSpan(
-                    text: (currentlyTranslated.containsKey(postContent))
-                        ? currentlyTranslated[postContent]!
+                    text: (currentlyTranslated.containsKey(postID))
+                        ? PostHelper.cachedTranslations[postContent]
                         : postContent,
                     style: TextStyle(
                       color: Colors.black,
@@ -635,17 +635,16 @@ class _ForumHomeState extends State<ForumHome> {
                   }
                   if (mounted) {
                     setState(() {
-                      if (currentlyTranslated.containsKey(postContent)) {
-                        currentlyTranslated.remove(postContent);
+                      if (currentlyTranslated.containsKey(postID)) {
+                        currentlyTranslated.remove(postID);
                       } else {
-                        currentlyTranslated[postContent] =
-                            PostHelper.cachedTranslations[postContent]!;
+                        currentlyTranslated[postID] = 'True';
                       }
                     });
                   }
                 },
                 child: Text(
-                  (currentlyTranslated.containsKey(postContent))
+                  (currentlyTranslated.containsKey(postID))
                       ? "Original Text"
                       : "Translate",
                   style: TextStyle(
