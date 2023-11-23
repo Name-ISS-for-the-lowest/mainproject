@@ -142,6 +142,8 @@ Map<String, dynamic> languageNames = {
   'zh-CN': 'Chinese (Simplified)'
 };
 
+int totalSteps = languageNames.length;
+int currentStep = 0;
 main() async {
   //read content of appText.json
   final List<dynamic> appText =
@@ -161,6 +163,7 @@ main() async {
 
   //loop thru each key in localizations
   List wordsToAdd = [];
+  List wordsToRemove = [];
   appText.forEach((value) {
     //check if key exists in appText
     if (!localizations.containsKey(value)) {
@@ -168,6 +171,24 @@ main() async {
       wordsToAdd.add(value);
     }
   });
+  for (var key in localizations.keys) {
+    //check if key exists in appText
+    if (!appText.contains(key)) {
+      wordsToRemove.add(key);
+    }
+  }
+  for (var key in wordsToRemove) {
+    localizations.remove(key);
+  }
+
+  if (wordsToRemove.length > 0 && wordsToAdd.length == 0) {
+    print("Words removed: ${wordsToRemove.length}");
+    JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+    String formattedJson = encoder.convert(localizations);
+    File('bin/localizations.json').writeAsStringSync(formattedJson);
+    return;
+  }
+
   if (wordsToAdd.length == 0) {
     print("No new words to add");
     return;
@@ -179,26 +200,47 @@ main() async {
   });
 
   var start = DateTime.now();
+  print(
+      "Generating translations, please wait a moment, flutter is single treaded and a bit slower than the python implementation");
   List<Future<void>> futures = [];
   for (var language in listOfLanguages) {
     futures.add(languageTranslations(wordsToAdd, language, localizations));
   }
   await Future.wait(futures);
-  print("Made it here");
+  updateProgressBar(totalSteps, totalSteps);
   //save localizations to json file
-  File('bin/localizations.json').writeAsStringSync(jsonEncode(localizations));
+  JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+  String formattedJson = encoder.convert(localizations);
+  File('bin/localizations.json').writeAsStringSync(formattedJson);
+  //run generateDataFile.dart
+  var result = await Process.run('dart', ['bin/generateDataFile.dart']);
+  print(result.stdout);
+  print('Exit code: ${result.exitCode}');
   var end = DateTime.now();
-  print("Time taken: ${end.difference(start)}");
+  print("\nWords added: ${wordsToAdd.length}");
+  print("Words removed: ${wordsToRemove.length}");
+  print("Time taken: ${end.difference(start).inSeconds}s");
+
+  //now I want to generate the file data.dart in lib/classes it is simply a class called data with 2 maps
 }
 
 Future<void> languageTranslations(wordsToAdd, language, finalMap) async {
   bool completed = false;
   List translatedList = await translateListFromEnglishTo(wordsToAdd, language);
+  int maxTries = 50;
   while (!completed) {
+    maxTries--;
+    if (maxTries == 0) {
+      throw Exception(
+          "Max tries reached on language: $language please try again in a few minutes");
+    }
     if (translatedList[0] == "Error") {
       translatedList = await translateListFromEnglishTo(wordsToAdd, language);
     } else {
       completed = true;
+      updateProgressBar(currentStep, totalSteps);
+      currentStep++;
+      // print("Completed language: $language");
     }
   }
   for (var i = 0; i < translatedList.length; i++) {
@@ -233,11 +275,26 @@ translateListFromEnglishTo(List appText, String language) async {
     //on anything but a 200 response this code will run
   } on DioException catch (e) {
     //return array of Error string
-    print("ERROR: $e $language $appText");
+    // print("ERROR: $e $language");
     List returnArray = [];
     appText.forEach((element) {
       returnArray.add("Error");
     });
     return returnArray;
   }
+}
+
+void updateProgressBar(int currentStep, int totalSteps) {
+  final int progressBarLength = 20;
+  final double progress = currentStep / totalSteps;
+  final int filledLength = (progress * progressBarLength).round();
+
+  // Build the progress bar string
+  final String progressBar = "Current Progress[" +
+      "=" * filledLength +
+      " " * (progressBarLength - filledLength) +
+      "] ${(progress * 100).toStringAsFixed(1)}%";
+
+  // Print the progress bar on the same line
+  stdout.write('\r$progressBar');
 }

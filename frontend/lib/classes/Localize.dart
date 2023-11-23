@@ -13,7 +13,7 @@ class Localizer {
     if (!_localizedValues.containsKey(key)) {
       //send error
       throw Exception(
-          'Key $key not found, please add your text to bin/appText.json and run ```dart run bin/generate.dart```');
+          'Key |$key| not found, please add your text to bin/appText.json and run ```dart run bin/generate.dart```');
     }
     return _localizedValues[key][lang];
     // return _localizedValues[key];

@@ -42,7 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         onSelect: (Country country) {
-          print('Select country: ${country.displayName}');
+          print('${Localize("Select country: ")}${country.displayName}');
         },
       );
     }
@@ -62,140 +62,140 @@ class _ProfilePageState extends State<ProfilePage> {
 
     //Language WHITELIST
     final supportedLanguages = [
-			Language.fromIsoCode('af'),
-			Language.fromIsoCode('sq'),
-			Language.fromIsoCode('am'),
-			Language.fromIsoCode('ar'),
-			Language.fromIsoCode('hy'),
-			Language.fromIsoCode('as'),
-			Language.fromIsoCode('ay'),
-			Language.fromIsoCode('az'),
-			Language.fromIsoCode('bm'),
-			Language.fromIsoCode('eu'),
-			Language.fromIsoCode('be'),
-			Language.fromIsoCode('bn'),
-			Language.fromIsoCode('bho'),
-			Language.fromIsoCode('bs'),
-			Language.fromIsoCode('bg'),
-			Language.fromIsoCode('ca'),
-			Language.fromIsoCode('ceb'),
-			Language.fromIsoCode('ny'),
-			Language.fromIsoCode('zh'),
-			Language.fromIsoCode('zh-TW'),
-			Language.fromIsoCode('co'),
-			Language.fromIsoCode('hr'),
-			Language.fromIsoCode('cs'),
-			Language.fromIsoCode('da'),
-			Language.fromIsoCode('dv'),
-			Language.fromIsoCode('doi'),
-			Language.fromIsoCode('nl'),
-			Language.fromIsoCode('en'),
-			Language.fromIsoCode('eo'),
-			Language.fromIsoCode('et'),
-			Language.fromIsoCode('ee'),
-			Language.fromIsoCode('tl'),
-			Language.fromIsoCode('fi'),
-			Language.fromIsoCode('fr'),
-			Language.fromIsoCode('fy'),
-			Language.fromIsoCode('gl'),
-			Language.fromIsoCode('lg'),
-			Language.fromIsoCode('ka'),
-			Language.fromIsoCode('de'),
-			Language.fromIsoCode('el'),
-			Language.fromIsoCode('gn'),
-			Language.fromIsoCode('gu'),
-			Language.fromIsoCode('ht'),
-			Language.fromIsoCode('ha'),
-			Language.fromIsoCode('haw'),
-			Language.fromIsoCode('iw'),
-			Language.fromIsoCode('hi'),
-			Language.fromIsoCode('hmn'),
-			Language.fromIsoCode('hu'),
-			Language.fromIsoCode('is'),
-			Language.fromIsoCode('ig'),
-			Language.fromIsoCode('ilo'),
-			Language.fromIsoCode('id'),
-			Language.fromIsoCode('ga'),
-			Language.fromIsoCode('it'),
-			Language.fromIsoCode('ja'),
-			Language.fromIsoCode('jw'),
-			Language.fromIsoCode('kn'),
-			Language.fromIsoCode('kk'),
-			Language.fromIsoCode('km'),
-			Language.fromIsoCode('rw'),
-			Language.fromIsoCode('gom'),
-			Language.fromIsoCode('ko'),
-			Language.fromIsoCode('kri'),
-			Language.fromIsoCode('ku'),
-			Language.fromIsoCode('ckb'),
-			Language.fromIsoCode('ky'),
-			Language.fromIsoCode('lo'),
-			Language.fromIsoCode('la'),
-			Language.fromIsoCode('lv'),
-			Language.fromIsoCode('ln'),
-			Language.fromIsoCode('lt'),
-			Language.fromIsoCode('lb'),
-			Language.fromIsoCode('mk'),
-			Language.fromIsoCode('mai'),
-			Language.fromIsoCode('mg'),
-			Language.fromIsoCode('ms'),
-			Language.fromIsoCode('ml'),
-			Language.fromIsoCode('mt'),
-			Language.fromIsoCode('mi'),
-			Language.fromIsoCode('mr'),
-			Language.fromIsoCode('mni-Mtei'),
-			Language.fromIsoCode('lus'),
-			Language.fromIsoCode('mn'),
-			Language.fromIsoCode('my'),
-			Language.fromIsoCode('ne'),
-			Language.fromIsoCode('nso'),
-			Language.fromIsoCode('no'),
-			Language.fromIsoCode('or'),
-			Language.fromIsoCode('om'),
-			Language.fromIsoCode('ps'),
-			Language.fromIsoCode('fa'),
-			Language.fromIsoCode('pl'),
-			Language.fromIsoCode('pt'),
-			Language.fromIsoCode('pa'),
-			Language.fromIsoCode('qu'),
-			Language.fromIsoCode('ro'),
-			Language.fromIsoCode('ru'),
-			Language.fromIsoCode('sm'),
-			Language.fromIsoCode('sa'),
-			Language.fromIsoCode('gd'),
-			Language.fromIsoCode('sr'),
-			Language.fromIsoCode('st'),
-			Language.fromIsoCode('sn'),
-			Language.fromIsoCode('sd'),
-			Language.fromIsoCode('si'),
-			Language.fromIsoCode('sk'),
-			Language.fromIsoCode('sl'),
-			Language.fromIsoCode('so'),
-			Language.fromIsoCode('es'),
-			Language.fromIsoCode('su'),
-			Language.fromIsoCode('sw'),
-			Language.fromIsoCode('sv'),
-			Language.fromIsoCode('tg'),
-			Language.fromIsoCode('ta'),
-			Language.fromIsoCode('tt'),
-			Language.fromIsoCode('te'),
-			Language.fromIsoCode('th'),
-			Language.fromIsoCode('ti'),
-			Language.fromIsoCode('ts'),
-			Language.fromIsoCode('tr'),
-			Language.fromIsoCode('tk'),
-			Language.fromIsoCode('ak'),
-			Language.fromIsoCode('uk'),
-			Language.fromIsoCode('ur'),
-			Language.fromIsoCode('ug'),
-			Language.fromIsoCode('uz'),
-			Language.fromIsoCode('vi'),
-			Language.fromIsoCode('cy'),
-			Language.fromIsoCode('xh'),
-			Language.fromIsoCode('yi'),
-			Language.fromIsoCode('yo'),
-			Language.fromIsoCode('zu'),
-			//Language.fromIsoCode('deezNuts'),      
+      Language.fromIsoCode('af'),
+      Language.fromIsoCode('sq'),
+      Language.fromIsoCode('am'),
+      Language.fromIsoCode('ar'),
+      Language.fromIsoCode('hy'),
+      Language.fromIsoCode('as'),
+      Language.fromIsoCode('ay'),
+      Language.fromIsoCode('az'),
+      Language.fromIsoCode('bm'),
+      Language.fromIsoCode('eu'),
+      Language.fromIsoCode('be'),
+      Language.fromIsoCode('bn'),
+      Language.fromIsoCode('bho'),
+      Language.fromIsoCode('bs'),
+      Language.fromIsoCode('bg'),
+      Language.fromIsoCode('ca'),
+      Language.fromIsoCode('ceb'),
+      Language.fromIsoCode('ny'),
+      Language.fromIsoCode('zh'),
+      Language.fromIsoCode('zh-TW'),
+      Language.fromIsoCode('co'),
+      Language.fromIsoCode('hr'),
+      Language.fromIsoCode('cs'),
+      Language.fromIsoCode('da'),
+      Language.fromIsoCode('dv'),
+      Language.fromIsoCode('doi'),
+      Language.fromIsoCode('nl'),
+      Language.fromIsoCode('en'),
+      Language.fromIsoCode('eo'),
+      Language.fromIsoCode('et'),
+      Language.fromIsoCode('ee'),
+      Language.fromIsoCode('tl'),
+      Language.fromIsoCode('fi'),
+      Language.fromIsoCode('fr'),
+      Language.fromIsoCode('fy'),
+      Language.fromIsoCode('gl'),
+      Language.fromIsoCode('lg'),
+      Language.fromIsoCode('ka'),
+      Language.fromIsoCode('de'),
+      Language.fromIsoCode('el'),
+      Language.fromIsoCode('gn'),
+      Language.fromIsoCode('gu'),
+      Language.fromIsoCode('ht'),
+      Language.fromIsoCode('ha'),
+      Language.fromIsoCode('haw'),
+      Language.fromIsoCode('iw'),
+      Language.fromIsoCode('hi'),
+      Language.fromIsoCode('hmn'),
+      Language.fromIsoCode('hu'),
+      Language.fromIsoCode('is'),
+      Language.fromIsoCode('ig'),
+      Language.fromIsoCode('ilo'),
+      Language.fromIsoCode('id'),
+      Language.fromIsoCode('ga'),
+      Language.fromIsoCode('it'),
+      Language.fromIsoCode('ja'),
+      Language.fromIsoCode('jw'),
+      Language.fromIsoCode('kn'),
+      Language.fromIsoCode('kk'),
+      Language.fromIsoCode('km'),
+      Language.fromIsoCode('rw'),
+      Language.fromIsoCode('gom'),
+      Language.fromIsoCode('ko'),
+      Language.fromIsoCode('kri'),
+      Language.fromIsoCode('ku'),
+      Language.fromIsoCode('ckb'),
+      Language.fromIsoCode('ky'),
+      Language.fromIsoCode('lo'),
+      Language.fromIsoCode('la'),
+      Language.fromIsoCode('lv'),
+      Language.fromIsoCode('ln'),
+      Language.fromIsoCode('lt'),
+      Language.fromIsoCode('lb'),
+      Language.fromIsoCode('mk'),
+      Language.fromIsoCode('mai'),
+      Language.fromIsoCode('mg'),
+      Language.fromIsoCode('ms'),
+      Language.fromIsoCode('ml'),
+      Language.fromIsoCode('mt'),
+      Language.fromIsoCode('mi'),
+      Language.fromIsoCode('mr'),
+      Language.fromIsoCode('mni-Mtei'),
+      Language.fromIsoCode('lus'),
+      Language.fromIsoCode('mn'),
+      Language.fromIsoCode('my'),
+      Language.fromIsoCode('ne'),
+      Language.fromIsoCode('nso'),
+      Language.fromIsoCode('no'),
+      Language.fromIsoCode('or'),
+      Language.fromIsoCode('om'),
+      Language.fromIsoCode('ps'),
+      Language.fromIsoCode('fa'),
+      Language.fromIsoCode('pl'),
+      Language.fromIsoCode('pt'),
+      Language.fromIsoCode('pa'),
+      Language.fromIsoCode('qu'),
+      Language.fromIsoCode('ro'),
+      Language.fromIsoCode('ru'),
+      Language.fromIsoCode('sm'),
+      Language.fromIsoCode('sa'),
+      Language.fromIsoCode('gd'),
+      Language.fromIsoCode('sr'),
+      Language.fromIsoCode('st'),
+      Language.fromIsoCode('sn'),
+      Language.fromIsoCode('sd'),
+      Language.fromIsoCode('si'),
+      Language.fromIsoCode('sk'),
+      Language.fromIsoCode('sl'),
+      Language.fromIsoCode('so'),
+      Language.fromIsoCode('es'),
+      Language.fromIsoCode('su'),
+      Language.fromIsoCode('sw'),
+      Language.fromIsoCode('sv'),
+      Language.fromIsoCode('tg'),
+      Language.fromIsoCode('ta'),
+      Language.fromIsoCode('tt'),
+      Language.fromIsoCode('te'),
+      Language.fromIsoCode('th'),
+      Language.fromIsoCode('ti'),
+      Language.fromIsoCode('ts'),
+      Language.fromIsoCode('tr'),
+      Language.fromIsoCode('tk'),
+      Language.fromIsoCode('ak'),
+      Language.fromIsoCode('uk'),
+      Language.fromIsoCode('ur'),
+      Language.fromIsoCode('ug'),
+      Language.fromIsoCode('uz'),
+      Language.fromIsoCode('vi'),
+      Language.fromIsoCode('cy'),
+      Language.fromIsoCode('xh'),
+      Language.fromIsoCode('yi'),
+      Language.fromIsoCode('yo'),
+      Language.fromIsoCode('zu'),
+      //Language.fromIsoCode('deezNuts'),
     ];
 
 //LANGUAGE SELECTOR
@@ -221,74 +221,71 @@ class _ProfilePageState extends State<ProfilePage> {
                   itemBuilder: _buildDialogItem)),
         );
 
+    showDeleteAlertDialog(BuildContext context) {
+      // set up the buttons
+      Widget cancelButton = TextButton(
+        child: Text(Localize("Cancel")),
+        onPressed: () {
+          return;
+        },
+      );
+      Widget continueButton = TextButton(
+        child: Text(Localize("Continue")),
+        onPressed: () {},
+      );
 
-  showDeleteAlertDialog(BuildContext context) {
-    // set up the buttons
-    Widget cancelButton = TextButton(
-      child: Text("Cancel"),
-      onPressed:  () {
+      // set up the AlertDialog
+      AlertDialog alert = AlertDialog(
+        title: Text(Localize("ACCOUNT DELETION")),
+        content: Text(Localize(
+            "THIS ACTION IS IRREVERSABLE. ARE YOU SURE YOU WANT TO CONTINUE?")),
+        actions: [
+          cancelButton,
+          continueButton,
+        ],
+      );
 
-        return;
-      },
-    );
-    Widget continueButton = TextButton(
-      child: Text("Continue"),
-      onPressed:  () {},
-    );
+      // show the dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
 
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("ACCOUNT DELETION"),
-      content: Text("THIS ACTION IS IRREVERSABLE. ARE YOU SURE YOU WANT TO CONTINUE?"),
-      actions: [
-        cancelButton,
-        continueButton,
-      ],
-    );
+    showLogoutAlertDialog(BuildContext context) {
+      // set up the buttons
+      Widget cancelButton = TextButton(
+        child: Text(Localize("Cancel")),
+        onPressed: () {
+          return;
+        },
+      );
+      Widget continueButton = TextButton(
+        child: Text(Localize("Continue")),
+        onPressed: () {},
+      );
 
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
+      // set up the AlertDialog
+      AlertDialog alert = AlertDialog(
+        title: Text(Localize("Log Out")),
+        content: Text(
+            Localize("You will be returned to the login screen. Continue?")),
+        actions: [
+          cancelButton,
+          continueButton,
+        ],
+      );
 
-  showLogoutAlertDialog(BuildContext context) {
-    // set up the buttons
-    Widget cancelButton = TextButton(
-      child: Text("Cancel"),
-      onPressed:  () {
-
-        return;
-      },
-    );
-    Widget continueButton = TextButton(
-      child: Text("Continue"),
-      onPressed:  () {},
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("Log Out"),
-      content: Text("You will be returned to the login screen. Continue?"),
-      actions: [
-        cancelButton,
-        continueButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
-  
+      // show the dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
 
     return Scaffold(
         backgroundColor: Color(0xffece7d5),
@@ -356,9 +353,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     alignment: Alignment.centerRight,
                     child: IconButton(
                       icon: Icon(Icons.edit_note),
-                      onPressed: () {
-
-                      },
+                      onPressed: () {},
                     ),
                   ),
                 ),
@@ -425,8 +420,6 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
 
-
-
             //EMAIL ADDRESS
             Container(
               child: ListTile(
@@ -444,12 +437,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 //LOCALIZE NOT FUNCTIONING AT THE MOMENT
                 //title: Text(Localize('Log Out')),
                 //subtitle: Text(Localize('Sign out of the current account.')),
-                title: Text('Log Out'),
-                subtitle: Text('Sign out of the current account.'),
+                title: Text(Localize('Log Out')),
+                subtitle: Text(Localize('Sign out of the current account.')),
                 onTap: () {
-
-                showLogoutAlertDialog(context);
-                  
+                  showLogoutAlertDialog(context);
                 },
               ),
             ),
@@ -463,9 +454,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 subtitle: Text(Localize('This action cannot be restored.')),
                 textColor: Colors.redAccent,
                 onTap: () {
-
-                showDeleteAlertDialog(context);
-                  
+                  showDeleteAlertDialog(context);
                 },
               ),
             ),
