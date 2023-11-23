@@ -9,6 +9,8 @@ import 'package:frontend/classes/authHelper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -304,6 +306,62 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+
+  //CAMERA CODE
+  File? image;
+
+  Future pickImage() async {
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+
+    final imageTemporary = File(image.path);
+    //setState(() => this.image = imageTemporary);
+  }
+
+  Future pickCamera() async {
+    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (image == null) return;
+
+    final imageTemporary = File(image.path);
+    //setState(() => this.image = imageTemporary);
+  }
+
+
+
+  void openCameraDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Theme(
+          data:
+              Theme.of(context).copyWith(
+                dialogBackgroundColor: Color(0xfff7ebe1)
+                ),
+          child: SimpleDialog(
+            title: const Text("Image Picker"),
+            children: <Widget>[
+              SimpleDialogOption(
+                child: const Text('Select from Gallery'),
+                onPressed: () => pickImage(),
+              ),
+              SimpleDialogOption(
+                child: const Text('Open Camera'),
+                onPressed: () => pickCamera(),
+              ),
+              SimpleDialogOption(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   
     //ACTUAL PAGE
     return Scaffold(
@@ -344,7 +402,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: IconButton(
                       icon: Icon(Icons.camera_alt),
                       iconSize: 50,
-                      onPressed: () {},
+                      onPressed: () {
+                        openCameraDialog(context);
+                      },
                     ),
                   ),
                 ),
