@@ -8,6 +8,9 @@ import '../languagePicker/language_picker.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:restart_app/restart_app.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -202,7 +205,11 @@ class _ProfilePageState extends State<ProfilePage> {
     void _openLanguagePickerDialog() => showDialog(
           context: context,
           builder: (context) => Theme(
-              data: Theme.of(context).copyWith(primaryColor: Colors.pink),
+              data: Theme.of(context).copyWith(
+                primaryColor: Colors.pink,
+                dialogBackgroundColor: Color(0xfff7ebe1),
+                
+                ),
               child: LanguagePickerDialog(
                   languages: supportedLanguages,
                   titlePadding: EdgeInsets.all(8.0),
@@ -221,23 +228,30 @@ class _ProfilePageState extends State<ProfilePage> {
                   itemBuilder: _buildDialogItem)),
         );
 
-
+  //DELETE ACCOUNT BUTTON
   showDeleteAlertDialog(BuildContext context) {
     // set up the buttons
     Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed:  () {
-
+          Navigator.pop(context);
         return;
       },
     );
     Widget continueButton = TextButton(
       child: Text("Continue"),
-      onPressed:  () {},
+      onPressed:  () {
+
+
+        Restart.restartApp(webOrigin: '');
+      },
     );
 
-    // set up the AlertDialog
     AlertDialog alert = AlertDialog(
+      backgroundColor: Color(0xfff7ebe1),      
+      //backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10.0))),
       title: Text("ACCOUNT DELETION"),
       content: Text("THIS ACTION IS IRREVERSABLE. ARE YOU SURE YOU WANT TO CONTINUE?"),
       actions: [
@@ -246,7 +260,6 @@ class _ProfilePageState extends State<ProfilePage> {
       ],
     );
 
-    // show the dialog
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -255,22 +268,28 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  //LOGOUT BUTTON
   showLogoutAlertDialog(BuildContext context) {
-    // set up the buttons
     Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed:  () {
-
+          Navigator.pop(context);
         return;
       },
     );
     Widget continueButton = TextButton(
       child: Text("Continue"),
-      onPressed:  () {},
+      onPressed:  () {
+        
+        
+        Restart.restartApp(webOrigin: '');
+      },
     );
 
-    // set up the AlertDialog
     AlertDialog alert = AlertDialog(
+      backgroundColor: Color(0xfff7ebe1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10.0))),      
       title: Text("Log Out"),
       content: Text("You will be returned to the login screen. Continue?"),
       actions: [
@@ -279,7 +298,6 @@ class _ProfilePageState extends State<ProfilePage> {
       ],
     );
 
-    // show the dialog
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -288,8 +306,64 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  
 
+  //CAMERA CODE
+  File? image;
+
+  Future pickImage() async {
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+
+    final imageTemporary = File(image.path);
+    //setState(() => this.image = imageTemporary);
+  }
+
+  Future pickCamera() async {
+    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (image == null) return;
+
+    final imageTemporary = File(image.path);
+    //setState(() => this.image = imageTemporary);
+  }
+
+
+
+  void openCameraDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Theme(
+          data:
+              Theme.of(context).copyWith(
+                dialogBackgroundColor: Color(0xfff7ebe1)
+                ),
+          child: SimpleDialog(
+            title: const Text("Image Picker"),
+            children: <Widget>[
+              SimpleDialogOption(
+                child: const Text('Select from Gallery'),
+                onPressed: () => pickImage(),
+              ),
+              SimpleDialogOption(
+                child: const Text('Open Camera'),
+                onPressed: () => pickCamera(),
+              ),
+              SimpleDialogOption(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  
+    //ACTUAL PAGE
     return Scaffold(
         backgroundColor: Color(0xffece7d5),
         // body: Center(child: Text("Profile Page")),
@@ -328,7 +402,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: IconButton(
                       icon: Icon(Icons.camera_alt),
                       iconSize: 50,
-                      onPressed: () {},
+                      onPressed: () {
+                        openCameraDialog(context);
+                      },
                     ),
                   ),
                 ),
