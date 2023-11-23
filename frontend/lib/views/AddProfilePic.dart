@@ -31,7 +31,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
         });
       }
     } catch (e) {
-      print("Error picking image: $e");
+      print("${Localize("Error picking image:")} $e");
     }
   }
 
@@ -40,21 +40,21 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(
-          title: Text("Choose an option"),
+          title: Text(Localize("Choose an option")),
           children: [
             SimpleDialogOption(
               onPressed: () async {
                 Navigator.pop(context); // Close the dialog
                 await pickImage(ImageSource.camera);
               },
-              child: Text("Take a photo"),
+              child: Text(Localize("Take a photo")),
             ),
             SimpleDialogOption(
               onPressed: () async {
                 Navigator.pop(context); // Close the dialog
                 await pickImage(ImageSource.gallery);
               },
-              child: Text("Choose from gallery"),
+              child: Text(Localize("Choose from gallery")),
             ),
           ],
         );
@@ -158,7 +158,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                               child: Align(
                                 alignment: Alignment.center,
                                 child: Hero(
-                                  tag: 'profile_pic',
+                                  tag: Localize('profile_pic'),
                                   child: Container(
                                     width: 150, // set your desired width
                                     height: 150, // set your desired height

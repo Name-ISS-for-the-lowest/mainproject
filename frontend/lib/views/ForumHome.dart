@@ -128,6 +128,7 @@ class _ForumHomeState extends State<ForumHome> {
   }
 
   Future<void> translatePost(String originalText, int index) async {
+    //first I check if cachedTranslations contains the original text as a key
     if (PostHelper.cachedTranslations.containsKey(originalText)) {
       return;
     } else if (postData[index]['translations'] != '') {
@@ -299,7 +300,7 @@ class _ForumHomeState extends State<ForumHome> {
                     )),
                 if (isEdited)
                   TextSpan(
-                    text: ' (Edited)',
+                    text: Localize('(Edited)'),
                     style: TextStyle(
                       fontStyle: FontStyle.italic,
                       color: Colors.grey,
@@ -343,7 +344,7 @@ class _ForumHomeState extends State<ForumHome> {
                 SizedBox(
                   width: 10,
                 ),
-                Text('Close Menu'),
+                Text(Localize('Close Menu')),
               ],
             ),
           ),
@@ -367,7 +368,7 @@ class _ForumHomeState extends State<ForumHome> {
                     width: 10,
                   ),
                   Text(
-                    'Edit Post',
+                    Localize('Edit Post'),
                     style: TextStyle(
                       color: Color(0xff0094FF),
                     ),
@@ -394,7 +395,7 @@ class _ForumHomeState extends State<ForumHome> {
                     width: 10,
                   ),
                   Text(
-                    'Delete Post',
+                    Localize('Delete Post'),
                     style: TextStyle(
                       color: Colors.red,
                     ),
@@ -421,7 +422,7 @@ class _ForumHomeState extends State<ForumHome> {
                     width: 10,
                   ),
                   Text(
-                    'Report Post',
+                    Localize('Report Post'),
                     style: TextStyle(
                       color: Colors.red,
                     ),
@@ -540,7 +541,7 @@ class _ForumHomeState extends State<ForumHome> {
                   onTap: () async {
                     var response = await PostHelper.likePost(postID);
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(response['message'])));
+                        SnackBar(content: Text(Localize(response['message']))));
                     setState(() {
                       postData[index]['liked'] = !liked;
 
@@ -645,8 +646,8 @@ class _ForumHomeState extends State<ForumHome> {
                 },
                 child: Text(
                   (currentlyTranslated.containsKey(postID))
-                      ? "Original Text"
-                      : "Translate",
+                      ? Localize("Original Text")
+                      : Localize("Translate"),
                   style: TextStyle(
                     color: Color(0xff0094FF),
                   ),
@@ -661,13 +662,17 @@ class _ForumHomeState extends State<ForumHome> {
                       child: GestureDetector(
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(
-                                  "Expanded Post (should go to same place as comments)")));
+                              content: Text(Localize(
+                                  "Expanded Post (should go to same place as comments)"))));
                         },
-                        child: Text(
-                          "Post too tall to view on home page.\nPlease click here to expand post.",
-                          style: TextStyle(
-                            color: Color(0x55000000),
+                        child: Container(
+                          width: 250,
+                          child: Text(
+                            Localize(
+                                "Post too tall to view on home page. Please click here to expand post."),
+                            style: TextStyle(
+                              color: Color(0x55000000),
+                            ),
                           ),
                         ),
                       ),

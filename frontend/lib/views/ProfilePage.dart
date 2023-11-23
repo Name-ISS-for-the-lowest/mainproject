@@ -241,28 +241,24 @@ class _ProfilePageState extends State<ProfilePage> {
                   itemBuilder: _buildDialogItem)),
         );
 
-    //DELETE ACCOUNT BUTTON
     showDeleteAlertDialog(BuildContext context) {
       // set up the buttons
       Widget cancelButton = TextButton(
-        child: Text("Cancel"),
+        child: Text(Localize("Cancel")),
         onPressed: () {
           Navigator.pop(context);
           return;
         },
       );
       Widget continueButton = TextButton(
-        child: Text("Continue"),
+        child: Text(Localize("Continue")),
         onPressed: () {
           Restart.restartApp(webOrigin: '');
         },
       );
 
+      // set up the AlertDialog
       AlertDialog alert = AlertDialog(
-        backgroundColor: Color(0xfff7ebe1),
-        //backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0))),
         title: Text("ACCOUNT DELETION"),
         content: Text(
             "THIS ACTION IS IRREVERSABLE. ARE YOU SURE YOU WANT TO CONTINUE?"),
@@ -272,6 +268,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       );
 
+      // show the dialog
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -280,8 +277,8 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
-    //LOGOUT BUTTON
     showLogoutAlertDialog(BuildContext context) {
+      // set up the buttons
       Widget cancelButton = TextButton(
         child: Text("Cancel"),
         onPressed: () {
@@ -290,16 +287,14 @@ class _ProfilePageState extends State<ProfilePage> {
         },
       );
       Widget continueButton = TextButton(
-        child: Text("Continue"),
+        child: Text(Localize("Continue")),
         onPressed: () {
           Restart.restartApp(webOrigin: '');
         },
       );
 
+      // set up the AlertDialog
       AlertDialog alert = AlertDialog(
-        backgroundColor: Color(0xfff7ebe1),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0))),
         title: Text("Log Out"),
         content: Text("You will be returned to the login screen. Continue?"),
         actions: [
@@ -307,6 +302,15 @@ class _ProfilePageState extends State<ProfilePage> {
           continueButton,
         ],
       );
+
+      // show the dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
 
       showDialog(
         context: context,
@@ -520,8 +524,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 //LOCALIZE NOT FUNCTIONING AT THE MOMENT
                 //title: Text(Localize('Log Out')),
                 //subtitle: Text(Localize('Sign out of the current account.')),
-                title: Text('Log Out'),
-                subtitle: Text('Sign out of the current account.'),
+                title: Text(Localize('Log Out')),
+                subtitle: Text(Localize('Sign out of the current account.')),
                 onTap: () {
                   showLogoutAlertDialog(context);
                 },
