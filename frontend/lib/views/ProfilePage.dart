@@ -20,6 +20,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+
   @override
   Widget build(BuildContext context) {
     //USER VARIABLES
@@ -250,7 +251,7 @@ class _ProfilePageState extends State<ProfilePage> {
     AlertDialog alert = AlertDialog(
       backgroundColor: Color(0xfff7ebe1),      
       //backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10.0))),
       title: Text("ACCOUNT DELETION"),
       content: Text("THIS ACTION IS IRREVERSABLE. ARE YOU SURE YOU WANT TO CONTINUE?"),
@@ -288,7 +289,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     AlertDialog alert = AlertDialog(
       backgroundColor: Color(0xfff7ebe1),
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10.0))),      
       title: Text("Log Out"),
       content: Text("You will be returned to the login screen. Continue?"),
@@ -323,7 +324,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (image == null) return;
 
     final imageTemporary = File(image.path);
-    //setState(() => this.image = imageTemporary);
+    //this.image = imageTemporary;
   }
 
 
@@ -339,18 +340,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 dialogBackgroundColor: Color(0xfff7ebe1)
                 ),
           child: SimpleDialog(
-            title: const Text("Image Picker"),
+            title: Text("Image Picker"),
             children: <Widget>[
               SimpleDialogOption(
-                child: const Text('Select from Gallery'),
+                child: Text('Select from Gallery'),
                 onPressed: () => pickImage(),
               ),
               SimpleDialogOption(
-                child: const Text('Open Camera'),
+                child: Text('Open Camera'),
                 onPressed: () => pickCamera(),
               ),
               SimpleDialogOption(
-                child: const Text('Close'),
+                child: Text('Close'),
                 onPressed: () {
                   Navigator.pop(context);
                 },
