@@ -46,6 +46,26 @@ class DBManager:
             return None
         else:
             return User.fromDict(user)
+        
+    @staticmethod
+    def updateUser(email: str, username:str, _id:str, language:str, nationality:str, profilePictureURL:str, profilePictureFileID:str):
+        id = ObjectId(_id)
+        user = DBManager.db["users"].find_one({"_id": id})
+        fields = ['email', 'username', 'language', 'nationality']
+        newDict = {}
+        for elem in fields:
+            if user.get(elem) != vars()[elem]:
+                newDict[elem] = vars()[elem]
+        profilePicture = user.get('profilePicture')
+        if profilePicture['url'] != profilePictureURL or profilePicture['fileId'] != profilePictureFileID:
+            profilePicture['url'] = profilePictureURL
+            profilePicture['fileId'] = profilePictureFileID
+            newDict['profilePicture'] = profilePicture
+        DBManager.db["users"].update_one({"_id": id},{"$set": newDict})
+
+
+
+
 
     @staticmethod
     def activateAccount(token):

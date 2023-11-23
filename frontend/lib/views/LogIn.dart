@@ -35,7 +35,7 @@ class _LogInState extends State<LogIn> {
       navigateToPrimaryScreens();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(response.data["message"] ?? "Error"),
+        content: Text(response.data["message"] ?? Localize("Error")),
       ));
     }
   }
