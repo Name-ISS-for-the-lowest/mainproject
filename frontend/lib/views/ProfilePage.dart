@@ -72,8 +72,8 @@ class _ProfilePageState extends State<ProfilePage> {
           countryListTheme: CountryListThemeData(
             backgroundColor: Color(0xffece7d5),
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(0),
-              topRight: Radius.circular(0),
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
             ),
           ),
           onSelect: (Country country) async {
@@ -240,6 +240,11 @@ class _ProfilePageState extends State<ProfilePage> {
               data: Theme.of(context).copyWith(
                 primaryColor: Colors.pink,
                 dialogBackgroundColor: Color(0xfff7ebe1),
+                dialogTheme: DialogTheme(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
               ),
               child: LanguagePickerDialog(
                   languages: supportedLanguages,
@@ -341,12 +346,13 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     //NAME BUTTON
-
-
     Future<String?> openNameDialog() => showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Your Name'),
+        backgroundColor: Color(0xfff7ebe1),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0))),
         content: TextField(
           autofocus: true,
           decoration: InputDecoration(hintText: 'Enter your name'),
