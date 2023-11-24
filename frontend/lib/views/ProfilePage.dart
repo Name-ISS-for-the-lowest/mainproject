@@ -280,7 +280,11 @@ class _ProfilePageState extends State<ProfilePage> {
       );
       Widget continueButton = TextButton(
         child: Text(Localize("Continue")),
-        onPressed: () {
+        onPressed: () async {
+          AuthHelper.logout();          
+          await updateUser();
+
+          
           Restart.restartApp(webOrigin: '');
         },
       );
@@ -309,24 +313,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     //LOGOUT BUTTON
-    //DELETE FUNCTION DOES NOT WORK??
-    
-    // Future<void> deleteCacheDir() async {
-    // final cacheDir = await getTemporaryDirectory();
-
-    // if (cacheDir.existsSync()) {
-    //   cacheDir.deleteSync(recursive: true);
-    //   }
-    // }
-
-    // Future<void> deleteAppDir() async {
-    // final appDir = await getApplicationSupportDirectory();
-
-    //   if(appDir.existsSync()){
-    //     appDir.deleteSync(recursive: true);
-    //   }
-    // }
-
     showLogoutAlertDialog(BuildContext context) {
       Widget cancelButton = TextButton(
         child: Text(Localize("Cancel")),
@@ -338,8 +324,7 @@ class _ProfilePageState extends State<ProfilePage> {
       Widget continueButton = TextButton(
         child: Text(Localize("Continue")),
         onPressed: () async {
-          // deleteAppDir();
-          // deleteCacheDir();
+          AuthHelper.logout();
           await updateUser();
           Restart.restartApp(webOrigin: '');
         },
