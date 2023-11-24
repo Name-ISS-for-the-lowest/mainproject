@@ -506,7 +506,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         if (name == null || name.isEmpty) return;
 
                         AuthHelper.userInfoCache['username'] = name;
-
+                        await updateUser();
                       },
                     ),
                   ),
