@@ -13,6 +13,7 @@ import 'package:restart_app/restart_app.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:async';
+import 'package:path_provider/path_provider.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -308,6 +309,24 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     //LOGOUT BUTTON
+    //DELETE FUNCTION DOES NOT WORK??
+    
+    // Future<void> deleteCacheDir() async {
+    // final cacheDir = await getTemporaryDirectory();
+
+    // if (cacheDir.existsSync()) {
+    //   cacheDir.deleteSync(recursive: true);
+    //   }
+    // }
+
+    // Future<void> deleteAppDir() async {
+    // final appDir = await getApplicationSupportDirectory();
+
+    //   if(appDir.existsSync()){
+    //     appDir.deleteSync(recursive: true);
+    //   }
+    // }
+
     showLogoutAlertDialog(BuildContext context) {
       Widget cancelButton = TextButton(
         child: Text(Localize("Cancel")),
@@ -318,7 +337,10 @@ class _ProfilePageState extends State<ProfilePage> {
       );
       Widget continueButton = TextButton(
         child: Text(Localize("Continue")),
-        onPressed: () {
+        onPressed: () async {
+          // deleteAppDir();
+          // deleteCacheDir();
+          await updateUser();
           Restart.restartApp(webOrigin: '');
         },
       );
@@ -374,12 +396,6 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
     );
-
-
-
-
-
-
 
     //CAMERA CODE
     File? image;
@@ -593,7 +609,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 //subtitle: Text(Localize('Sign out of the current account.')),
                 title: Text(Localize('Log Out')),
                 subtitle: Text(Localize('Sign out of the current account.')),
-                onTap: () {
+                onTap: () async {
                   showLogoutAlertDialog(context);
                 },
               ),
