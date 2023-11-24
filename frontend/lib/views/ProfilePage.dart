@@ -9,11 +9,11 @@ import '../languagePicker/language_picker.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:restart_app/restart_app.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
+import 'package:frontend/home.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -282,10 +282,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Text(Localize("Continue")),
         onPressed: () async {
           AuthHelper.logout();          
-          await updateUser();
-
-          
-          Restart.restartApp(webOrigin: '');
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Home()), (route) => false);
         },
       );
 
@@ -325,8 +322,8 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Text(Localize("Continue")),
         onPressed: () async {
           AuthHelper.logout();
-          await updateUser();
-          Restart.restartApp(webOrigin: '');
+
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Home()), (route) => false);
         },
       );
 
