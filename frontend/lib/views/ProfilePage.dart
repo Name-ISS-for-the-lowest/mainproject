@@ -29,6 +29,28 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  late TextEditingController controller;
+  String name = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+
+    super.dispose();
+  }
+
+  void submit() async {
+    Navigator.of(context).pop(controller.text);
+    await updateUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     //USER VARIABLES
@@ -318,6 +340,41 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
+    //NAME BUTTON
+
+
+    Future<String?> openNameDialog() => showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Your Name'),
+        content: TextField(
+          autofocus: true,
+          decoration: InputDecoration(hintText: 'Enter your name'),
+          controller: controller,
+        ),
+        actions: [
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: Text('Submit'),
+            onPressed: () {
+              submit();
+            },
+          ),
+        ],
+      ),
+    );
+
+
+
+
+
+
+
     //CAMERA CODE
     File? image;
 
@@ -438,7 +495,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     alignment: Alignment.centerRight,
                     child: IconButton(
                       icon: Icon(Icons.edit_note),
-                      onPressed: () {},
+                      onPressed: () async {
+                        final name = await openNameDialog();
+                        if (name == null || name.isEmpty) return;
+
+                        AuthHelper.userInfoCache['username'] = name;
+
+                      },
                     ),
                   ),
                 ),
