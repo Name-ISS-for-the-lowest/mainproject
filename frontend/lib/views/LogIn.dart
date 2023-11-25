@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/ResetPassword.dart';
 import 'package:frontend/views/SignUp.dart';
@@ -13,37 +12,9 @@ class LogIn extends StatefulWidget {
   State<LogIn> createState() => _LogInState();
 }
 
-class BackgroundWidget extends StatelessWidget{
-  const BackgroundWidget({super.key});
-  
-  @override
-  Widget build(BuildContext context){ 
-    final screenHeight = MediaQuery.sizeOf(context).height;
-    //final screenWidth = MediaQuery.sizeOf(context).width;
-
-    return Scaffold(
-      backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
-      body: Stack(
-        children: [
-          Positioned(
-            top: 200,
-            child: SizedBox(
-            height: screenHeight,
-            child: LottieBuilder.asset('assets/BackgroundWave.json',
-              fit: BoxFit.fill,),
-          )) 
-        ],
-        )
-      );
-  }
-}
-
-
-
 class _LogInState extends State<LogIn> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
 
   @override
   void initState() {
@@ -126,8 +97,7 @@ class _LogInState extends State<LogIn> {
   Widget build(BuildContext context) {
  
     final screenHeight = MediaQuery.sizeOf(context).height;
-    //final screenWidth = MediaQuery.sizeOf(context).width;
-    const BackgroundWidget();
+    
     return Scaffold(
       
       backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
@@ -147,11 +117,28 @@ class _LogInState extends State<LogIn> {
             
           //Returning User Form begins Here--------------------------
           Positioned(
-            top: 260,
+            top: 100,
             child: Column(
             
                   children: [  
-          
+                    
+                    //This part is just text and formatting
+                    const Text(
+                      'Welcome \n Back',
+                      style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 45,
+                            color: Color.fromRGBO(230, 183, 17, 1)
+                          ),
+                      textAlign: TextAlign.center,
+                      ),
+                      
+                   //Spacer for Column elements
+                    const SizedBox(
+                      height: 37,
+                    ),
+
                     //Email Field Styling
                     SizedBox(       
                       width: 330,
@@ -247,12 +234,13 @@ class _LogInState extends State<LogIn> {
             )
           ),
 
-
+          //New User Forms Begin here -------------------------------
           Positioned(
             bottom: 42,
             child: Column(
                 children: [
 
+                    //This part is just text and formatting
                     const Text(
                       'Don\'t have an account?',
                       style: TextStyle(
@@ -263,10 +251,12 @@ class _LogInState extends State<LogIn> {
                           ),
                       ),
 
+                    //Spacer
                     const SizedBox(
                       height: 9,
                     ),
 
+                    //Sign Up button Formatting
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           fixedSize: const Size(330, 50),
@@ -293,236 +283,5 @@ class _LogInState extends State<LogIn> {
         ],
         )
       );
-
-    
-    
-    /*return Scaffold(
-      backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
-      body: Stack(
-        children: [
-          Container(
-            color: const Color.fromRGBO(0, 78, 56, 1),
-            width: screenWidth,
-            height: 400,
-          ),  
-          Align(
-            alignment: const Alignment(0,0.5),
-            child: SizedBox(
-                  height: screenHeight * .5,
-                  child: Lottie.asset('assets/BackgroundWave.json',
-                    height: screenHeight,
-                    width: screenWidth,
-                    fit: BoxFit.fitWidth,
-                  )
-                  ))   
-                  ],
-      ),
-    );*/
-    
-    /*final screenHeight = MediaQuery.sizeOf(context).height;
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                SizedBox(
-                  height: screenHeight * 0.60,
-                ),
-                SizedBox(
-                  height: screenHeight * 0.40,
-                  child: Lottie.asset(
-                    'assets/BackgroundWave.json',
-                    height: 800,
-                    width: screenWidth,
-                    fit: BoxFit.fill,
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                //spacer for top
-                const SizedBox(
-                  height: 120,
-                ),
-                //Log in title
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      "Log In",
-                      style: TextStyle(
-                        fontSize: 50,
-                        fontWeight: FontWeight.w700,
-                        color: Color.fromRGBO(230, 183, 17, 1),
-                      ),
-                    ),
-                  ),
-                ),
-                //Input fields
-                Column(
-                  children: [
-                    const SizedBox(
-                      height: 50,
-                    ),
-                    Column(
-                      children: [
-                        Column(
-                          children: [
-                            SizedBox(
-                              width: 340,
-                              child: TextField(
-                                controller: emailController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  labelText: 'Email',
-                                  contentPadding: const EdgeInsets.all(18),
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.never,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Column(
-                          children: [
-                            SizedBox(
-                              width: 340,
-                              child: TextField(
-                                obscureText: true,
-                                controller: passwordController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  labelText: 'Password',
-                                  contentPadding: const EdgeInsets.all(18),
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.never,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Column(
-                      children: [
-                        const SizedBox(
-                          height: 50,
-                        ),
-                        Column(
-                          children: [
-                            Center(
-                              child: SizedBox(
-                                width: 340,
-                                height: 50,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    elevation: 10,
-                                    backgroundColor:
-                                        const Color.fromRGBO(230, 183, 17, 1),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                  ),
-                                  onPressed: () => {
-                                    executeLogin(context, emailController.text,
-                                        passwordController.text),
-                                  },
-                                  child: const Text(
-                                    "Login",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color.fromARGB(255, 53, 53, 53),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Column(
-                          children: [
-                            Center(
-                              child: SizedBox(
-                                width: 340,
-                                height: 50,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    elevation: 10,
-                                    backgroundColor:
-                                        const Color.fromRGBO(221, 151, 26, 1),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                  ),
-                                  onPressed: () => {
-                                    navigateToSignUp(),
-                                  },
-                                  child: const Text(
-                                    "Sign Up",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color.fromARGB(255, 53, 53, 53),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                      ),
-                      onPressed: () => {
-                        navigateToResetPassword(),
-                      },
-                      child: const Text(
-                        "Forgot Password?",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: Color.fromRGBO(230, 183, 17, 1),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );*/
   }
 }
