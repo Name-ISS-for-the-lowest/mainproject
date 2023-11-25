@@ -12,6 +12,7 @@ from classes.ImageHelper import ImageHelper
 import json
 import urllib.parse
 from models.Post import Post
+from models.Report import Report
 from bson import ObjectId
 import migrate
 from classes.Translator import Translator
@@ -262,6 +263,12 @@ def getPosts(start: int, end: int, showReported: str, showRemoved: str, showDele
 def likePost(postID: str, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
     response = DBManager.likePost(postID, userID)
+    return JSONResponse(response, status_code=200)
+
+@app.post("/reportPost", summary="Report a post")
+def reportPost(postID: str, request: Request):
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    response = DBManager.reportPost(postID, userID)
     return JSONResponse(response, status_code=200)
 
 

@@ -158,7 +158,6 @@ class DBManager:
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
             if likedResult is not None:
                 post.liked = True
-           
             returnPosts.append(post)
         return returnPosts
 
@@ -222,6 +221,25 @@ class DBManager:
             # remove the like from the likes collection
             DBManager.db["likes"].delete_one({"comboID": comboID})
             return {"message": "Post unliked"}
+        
+    @staticmethod
+    def reportPost(postID, userID):
+        # check if the user has already liked the post
+        comboID = str(postID) + str(userID)
+        postID = ObjectId(postID)
+        reportResult = DBManager.db["reports"].find_one({"comboID": comboID})
+        if reportResult is None:
+            result = DBManager.db["posts"].update_one(
+                {"_id": postID}, {"$inc": {"reports": 1}}
+            )
+            print(result.modified_count)
+
+            # add the reports to the reports collection
+            DBManager.db["reports"].insert_one({"PostID": postID, "comboID": comboID, "Reason": 'harassment'})
+            print("Reported")
+            return {"message": "Post reported"}
+        else:
+            return {"message": "Post already reported"}
 
     @staticmethod
     def addTranslationToPost(translatedText, userLang, postID):

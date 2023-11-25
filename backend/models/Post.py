@@ -12,6 +12,7 @@ class Post:
     profilePicture = Picture()
     date: datetime.datetime
     likes: int
+    reports: int
     imagelinks: list
     liked: bool = False
     edited: bool
@@ -26,6 +27,7 @@ class Post:
         self.userID = user_id
         self.date = datetime.datetime.now()
         self.likes = 0
+        self.reports = 0
         self.liked = False
         # if parent is none then post is not a reply
         # otherwise the post is a reply to parent
