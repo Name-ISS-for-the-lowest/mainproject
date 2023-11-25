@@ -42,6 +42,30 @@ class AuthHelper {
     }
   }
 
+  static Future<Response> logout() async {
+    String endPoint = '/logout';
+    var url = '$defaultHost$endPoint';
+
+    //this is the dio library making a post request
+    try {
+      final response = await RouteHandler.dio.post(url);
+      return response;
+
+      //on anything but a 200 response this code will run
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!;
+      } else {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'Unable to connect to server'},
+          statusCode: 500,
+          statusMessage: 'Unable to connect to server',
+        );
+      }
+    }
+  }  
+
   static Future<Response> signUp(String email, String password) async {
     final data = {'email': email, 'password': password};
     String endPoint = '/signup';

@@ -9,10 +9,11 @@ import '../languagePicker/language_picker.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:restart_app/restart_app.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:async';
+import 'package:path_provider/path_provider.dart';
+import 'package:frontend/home.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -27,6 +28,28 @@ class _ProfilePageState extends State<ProfilePage> {
     if (mounted) {
       setState(() {});
     }
+  }
+
+  late TextEditingController controller;
+  String name = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+
+    super.dispose();
+  }
+
+  void submit() async {
+    Navigator.of(context).pop(controller.text);
+    await updateUser();
   }
 
   @override
@@ -50,8 +73,8 @@ class _ProfilePageState extends State<ProfilePage> {
           countryListTheme: CountryListThemeData(
             backgroundColor: Color(0xffece7d5),
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(0),
-              topRight: Radius.circular(0),
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
             ),
           ),
           onSelect: (Country country) async {
@@ -218,6 +241,11 @@ class _ProfilePageState extends State<ProfilePage> {
               data: Theme.of(context).copyWith(
                 primaryColor: Colors.pink,
                 dialogBackgroundColor: Color(0xfff7ebe1),
+                dialogTheme: DialogTheme(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
               ),
               child: LanguagePickerDialog(
                   languages: supportedLanguages,
@@ -252,8 +280,9 @@ class _ProfilePageState extends State<ProfilePage> {
       );
       Widget continueButton = TextButton(
         child: Text(Localize("Continue")),
-        onPressed: () {
-          Restart.restartApp(webOrigin: '');
+        onPressed: () async {
+          AuthHelper.logout();          
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Home()), (route) => false);
         },
       );
 
@@ -291,8 +320,10 @@ class _ProfilePageState extends State<ProfilePage> {
       );
       Widget continueButton = TextButton(
         child: Text(Localize("Continue")),
-        onPressed: () {
-          Restart.restartApp(webOrigin: '');
+        onPressed: () async {
+          AuthHelper.logout();
+
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Home()), (route) => false);
         },
       );
 
@@ -317,6 +348,36 @@ class _ProfilePageState extends State<ProfilePage> {
         },
       );
     }
+
+    //NAME BUTTON
+    Future<String?> openNameDialog() => showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Your Name'),
+        backgroundColor: Color(0xfff7ebe1),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0))),
+        content: TextField(
+          autofocus: true,
+          decoration: InputDecoration(hintText: 'Enter your name'),
+          controller: controller,
+        ),
+        actions: [
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: Text('Submit'),
+            onPressed: () {
+              submit();
+            },
+          ),
+        ],
+      ),
+    );
 
     //CAMERA CODE
     File? image;
@@ -438,7 +499,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     alignment: Alignment.centerRight,
                     child: IconButton(
                       icon: Icon(Icons.edit_note),
-                      onPressed: () {},
+                      onPressed: () async {
+                        final name = await openNameDialog();
+                        if (name == null || name.isEmpty) return;
+
+                        AuthHelper.userInfoCache['username'] = name;
+                        await updateUser();
+                      },
                     ),
                   ),
                 ),
@@ -524,7 +591,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 //subtitle: Text(Localize('Sign out of the current account.')),
                 title: Text(Localize('Log Out')),
                 subtitle: Text(Localize('Sign out of the current account.')),
-                onTap: () {
+                onTap: () async {
                   showLogoutAlertDialog(context);
                 },
               ),
