@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/ResetPassword.dart';
@@ -118,17 +117,21 @@ class _LogInState extends State<LogIn> {
                   children: [  
                     
                     //This part is just text and formatting
-                    const Text(
-                      'Welcome \n Back',
-                      style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 45,
-                            color: Color.fromRGBO(230, 183, 17, 1)
-                          ),
-                      textAlign: TextAlign.center,
-                      ),
-                      
+                    SizedBox(
+                      width: 210,
+                      child : Text(
+                          Localize('Welcome Back'),
+                          style: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.bold,
+                                fontSize: 45,
+                                color: Color.fromRGBO(230, 183, 17, 1)
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                    ),
+                    
+                    
                    //Spacer for Column elements
                     const SizedBox(
                       height: 37,
@@ -144,7 +147,7 @@ class _LogInState extends State<LogIn> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(5),
                           ),
-                          labelText: 'Email',
+                          labelText: Localize('Email'),
                           filled: true,
                           fillColor: Colors.white,
                         ),
@@ -167,7 +170,7 @@ class _LogInState extends State<LogIn> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(5),
                           ),
-                          labelText: 'Password',
+                          labelText: Localize('Password'),
                           filled: true,
                           fillColor: Colors.white,
                         ),
@@ -186,9 +189,9 @@ class _LogInState extends State<LogIn> {
                         onTap: () {
                           navigateToResetPassword();
                         },
-                        child: const Text(
-                          'Forgot Password?',
-                          style: TextStyle(
+                        child: Text(
+                          Localize('Forgot Password?'),
+                          style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -219,7 +222,7 @@ class _LogInState extends State<LogIn> {
                             ), 
                         ),
 
-                        child: const Text('Log In'),
+                        child: Text(Localize('Log In')),
                         onPressed: () => {
                           executeLogin(context, emailController.text, passwordController.text)
                         },
@@ -236,9 +239,9 @@ class _LogInState extends State<LogIn> {
                 children: [
 
                     //This part is just text and formatting
-                    const Text(
-                      'Don\'t have an account?',
-                      style: TextStyle(
+                    Text(
+                      Localize('Don\'t have an account?'),
+                      style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -266,7 +269,7 @@ class _LogInState extends State<LogIn> {
                            ), 
                         ),
 
-                      child: const Text('Sign Up'),
+                      child: Text(Localize('Sign Up')),
                       onPressed: () => {
                         navigateToSignUp()
                       },
