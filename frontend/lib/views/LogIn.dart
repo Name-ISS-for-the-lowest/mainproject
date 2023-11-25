@@ -5,6 +5,7 @@ import 'package:frontend/views/ResetPassword.dart';
 import 'package:frontend/views/SignUp.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 import 'package:lottie/lottie.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
@@ -120,23 +121,47 @@ class _LogInState extends State<LogIn> {
                     
                     //This part is just text and formatting
                     SizedBox(
-                      width: 210,
-                      child : Text(
-                          Localize('Welcome Back'),
-                          style: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 45,
-                                color: Color.fromRGBO(230, 183, 17, 1)
-                              ),
-                          textAlign: TextAlign.center,
-                        ),
+                      width: 240,
+                      height: 100,
+                      child : FittedBox(
+                        
+                        child : DefaultTextStyle(
+                            style: const TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 50,
+                                  color: Color.fromRGBO(230, 183, 17, 1)
+                                ),
+                            textAlign: TextAlign.center,
+                            child: AnimatedTextKit( 
+                              isRepeatingAnimation: true,
+                              animatedTexts: [
+                                RotateAnimatedText(
+                                  transitionHeight: 100,
+                                  Localizer.localize('Welcome Back', 'en')
+                                  ),
+                                RotateAnimatedText(
+                                  transitionHeight: 100,
+                                  Localizer.localize('Welcome Back', 'es')
+                                  ),
+                                RotateAnimatedText(
+                                  transitionHeight: 100,
+                                  Localizer.localize('Welcome Back', 'fr')
+                                  ),
+                                RotateAnimatedText(
+                                  transitionHeight: 100,
+                                  Localizer.localize('Welcome Back', 'zh')
+                                  ),
+                                ]
+                            ),
+                          ),
+                      )
                     ),
                     
                     
                    //Spacer for Column elements
                     const SizedBox(
-                      height: 37,
+                      height: 45,
                     ),
 
                     
