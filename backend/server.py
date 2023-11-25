@@ -264,7 +264,7 @@ def likePost(postID: str, request: Request):
     response = DBManager.likePost(postID, userID)
     return JSONResponse(response, status_code=200)
 
-@app.post("/reportPost", summary="Like a post, if already liked it will be unliked")
+@app.post("/reportPost", summary="Report a post")
 def reportPost(postID: str, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
     response = DBManager.reportPost(postID, userID)

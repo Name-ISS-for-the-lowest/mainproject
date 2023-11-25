@@ -215,7 +215,7 @@ class DBManager:
             print(result.modified_count)
 
             # add the reports to the reports collection
-            DBManager.db["reports"].insert_one({"comboID": comboID})
+            DBManager.db["reports"].insert_one({"PostID": postID, "comboID": comboID, "Reason": 'harassment'})
             print("Reported")
             return {"message": "Post reported"}
         else:

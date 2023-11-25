@@ -12,6 +12,7 @@ class ReportPage extends StatefulWidget {
 
 class _ReportPageState extends State<ReportPage> {
   String selectedOption = '';
+  String reason = 'harassment';
 
   void navigateToPrimaryScreens() {
     Navigator.of(context).push(
@@ -133,6 +134,7 @@ class _ReportPageState extends State<ReportPage> {
           const SizedBox(height: 16.0),
           GestureDetector(
             onTap: () async {
+              //String reasonValue = await reason;
               var response = await PostHelper.reportPost(widget.postID);
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(response['message'])));
