@@ -92,7 +92,6 @@ class AuthHelper {
   }
 
   static Future<bool> isLoggedIn() async {
-    // return false;
     var sessionCookie = await readCookie('session_cookie');
     if (sessionCookie == null) return false;
 

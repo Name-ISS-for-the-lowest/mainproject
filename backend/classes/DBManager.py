@@ -65,13 +65,22 @@ class DBManager:
             if user.get(elem) != vars()[elem]:
                 newDict[elem] = vars()[elem]
         profilePicture = user.get("profilePicture")
+        oldProfilePicture = profilePicture.copy()
         if (
             profilePicture["url"] != profilePictureURL
             or profilePicture["fileId"] != profilePictureFileID
         ):
+            profilePictureHistory = user.get('profilePictureHistory')
+            profilePictureHistory.append(oldProfilePicture)
             profilePicture["url"] = profilePictureURL
             profilePicture["fileId"] = profilePictureFileID
             newDict["profilePicture"] = profilePicture
+            newDict['profilePictureHistory'] = profilePictureHistory
+        oldUsername = user.get("username")
+        if oldUsername != username:
+            usernameHistory = user.get('usernameHistory')
+            usernameHistory.append(oldUsername)
+            newDict['usernameHistory'] = usernameHistory
         DBManager.db["users"].update_one({"_id": id}, {"$set": newDict})
 
     @staticmethod
