@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:frontend/classes/Localize.dart';
+import 'package:frontend/classes/postHelper.dart';
 // import 'package:language_picker/language_picker.dart';
 // import 'package:language_picker/languages.dart';
 import '../languagePicker/languages.dart';
@@ -8,6 +9,11 @@ import '../languagePicker/language_picker.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'dart:async';
+import 'package:path_provider/path_provider.dart';
+import 'package:frontend/home.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -17,12 +23,42 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  Future<void> updateUser() async {
+    var response = await AuthHelper.updateUser();
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  late TextEditingController controller;
+  String name = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+
+    super.dispose();
+  }
+
+  void submit() async {
+    Navigator.of(context).pop(controller.text);
+    await updateUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     //USER VARIABLES
+
     String imageURL = AuthHelper.userInfoCache['profilePicture.url'];
     String displayName = AuthHelper.userInfoCache['username'];
-    String nationality = AuthHelper.userInfoCache['nationality'];
+    String nationality = Localize(AuthHelper.userInfoCache['nationality']);
     String language =
         AuthHelper.languageNames[AuthHelper.userInfoCache['language']];
     String emailAddress = AuthHelper.userInfoCache['email'];
@@ -31,20 +67,20 @@ class _ProfilePageState extends State<ProfilePage> {
 //COUNTRY SELECTOR
     void countryselect() {
       showCountryPicker(
-        context: context,
-        favorite: <String>['US', 'CN', 'MX', 'IN'],
-        //exclude: <String>['FR'],
-        countryListTheme: CountryListThemeData(
-          backgroundColor: Color(0xffece7d5),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(0),
-            topRight: Radius.circular(0),
+          context: context,
+          favorite: <String>['US', 'CN', 'MX', 'IN'],
+          //exclude: <String>['FR'],
+          countryListTheme: CountryListThemeData(
+            backgroundColor: Color(0xffece7d5),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+            ),
           ),
-        ),
-        onSelect: (Country country) {
-          print('${Localize("Select country: ")}${country.displayName}');
-        },
-      );
+          onSelect: (Country country) async {
+            AuthHelper.userInfoCache['nationality'] = country.name;
+            await updateUser();
+          });
     }
 
     Widget _buildDialogItem(Language language) {
@@ -202,7 +238,15 @@ class _ProfilePageState extends State<ProfilePage> {
     void _openLanguagePickerDialog() => showDialog(
           context: context,
           builder: (context) => Theme(
-              data: Theme.of(context).copyWith(primaryColor: Colors.pink),
+              data: Theme.of(context).copyWith(
+                primaryColor: Colors.pink,
+                dialogBackgroundColor: Color(0xfff7ebe1),
+                dialogTheme: DialogTheme(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+              ),
               child: LanguagePickerDialog(
                   languages: supportedLanguages,
                   titlePadding: EdgeInsets.all(8.0),
@@ -211,34 +255,45 @@ class _ProfilePageState extends State<ProfilePage> {
                       InputDecoration(hintText: Localize('Search')),
                   isSearchable: true,
                   title: Text(Localize('Select your language')),
-                  onValuePicked: (Language language) => setState(() {
-                        print(AuthHelper.userInfoCache['language']);
-                        AuthHelper.userInfoCache['language'] = language.isoCode;
-                        _selectedDialogLanguage = language;
-                        // print(_selectedDialogLanguage.name);
-                        // print(_selectedDialogLanguage.isoCode);
-                      }),
+                  onValuePicked: (Language language) async {
+                    print(AuthHelper.userInfoCache['language']);
+                    AuthHelper.userInfoCache['language'] = language.isoCode;
+                    _selectedDialogLanguage = language;
+                    PostHelper.cachedTranslations = {};
+
+                    // print(_selectedDialogLanguage.name);
+                    // print(_selectedDialogLanguage.isoCode);
+                    await updateUser();
+                  },
                   itemBuilder: _buildDialogItem)),
         );
 
+    //DELETE ACCOUNT BUTTON
     showDeleteAlertDialog(BuildContext context) {
       // set up the buttons
       Widget cancelButton = TextButton(
         child: Text(Localize("Cancel")),
         onPressed: () {
+          Navigator.pop(context);
           return;
         },
       );
       Widget continueButton = TextButton(
         child: Text(Localize("Continue")),
-        onPressed: () {},
+        onPressed: () async {
+          AuthHelper.logout();          
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Home()), (route) => false);
+        },
       );
 
-      // set up the AlertDialog
       AlertDialog alert = AlertDialog(
-        title: Text(Localize("ACCOUNT DELETION")),
-        content: Text(Localize(
-            "THIS ACTION IS IRREVERSABLE. ARE YOU SURE YOU WANT TO CONTINUE?")),
+        backgroundColor: Color(0xfff7ebe1),
+        //backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0))),
+        title: Text("ACCOUNT DELETION"),
+        content: Text(
+            "THIS ACTION IS IRREVERSABLE. ARE YOU SURE YOU WANT TO CONTINUE?"),
         actions: [
           cancelButton,
           continueButton,
@@ -254,21 +309,28 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
+    //LOGOUT BUTTON
     showLogoutAlertDialog(BuildContext context) {
-      // set up the buttons
       Widget cancelButton = TextButton(
         child: Text(Localize("Cancel")),
         onPressed: () {
+          Navigator.pop(context);
           return;
         },
       );
       Widget continueButton = TextButton(
         child: Text(Localize("Continue")),
-        onPressed: () {},
+        onPressed: () async {
+          AuthHelper.logout();
+
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Home()), (route) => false);
+        },
       );
 
-      // set up the AlertDialog
       AlertDialog alert = AlertDialog(
+        backgroundColor: Color(0xfff7ebe1),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0))),
         title: Text(Localize("Log Out")),
         content: Text(
             Localize("You will be returned to the login screen. Continue?")),
@@ -287,6 +349,88 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
+    //NAME BUTTON
+    Future<String?> openNameDialog() => showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Your Name'),
+        backgroundColor: Color(0xfff7ebe1),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0))),
+        content: TextField(
+          autofocus: true,
+          decoration: InputDecoration(hintText: 'Enter your name'),
+          controller: controller,
+        ),
+        actions: [
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: Text('Submit'),
+            onPressed: () {
+              submit();
+            },
+          ),
+        ],
+      ),
+    );
+
+    //CAMERA CODE
+    File? image;
+
+    Future pickImage() async {
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      final imageTemporary = File(image.path);
+      //setState(() => this.image = imageTemporary);
+    }
+
+    Future pickCamera() async {
+      final image = await ImagePicker().pickImage(source: ImageSource.camera);
+      if (image == null) return;
+
+      final imageTemporary = File(image.path);
+      //setState(() => this.image = imageTemporary);
+    }
+
+    void openCameraDialog(BuildContext context) {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return Theme(
+            data: Theme.of(context)
+                .copyWith(dialogBackgroundColor: Color(0xfff7ebe1)),
+            child: SimpleDialog(
+              title: const Text("Image Picker"),
+              children: <Widget>[
+                SimpleDialogOption(
+                  child: const Text('Select from Gallery'),
+                  onPressed: () => pickImage(),
+                ),
+                SimpleDialogOption(
+                  child: const Text('Open Camera'),
+                  onPressed: () => pickCamera(),
+                ),
+                SimpleDialogOption(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
+    //ACTUAL PAGE
     return Scaffold(
         backgroundColor: Color(0xffece7d5),
         // body: Center(child: Text("Profile Page")),
@@ -325,7 +469,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: IconButton(
                       icon: Icon(Icons.camera_alt),
                       iconSize: 50,
-                      onPressed: () {},
+                      onPressed: () {
+                        openCameraDialog(context);
+                      },
                     ),
                   ),
                 ),
@@ -353,7 +499,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     alignment: Alignment.centerRight,
                     child: IconButton(
                       icon: Icon(Icons.edit_note),
-                      onPressed: () {},
+                      onPressed: () async {
+                        final name = await openNameDialog();
+                        if (name == null || name.isEmpty) return;
+
+                        AuthHelper.userInfoCache['username'] = name;
+                        await updateUser();
+                      },
                     ),
                   ),
                 ),
@@ -439,7 +591,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 //subtitle: Text(Localize('Sign out of the current account.')),
                 title: Text(Localize('Log Out')),
                 subtitle: Text(Localize('Sign out of the current account.')),
-                onTap: () {
+                onTap: () async {
                   showLogoutAlertDialog(context);
                 },
               ),

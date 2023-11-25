@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/eventHelper.dart';
 import 'package:frontend/classes/routeHandler.dart';
 import 'package:frontend/views/SearchBar.dart';
@@ -8,6 +9,7 @@ import 'package:html/parser.dart' show parse;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:memoized/memoized.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:frontend/classes/Localize.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -126,7 +128,26 @@ class _EventsPageState extends State<EventsPage> {
                               fontWeight: FontWeight.w400,
                               // overflow: TextOverflow.ellipsis
                             ),
-                          )
+                          ),
+                          (event['recommended'] == 'True')
+                              ? Row(
+                                  children: [
+                                    Text(
+                                      Localize("Recommended for you!"),
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.red),
+                                    ),
+                                    SvgPicture.asset(
+                                      'assets/light-bulb.svg',
+                                      height: 25,
+                                      width: 25,
+                                      color: Colors.red,
+                                    )
+                                  ],
+                                )
+                              : const SizedBox(),
                         ],
                       ),
                     ],

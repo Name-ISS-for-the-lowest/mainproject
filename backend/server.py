@@ -4,6 +4,7 @@ from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
 from JSONmodels.postid import postid
 from JSONmodels.postsearch import postsearch
+from JSONmodels.userinfo import userinfo
 from classes.PasswordHasher import PassHasher
 from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -14,10 +15,13 @@ from models.Post import Post
 from bson import ObjectId
 import migrate
 from classes.Translator import Translator
+import adminManager
 
 
 app = FastAPI(title="ISS App")
 migrate.migrate()
+# When we actaully go live, I'd probably comment the adminManager out since we dont need to run it everytime server starts, only when changes to admin are made
+adminManager.setAdmins()
 
 
 class CookiesMiddleWare(BaseHTTPMiddleware):
@@ -238,12 +242,17 @@ def deletePost(postID: str, request: Request):
     DBManager.deletePost(postID)
     return JSONResponse({"message": "Post Deleted"}, status_code=200)
 
+@app.post("/toggleRemovalOfPost")
+def toggleRemovalOfPost(postID: str, request: Request):
+    DBManager.toggleRemovalOfPost(postID)
+    return JSONResponse({"message": "Removal Status Updated"}, status_code=200)
+
 
 @app.get("/getPosts")
-def getPosts(start: int, end: int, request: Request):
+def getPosts(start: int, end: int, showReported: str, showRemoved: str, showDeleted : str, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
     print("userID: ", userID)
-    posts = DBManager.getPosts(start=start, end=end, userID=userID)
+    posts = DBManager.getPosts(start=start, end=end, showReported=showReported, showDeleted=showDeleted, showRemoved=showRemoved, userID=userID)
     posts = Post.listToJson(posts)
     return posts
 
@@ -310,8 +319,14 @@ def getUserByID(userID: str, request: Request):
         "username": userDict["username"],
         "profilePicture.url": pfpUrl,
         "profilePicture.fileId": pfpFileId,
+        "admin" : str(userDict["admin"])
     }
     return JSONResponse(content=returnedDict, status_code=200)
+
+@app.post('/updateUser')
+def updateUser(data: userinfo, request: Request):
+    DBManager.updateUser(email=data.email, username=data.username, nationality=data.nationality, _id=data.id, language=data.language, profilePictureFileID=data.profilePictureFileID, profilePictureURL=data.profilePictureURL)
+    return JSONResponse(content='User Updated', status_code=200)
 
 
 @app.post("/searchPosts", summary="Search Posts using a String input")
@@ -320,6 +335,9 @@ def searchPosts(data: postsearch):
     end = data.end
     search = data.search
     userID = data.userID
-    posts = DBManager.searchPosts(start, end, search, userID)
+    showReported = data.showReported
+    showRemoved = data.showRemoved
+    showDeleted = data.showDeleted
+    posts = DBManager.searchPosts(start=start, end=end, search=search, showDeleted=showDeleted, showRemoved=showRemoved, showReported=showReported, userID=userID)
     posts = Post.listToJson(posts)
     return posts
