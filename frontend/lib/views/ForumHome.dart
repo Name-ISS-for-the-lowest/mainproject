@@ -8,6 +8,7 @@ import 'package:frontend/views/CreatePost.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ReportPage.dart';
+import 'package:frontend/classes/keywordData.dart';
 
 class ForumHome extends StatefulWidget {
   const ForumHome({super.key});
@@ -114,17 +115,28 @@ class _ForumHomeState extends State<ForumHome> {
   }
 
   String formatLargeNumber(int number) {
+    String userLang = AuthHelper.userInfoCache['language'];
     if (number < 1000) {
       return number.toString();
     }
     double num = number / 1000.0;
-    String suffix = 'K';
+
+    String suffix = keywordData.thousandSuffix[userLang]!;
+
+    String returnedNumber;
 
     if (num >= 1000) {
       num /= 1000.0;
-      suffix = 'M';
+      suffix = keywordData.millionSuffix[userLang]!;
     }
-    return '${num.toStringAsFixed(1)}$suffix';
+
+    if (keywordData.commaDecimals.contains(userLang)) {
+      returnedNumber = num.toStringAsFixed(1).replaceAll('.', ',');
+    } else {
+      returnedNumber = num.toStringAsFixed(1);
+    }
+
+    return '${returnedNumber}$suffix';
   }
 
   Future<void> translatePost(String originalText, int index) async {
@@ -281,6 +293,9 @@ class _ForumHomeState extends State<ForumHome> {
       postContent = postContent.substring(0, 200);
       postContent += "...";
     }
+
+    String commentNumber = '0';
+    String reportNumber = '0';
 
     Container postBodyContainer = Container(
       width: 280,
@@ -589,30 +604,40 @@ class _ForumHomeState extends State<ForumHome> {
                       Text(formattedLikes, style: TextStyle(fontSize: 11))
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Comment Tapped")));
-                    },
-                    child: SvgPicture.asset(
-                      "assets/PostUI/icon-comment.svg",
-                      height: 20,
-                      width: 20,
-                    ),
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Comment Tapped")));
+                        },
+                        child: SvgPicture.asset(
+                          "assets/PostUI/icon-comment.svg",
+                          height: 20,
+                          width: 20,
+                        ),
+                      ),
+                      Text(commentNumber, style: TextStyle(fontSize: 11))
+                    ],
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text("Flag Tapped")));
-                    },
-                    child: (userIsAdmin)
-                        ? SvgPicture.asset(
-                            "assets/PostUI/icon-flag.svg",
-                            height: 20,
-                            width: 20,
-                            color: Colors.deepOrange,
-                          )
-                        : SizedBox(),
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Flag Tapped")));
+                        },
+                        child: (userIsAdmin)
+                            ? SvgPicture.asset(
+                                "assets/PostUI/icon-flag.svg",
+                                height: 20,
+                                width: 20,
+                                color: Colors.deepOrange,
+                              )
+                            : SizedBox(),
+                      ),
+                      Text(reportNumber, style: TextStyle(fontSize: 11))
+                    ],
                   ),
                   (userIsAdmin)
                       ? (deleted)
