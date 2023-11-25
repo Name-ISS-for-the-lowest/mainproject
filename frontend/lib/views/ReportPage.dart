@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 
 class ReportPage extends StatefulWidget {
@@ -24,14 +25,10 @@ class _ReportPageState extends State<ReportPage> {
     );
   }
 
-  void submitReport() {
-    print("Selected Option: $selectedOption");
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffece7d5),
+      backgroundColor: const Color(0xffece7d5),
       appBar: AppBar(
           centerTitle: true,
           backgroundColor: Colors.transparent,
@@ -133,10 +130,15 @@ class _ReportPageState extends State<ReportPage> {
               ]
             )
           ),
-          SizedBox(height: 16.0),
-          ElevatedButton(
-            onPressed: submitReport,
-            child: Text("Submit"),
+          const SizedBox(height: 16.0),
+          GestureDetector(
+            onTap: () async {
+              var response = await PostHelper.reportPost(widget.postID);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(response['message'])));
+                    print(widget.postID);
+            },
+            child: const Text("Submit"),
           ),
         ],
       ),
