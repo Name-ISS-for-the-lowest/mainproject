@@ -4,6 +4,7 @@ from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
 from JSONmodels.postid import postid
 from JSONmodels.postsearch import postsearch
+from JSONmodels.userinfo import userinfo
 from classes.PasswordHasher import PassHasher
 from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -321,6 +322,11 @@ def getUserByID(userID: str, request: Request):
         "admin" : str(userDict["admin"])
     }
     return JSONResponse(content=returnedDict, status_code=200)
+
+@app.post('/updateUser')
+def updateUser(data: userinfo, request: Request):
+    DBManager.updateUser(email=data.email, username=data.username, nationality=data.nationality, _id=data.id, language=data.language, profilePictureFileID=data.profilePictureFileID, profilePictureURL=data.profilePictureURL)
+    return JSONResponse(content='User Updated', status_code=200)
 
 
 @app.post("/searchPosts", summary="Search Posts using a String input")
