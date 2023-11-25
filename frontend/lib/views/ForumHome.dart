@@ -540,8 +540,6 @@ class _ForumHomeState extends State<ForumHome> {
               child: GestureDetector(
                   onTap: () async {
                     var response = await PostHelper.likePost(postID);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(Localize(response['message']))));
                     setState(() {
                       postData[index]['liked'] = !liked;
 
