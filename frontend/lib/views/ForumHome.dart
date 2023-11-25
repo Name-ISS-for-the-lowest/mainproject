@@ -535,91 +535,108 @@ class _ForumHomeState extends State<ForumHome> {
               child: postBodyContainer,
             ),
             Positioned(
-              bottom: 33,
+              bottom: 20,
               left: 50,
-              child: GestureDetector(
-                  onTap: () async {
-                    var response = await PostHelper.likePost(postID);
-                    setState(() {
-                      postData[index]['liked'] = !liked;
+              width: (userIsAdmin) ? 120 : 70,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          var response = await PostHelper.likePost(postID);
+                          setState(() {
+                            postData[index]['liked'] = !liked;
 
-                      liked = !liked;
+                            liked = !liked;
 
-                      if (liked) {
-                        postData[index]['likes']++;
-                      } else {
-                        postData[index]['likes']--;
-                      }
-                    });
-                  },
-                  child: Icon(
-                    liked ? Icons.favorite : Icons.favorite_border,
-                    color: liked ? Colors.red : Colors.black,
-                    size: 20,
-                  )),
-            ),
-            Positioned(
-              bottom: 15,
-              left: 45,
-              child: Text(formattedLikes, style: TextStyle(fontSize: 11)),
-            ),
-            Positioned(
-              bottom: 33,
-              left: 85,
-              child: GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text("Comment Tapped")));
-                },
-                child: SvgPicture.asset(
-                  "assets/PostUI/icon-comment.svg",
-                  height: 20,
-                  width: 20,
-                ),
+                            if (liked) {
+                              postData[index]['likes']++;
+                            } else {
+                              postData[index]['likes']--;
+                            }
+                          });
+                        },
+                        child: (liked)
+                            ? Stack(
+                                children: [
+                                  Positioned(
+                                    left: 1,
+                                    child: SvgPicture.asset(
+                                      'assets/PostUI/icon-heartFilled.svg',
+                                      color: Colors.red,
+                                      height: 20,
+                                      width: 20,
+                                    ),
+                                  ),
+                                  SvgPicture.asset(
+                                    'assets/PostUI/icon-heart.svg',
+                                    color: Colors.black,
+                                    height: 20,
+                                    width: 20,
+                                  )
+                                ],
+                              )
+                            : SvgPicture.asset(
+                                'assets/PostUI/icon-heart.svg',
+                                color: Colors.black,
+                                height: 20,
+                                width: 20,
+                              ),
+                      ),
+                      Text(formattedLikes, style: TextStyle(fontSize: 11))
+                    ],
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Comment Tapped")));
+                    },
+                    child: SvgPicture.asset(
+                      "assets/PostUI/icon-comment.svg",
+                      height: 20,
+                      width: 20,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text("Flag Tapped")));
+                    },
+                    child: (userIsAdmin)
+                        ? SvgPicture.asset(
+                            "assets/PostUI/icon-flag.svg",
+                            height: 20,
+                            width: 20,
+                            color: Colors.deepOrange,
+                          )
+                        : SizedBox(),
+                  ),
+                  (userIsAdmin)
+                      ? (deleted)
+                          ? SizedBox()
+                          : GestureDetector(
+                              onTap: () async {
+                                await loadRemovalToggle(postID);
+                              },
+                              child: (removed)
+                                  ? SvgPicture.asset(
+                                      "assets/PostUI/icon-approve.svg",
+                                      height: 20,
+                                      width: 20,
+                                      color: Colors.green,
+                                    )
+                                  : SvgPicture.asset(
+                                      "assets/PostUI/icon-remove.svg",
+                                      height: 18,
+                                      width: 18,
+                                      color: Colors.red,
+                                    ))
+                      : SizedBox(),
+                ],
               ),
-            ),
-            Positioned(
-              bottom: 33,
-              left: 120,
-              child: GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text("Flag Tapped")));
-                },
-                child: (userIsAdmin)
-                    ? SvgPicture.asset(
-                        "assets/PostUI/icon-flag.svg",
-                        height: 20,
-                        width: 20,
-                        color: Colors.deepOrange,
-                      )
-                    : SizedBox(),
-              ),
-            ),
-            Positioned(
-              bottom: 33,
-              left: 155,
-              child: (userIsAdmin)
-                  ? (deleted)
-                      ? SizedBox()
-                      : GestureDetector(
-                          onTap: () async {
-                            await loadRemovalToggle(postID);
-                          },
-                          child: (removed)
-                              ? SvgPicture.asset(
-                                  "assets/PostUI/icon-approve.svg",
-                                  height: 20,
-                                  width: 20,
-                                  color: Colors.green,
-                                )
-                              : SvgPicture.asset(
-                                  "assets/PostUI/icon-remove.svg",
-                                  height: 18,
-                                  width: 18,
-                                  color: Colors.red,
-                                ))
-                  : SizedBox(),
             ),
             Positioned(
               bottom: 33,

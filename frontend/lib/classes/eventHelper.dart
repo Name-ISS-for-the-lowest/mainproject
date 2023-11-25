@@ -7,7 +7,7 @@ import 'package:frontend/classes/keywordData.dart';
 import 'package:frontend/classes/authHelper.dart';
 
 class EventHelper {
-  static final events = <Map<String, String>>[];
+  static var events = <Map<String, String>>[];
   static bool mounted = true;
   static bool fetched = false;
 

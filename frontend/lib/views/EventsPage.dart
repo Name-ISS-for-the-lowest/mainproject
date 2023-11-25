@@ -84,7 +84,7 @@ class _EventsPageState extends State<EventsPage> {
                         ),
                       ),
                       Text(
-                        event['month']!,
+                        Localize(event['month']!).toUpperCase(),
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
