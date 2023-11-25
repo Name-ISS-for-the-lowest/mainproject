@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/eventHelper.dart';
 import 'package:frontend/classes/routeHandler.dart';
 import 'package:frontend/views/SearchBar.dart';
@@ -65,8 +66,12 @@ class _EventsPageState extends State<EventsPage> {
 
   Widget _buildEvent(Map<String, String> event) {
     return GestureDetector(
-      onTap: () => {
-        _launchURL(Uri.parse(event['url']!)),
+      onTap: () {
+        String? eventId = event['id'];
+        String userLanguage = AuthHelper.userInfoCache['language'];
+        var url =
+            "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$userLanguage";
+        _launchURL(Uri.parse(url));
       },
       child: Column(
         children: [
@@ -84,7 +89,7 @@ class _EventsPageState extends State<EventsPage> {
                         ),
                       ),
                       Text(
-                        event['month']!,
+                        Localize(event['month']!),
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
