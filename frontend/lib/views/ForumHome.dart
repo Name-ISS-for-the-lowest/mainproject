@@ -261,6 +261,7 @@ class _ForumHomeState extends State<ForumHome> {
     String postContent = postData[index]["content"];
     String postID = postData[index]["_id"];
     String posterID = postData[index]['userID'];
+    String reportNumber = postData[index]['reports'];
     late int likes = postData[index]['likes'];
     bool posterIsAdmin = false;
     bool userIsAdmin = false;
@@ -295,7 +296,6 @@ class _ForumHomeState extends State<ForumHome> {
     }
 
     String commentNumber = '0';
-    String reportNumber = '0';
 
     Container postBodyContainer = Container(
       width: 280,
@@ -552,7 +552,6 @@ class _ForumHomeState extends State<ForumHome> {
             Positioned(
               bottom: 20,
               left: 50,
-              width: (userIsAdmin) ? 120 : 70,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -604,6 +603,7 @@ class _ForumHomeState extends State<ForumHome> {
                       Text(formattedLikes, style: TextStyle(fontSize: 11))
                     ],
                   ),
+                  const SizedBox(width: 5),
                   Column(
                     children: [
                       GestureDetector(
@@ -620,25 +620,30 @@ class _ForumHomeState extends State<ForumHome> {
                       Text(commentNumber, style: TextStyle(fontSize: 11))
                     ],
                   ),
-                  Column(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Flag Tapped")));
-                        },
-                        child: (userIsAdmin)
-                            ? SvgPicture.asset(
-                                "assets/PostUI/icon-flag.svg",
-                                height: 20,
-                                width: 20,
-                                color: Colors.deepOrange,
-                              )
-                            : SizedBox(),
-                      ),
-                      Text(reportNumber, style: TextStyle(fontSize: 11))
-                    ],
-                  ),
+                  (userIsAdmin) ? const SizedBox(width: 5) : const SizedBox(),
+                  (userIsAdmin)
+                      ? Column(
+                          children: [
+                            GestureDetector(
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("Flag Tapped")));
+                                },
+                                child: SvgPicture.asset(
+                                  "assets/PostUI/icon-flag.svg",
+                                  height: 20,
+                                  width: 20,
+                                  color: Colors.deepOrange,
+                                )),
+                            Text(reportNumber, style: TextStyle(fontSize: 11))
+                          ],
+                        )
+                      : const SizedBox(),
+                  (userIsAdmin)
+                      ? (deleted)
+                          ? const SizedBox()
+                          : const SizedBox(width: 5)
+                      : const SizedBox(),
                   (userIsAdmin)
                       ? (deleted)
                           ? SizedBox()

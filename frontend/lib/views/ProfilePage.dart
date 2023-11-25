@@ -393,6 +393,12 @@ class _ProfilePageState extends State<ProfilePage> {
       if (image == null) return;
 
       final imageTemporary = File(image.path);
+      Navigator.of(context).pop();
+      var profilePicture = await AuthHelper.setProfilePicture(imageTemporary);
+      AuthHelper.userInfoCache['profilePicture.url'] = profilePicture['url'];
+      AuthHelper.userInfoCache['profilePicture.fileId'] =
+          profilePicture['fileId'];
+      await updateUser();
       //setState(() => this.image = imageTemporary);
     }
 
@@ -401,6 +407,14 @@ class _ProfilePageState extends State<ProfilePage> {
       if (image == null) return;
 
       final imageTemporary = File(image.path);
+      Navigator.of(context).pop();
+      var profilePicture = await AuthHelper.setProfilePicture(imageTemporary);
+      print(AuthHelper.userInfoCache['profilePicture.url']);
+      print(AuthHelper.userInfoCache['profilePicture.fileId']);
+      AuthHelper.userInfoCache['profilePicture.url'] = profilePicture['url'];
+      AuthHelper.userInfoCache['profilePicture.fileId'] =
+          profilePicture['fileId'];
+      await updateUser();
       //setState(() => this.image = imageTemporary);
     }
 

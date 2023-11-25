@@ -213,9 +213,9 @@ def protected(request: Request):
 # it will be protected so I can use the cookie to get the userID, and change the url of the profile picture  in the db
 # also add an optional signUp field for profile picture, and set it to the default profile picture
 @app.post("/uploadPhoto")
-async def uploadPhoto(photo: UploadFile, name: str):
+async def uploadPhoto(photo: UploadFile, name: str, type:str):
     try:
-        image = await ImageHelper.uploadImage(photo, name)
+        image = await ImageHelper.uploadImage(photo, name, type)
         print("image: ", image.__dict__)
         jsonImage = json.dumps(image.__dict__, ensure_ascii=False)
 

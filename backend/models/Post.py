@@ -21,6 +21,7 @@ class Post:
     contentHistory: []
     translations: {}
     posterIsAdmin: bool
+    reports: int
 
     def __init__(self, content, user_id, parent_id=None):
         self.content = content
@@ -37,6 +38,7 @@ class Post:
         self.contentHistory = []
         self.deleted = False
         self.removed = False
+        self.reports = 0
 
     @staticmethod
     def fromDict(dict):
@@ -72,6 +74,7 @@ class Post:
         post.deleted = str(post.deleted)
         post.removed = str(post.removed)
         post.posterIsAdmin = str(post.posterIsAdmin)
+        post.reports = str(post.reports)
         return json.dumps(post.__dict__)
 
     @staticmethod
@@ -85,6 +88,7 @@ class Post:
             post.deleted = str(post.deleted)
             post.removed = str(post.removed)
             post.posterIsAdmin = str(post.posterIsAdmin)
+            post.reports = str(post.reports)
             if targetLang in post.translations:
                 post.translations = str(post.translations[targetLang])
             else:
