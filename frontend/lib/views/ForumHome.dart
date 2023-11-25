@@ -51,54 +51,69 @@ class _ForumHomeState extends State<ForumHome> {
     // print("Posts Fetched:$postsFetched");
     // print("Posts Per Fetch:$postsPerFetch");
     if (search == "") {
-      var dataCall = await PostHelper.getPosts(
-          searchParams["postsFetched"], postsPerFetch);
-      print("Data Call:$dataCall");
-      Map dataCallMap = {};
-      for (var item in dataCall) {
-        dataCallMap[item['_id']] = item;
-      }
-      var arrayOfCurrentIds = [];
-      for (var item in postData) {
-        arrayOfCurrentIds.add(item['_id']);
-      }
-      for (var item in dataCall) {
-        //only input items with unique id's
-        if (!arrayOfCurrentIds.contains(item['_id'])) {
-          postData.add(item);
+      try {
+        var dataCall = await PostHelper.getPosts(
+            searchParams["postsFetched"], postsPerFetch);
+        print("Data Call:$dataCall");
+        Map dataCallMap = {};
+        for (var item in dataCall) {
+          dataCallMap[item['_id']] = item;
         }
-      }
+        var arrayOfCurrentIds = [];
+        for (var item in postData) {
+          arrayOfCurrentIds.add(item['_id']);
+        }
+        for (var item in dataCall) {
+          //only input items with unique id's
+          if (!arrayOfCurrentIds.contains(item['_id'])) {
+            postData.add(item);
+          }
+        }
 
-      int fetchedLength = dataCall.length;
-      searchParams["postsFetched"] += fetchedLength;
-      if (firstLoad) {
-        firstLoad = false;
-        setState(() {});
+        int fetchedLength = dataCall.length;
+        searchParams["postsFetched"] += fetchedLength;
+        if (firstLoad) {
+          firstLoad = false;
+          setState(() {});
+        }
+        searching = false;
+        return dataCall;
+      } catch (e) {
+        print("Error: $e");
+        searching = false;
+        return [];
       }
-      searching = false;
-      return dataCall;
     } else {
-      var dataCall = await PostHelper.searchPosts(searchParams["postsFetched"],
-          postsPerFetch, search, AuthHelper.userInfoCache["_id"]);
-      Map dataCallMap = {};
-      for (var item in dataCall) {
-        dataCallMap[item['_id']] = item;
-      }
-      var arrayOfCurrentIds = [];
-      for (var item in postData) {
-        arrayOfCurrentIds.add(item['_id']);
-      }
-
-      for (var item in dataCall) {
-        //only input items with unique id's
-        if (!arrayOfCurrentIds.contains(item['_id'])) {
-          postData.add(item);
+      try {
+        var dataCall = await PostHelper.searchPosts(
+            searchParams["postsFetched"],
+            postsPerFetch,
+            search,
+            AuthHelper.userInfoCache["_id"]);
+        Map dataCallMap = {};
+        for (var item in dataCall) {
+          dataCallMap[item['_id']] = item;
         }
+        var arrayOfCurrentIds = [];
+        for (var item in postData) {
+          arrayOfCurrentIds.add(item['_id']);
+        }
+
+        for (var item in dataCall) {
+          //only input items with unique id's
+          if (!arrayOfCurrentIds.contains(item['_id'])) {
+            postData.add(item);
+          }
+        }
+        int fetchedLength = dataCall.length;
+        searchParams["postsFetched"] += fetchedLength;
+        searching = false;
+        return dataCall;
+      } catch (e) {
+        print("Error: $e");
+        searching = false;
+        return [];
       }
-      int fetchedLength = dataCall.length;
-      searchParams["postsFetched"] += fetchedLength;
-      searching = false;
-      return dataCall;
     }
   }
 
