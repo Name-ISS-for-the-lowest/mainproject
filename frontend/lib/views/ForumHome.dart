@@ -9,6 +9,7 @@ import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ReportPage.dart';
 import 'package:frontend/classes/keywordData.dart';
+import 'package:html_unescape/html_unescape.dart';
 
 class ForumHome extends StatefulWidget {
   const ForumHome({super.key});
@@ -297,6 +298,7 @@ class _ForumHomeState extends State<ForumHome> {
     if (postData[index]['removed'] == 'True') {
       removed = true;
     }
+    var unescape = HtmlUnescape();
 
     String formattedLikes = formatLargeNumber(likes);
     postContent = postContent.replaceAll('\n', ' ');
@@ -319,7 +321,8 @@ class _ForumHomeState extends State<ForumHome> {
               children: [
                 TextSpan(
                     text: (currentlyTranslated.containsKey(postID))
-                        ? PostHelper.cachedTranslations[postContent]
+                        ? unescape.convert(
+                            PostHelper.cachedTranslations[postContent]!)
                         : postContent,
                     style: TextStyle(
                       color: Colors.black,
@@ -463,11 +466,25 @@ class _ForumHomeState extends State<ForumHome> {
         return menuItems;
       },
       color: Color(0xffffffff),
-      child: SvgPicture.asset(
-        "assets/PostUI/icon-3dots.svg",
-        width: 20,
-        height: 5,
-        color: Colors.black,
+      child: Stack(
+        children: [
+          Positioned(
+            child: Container(
+              width: 40,
+              height: 25,
+            ),
+          ),
+          Positioned(
+            left: 10,
+            top: 10,
+            child: SvgPicture.asset(
+              "assets/PostUI/icon-3dots.svg",
+              width: 20,
+              height: 5,
+              color: Colors.black,
+            ),
+          ),
+        ],
       ),
     );
 
@@ -541,8 +558,8 @@ class _ForumHomeState extends State<ForumHome> {
                             : SizedBox()
                     : SizedBox()),
             Positioned(
-              left: 350,
-              top: 22.5,
+              left: 340,
+              top: 12.5,
               child: Container(
                 child: threeDotMenu,
               ),
