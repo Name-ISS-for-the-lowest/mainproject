@@ -3,6 +3,7 @@ import 'package:frontend/classes/routeHandler.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:frontend/classes/Data.dart';
+import 'package:frontend/classes/keywordData.dart';
 import 'package:frontend/classes/authHelper.dart';
 
 class EventHelper {
@@ -99,7 +100,7 @@ class EventHelper {
         eventDescription.contains(userLanguage)) {
       return true;
     }
-    List? userKeywords = Data.countryKeywords[userNationality];
+    List? userKeywords = keywordData.countryKeywords[userNationality];
     if (userKeywords == null) {
       userKeywords = [];
     }

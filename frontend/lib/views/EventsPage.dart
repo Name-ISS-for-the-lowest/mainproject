@@ -9,6 +9,7 @@ import 'package:html/parser.dart' show parse;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:memoized/memoized.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:frontend/classes/Localize.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -132,7 +133,7 @@ class _EventsPageState extends State<EventsPage> {
                               ? Row(
                                   children: [
                                     Text(
-                                      "Recommended for you!",
+                                      Localize("Recommended for you!"),
                                       style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w400,
