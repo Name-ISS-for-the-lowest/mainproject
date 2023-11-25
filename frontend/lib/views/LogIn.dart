@@ -46,9 +46,9 @@ class _LogInState extends State<LogIn> {
     var result = Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return Scaffold(
-            //I kept the email in the text field
-            body: SignUp(email: emailController.text),
+          return const Scaffold(
+            resizeToAvoidBottomInset: false,
+            body: SignUp(),
           );
         },
       ),
@@ -84,7 +84,7 @@ class _LogInState extends State<LogIn> {
 
   void navigateToPrimaryScreens() {
     Navigator.pushAndRemoveUntil(context,
-        MaterialPageRoute(builder: (_) => CoreTemplate()), (route) => false);
+        MaterialPageRoute(builder: (_) => const CoreTemplate()), (route) => false);
   }
 
   @override
@@ -95,6 +95,8 @@ class _LogInState extends State<LogIn> {
     return Scaffold(
       
       backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
+      resizeToAvoidBottomInset: false,
+
       body: Stack(
 
         alignment: Alignment.center,
@@ -137,6 +139,7 @@ class _LogInState extends State<LogIn> {
                       height: 37,
                     ),
 
+                    
                     //Email Field Styling
                     SizedBox(       
                       width: 330,
