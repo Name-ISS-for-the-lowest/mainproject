@@ -11216,7 +11216,7 @@ class Data {
       "jv": "Angeluilla",
       "zh-CN": "anguilla"
     },
-    "Aland Islands": {
+    "Åland Islands": {
       "af": "Alandseilande",
       "sq": "Ishujt e Alandës",
       "am": "የአላንድ ደሴቶች",
