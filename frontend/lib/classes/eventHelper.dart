@@ -2,9 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:frontend/classes/routeHandler.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:html/parser.dart' show parse;
-import 'package:frontend/classes/Data.dart';
+
 import 'package:frontend/classes/keywordData.dart';
 import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/classes/localize.dart';
 
 class EventHelper {
   static var events = <Map<String, String>>[];
@@ -37,8 +38,7 @@ class EventHelper {
       var results = response.data;
       final eventsSecondary = <Map<String, String>>[];
 
-      //I need to fix the set state bug, if you click to another page while events are fetching,
-      //an error will be thrown because set state is called on an non-existent widget, RIP.
+      //Okay so how are the events being set as recommended?
       if (mounted) {
         setState(() {
           for (var event in results) {
@@ -53,6 +53,7 @@ class EventHelper {
                 'url': event['permaLinkUrl'],
                 'description': _parseHtmlString(event['description']),
                 'recommended': 'True',
+                'id': event['eventID'],
               });
             } else {
               DateTime dateTime = DateTime.parse(event['startDateTime']);
@@ -65,6 +66,7 @@ class EventHelper {
                 'url': event['permaLinkUrl'],
                 'description': _parseHtmlString(event['description']),
                 'recommended': 'False',
+                'id': event['eventID'].toString(),
               });
             }
           }

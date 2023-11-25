@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/eventHelper.dart';
 import 'package:frontend/views/SearchBar.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -121,8 +122,12 @@ class _EventsPageState extends State<EventsPage> {
 
   Widget _buildEvent(Map<String, String> event) {
     return GestureDetector(
-      onTap: () => {
-        _launchURL(Uri.parse(event['url']!)),
+      onTap: () {
+        String? eventId = event['id'];
+        String userLanguage = AuthHelper.userInfoCache['language'];
+        var url =
+            "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$userLanguage";
+        _launchURL(Uri.parse(url));
       },
       onLongPress: () {
         showExpandedInformation(event);
@@ -143,7 +148,11 @@ class _EventsPageState extends State<EventsPage> {
                         ),
                       ),
                       Text(
+<<<<<<< HEAD
                         Localize(event['month']!).toUpperCase(),
+=======
+                        Localize(event['month']!),
+>>>>>>> origin/gabriel
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,

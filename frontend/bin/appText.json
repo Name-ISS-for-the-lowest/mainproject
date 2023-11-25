@@ -337,6 +337,7 @@
   "Post Removed",
   "No Posts Found",
   "Recommended for you!",
+<<<<<<< HEAD
   "Image Source",
   "Select from Gallery",
   "Open Camera",
@@ -344,6 +345,8 @@
   "Submit",
   "Your Screen Name",
   "Enter your name",
+=======
+>>>>>>> origin/gabriel
   "JAN",
   "FEB",
   "MAR",
@@ -355,9 +358,13 @@
   "SEP",
   "OCT",
   "NOV",
+<<<<<<< HEAD
   "DEC",
   "Deactivate Account",
   "This action cannot be restored from the app.",
   "ACCOUNT DEACTIVATION",
   "THIS ACTION CANNOT BE UNDONE FROM THE APP. ARE YOU SURE YOU WANT TO CONTINUE?"
+=======
+  "DEC"
+>>>>>>> origin/gabriel
 ]

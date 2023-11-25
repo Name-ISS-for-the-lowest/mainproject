@@ -97,8 +97,8 @@ def login(creds: credentials, request: Request, response: Response):
             # we need to check the password
             passwordHash = user["passwordHash"]
             salt = user["salt"]
-            print(type(salt))
-            print(user.__dict__)
+            # print(type(salt))
+            # print(user.__dict__)
             print(PassHasher.checkPassword(password, passwordHash, salt))
             if PassHasher.checkPassword(password, passwordHash, salt):
                 # check if the user has a cookie
@@ -243,6 +243,7 @@ def deletePost(postID: str, request: Request):
     DBManager.deletePost(postID)
     return JSONResponse({"message": "Post Deleted"}, status_code=200)
 
+
 @app.post("/toggleRemovalOfPost")
 def toggleRemovalOfPost(postID: str, request: Request):
     DBManager.toggleRemovalOfPost(postID)
@@ -250,10 +251,24 @@ def toggleRemovalOfPost(postID: str, request: Request):
 
 
 @app.get("/getPosts")
-def getPosts(start: int, end: int, showReported: str, showRemoved: str, showDeleted : str, request: Request):
+def getPosts(
+    start: int,
+    end: int,
+    showReported: str,
+    showRemoved: str,
+    showDeleted: str,
+    request: Request,
+):
     userID = IdFromCookie(request.cookies["session_cookie"])
-    print("userID: ", userID)
-    posts = DBManager.getPosts(start=start, end=end, showReported=showReported, showDeleted=showDeleted, showRemoved=showRemoved, userID=userID)
+    # print("userID: ", userID)
+    posts = DBManager.getPosts(
+        start=start,
+        end=end,
+        showReported=showReported,
+        showDeleted=showDeleted,
+        showRemoved=showRemoved,
+        userID=userID,
+    )
     posts = Post.listToJson(posts)
     return posts
 
@@ -275,41 +290,20 @@ def reportPost(postID: str, request: Request):
 # both target and source are optional
 # target language defaults to english
 # source language can be infered
-@app.get(
-    "/translate",
-    summary="Translate a string from one language to another",
-)
+@app.get("/translate")
 def translate(content: str, target: str = "en", source: str = ""):
     result = Translator.translate(content, target, source)
-    print("made it here")
-    print(result)
+    # print("made it here")
+    # print(result)
     return JSONResponse({"result": result}, status_code=200)
 
 
-@app.post(
-    "/addTranslation", summary="Add a translation to the post entry for later retrieval"
-)
+@app.post("/addTranslation")
 def addTranslation(translatedText: str, userLang: str, postID: str, request: Request):
     DBManager.addTranslationToPost(
         translatedText=translatedText, userLang=userLang, postID=postID
     )
     return JSONResponse({"message": "Translation Added"}, status_code=200)
-
-
-@app.get(
-    "/getLanguageDictionary",
-    summary="We have a situation where 2 character language codes are the norm for storage and translation, but for actual display we don't wanna use them. This gets the dictionary.",
-)
-def getLanguageDictionary():
-    file = open("supportedLanguages.json")
-    data = json.load(file)
-    returned_data = {}
-    for elem in data:
-        lang_code = elem["language"]
-        lang_name = elem["name"]
-        returned_data[lang_code] = lang_name
-    print(returned_data)
-    return JSONResponse(content=json.dumps(returned_data), status_code=200)
 
 
 @app.get("/getUserByID", summary="A way to get a User's information by their ID")
@@ -326,14 +320,23 @@ def getUserByID(userID: str, request: Request):
         "username": userDict["username"],
         "profilePicture.url": pfpUrl,
         "profilePicture.fileId": pfpFileId,
-        "admin" : str(userDict["admin"])
+        "admin": str(userDict["admin"]),
     }
     return JSONResponse(content=returnedDict, status_code=200)
 
-@app.post('/updateUser')
+
+@app.post("/updateUser")
 def updateUser(data: userinfo, request: Request):
-    DBManager.updateUser(email=data.email, username=data.username, nationality=data.nationality, _id=data.id, language=data.language, profilePictureFileID=data.profilePictureFileID, profilePictureURL=data.profilePictureURL)
-    return JSONResponse(content='User Updated', status_code=200)
+    DBManager.updateUser(
+        email=data.email,
+        username=data.username,
+        nationality=data.nationality,
+        _id=data.id,
+        language=data.language,
+        profilePictureFileID=data.profilePictureFileID,
+        profilePictureURL=data.profilePictureURL,
+    )
+    return JSONResponse(content="User Updated", status_code=200)
 
 
 @app.post("/searchPosts", summary="Search Posts using a String input")
@@ -345,6 +348,25 @@ def searchPosts(data: postsearch):
     showReported = data.showReported
     showRemoved = data.showRemoved
     showDeleted = data.showDeleted
-    posts = DBManager.searchPosts(start=start, end=end, search=search, showDeleted=showDeleted, showRemoved=showRemoved, showReported=showReported, userID=userID)
+    posts = DBManager.searchPosts(
+        start=start,
+        end=end,
+        search=search,
+        showDeleted=showDeleted,
+        showRemoved=showRemoved,
+        showReported=showReported,
+        userID=userID,
+    )
     posts = Post.listToJson(posts)
     return posts
+
+
+# get events
+@app.get("/getEvents")
+def getEvents(request: Request):
+    # need to get the user language
+    id = IdFromCookie(request.cookies["session_cookie"])
+    user = DBManager.getUserById(id)
+    language = user.language
+    events = DBManager.getEvents(language)
+    return events
