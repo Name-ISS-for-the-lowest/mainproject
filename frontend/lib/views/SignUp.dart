@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/views/PasswordSetup.dart';
+import 'package:lottie/lottie.dart';
 
 class SignUp extends StatefulWidget {
   String email = "";
@@ -94,6 +95,7 @@ class _SignUpState extends State<SignUp> {
       ),
     );
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -116,9 +118,11 @@ class _SignUpState extends State<SignUp> {
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.40,
-                  child: SvgPicture.asset(
-                    'assets/BackGround.svg',
-                    fit: BoxFit.fitWidth,
+                  child: Lottie.asset(
+                    'assets/BackgroundWave.json',
+                    height: 800,
+                    width: 800,
+                    fit: BoxFit.fill
                   ),
                 ),
               ],
