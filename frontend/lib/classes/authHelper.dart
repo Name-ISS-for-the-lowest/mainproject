@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:frontend/classes/Data.dart';
 import 'package:frontend/classes/routeHandler.dart';
 import 'package:intl/intl.dart';
 
@@ -8,8 +9,8 @@ import 'package:intl/intl.dart';
 
 class AuthHelper {
   static String defaultHost = RouteHandler.defaultHost;
-  static Map<String, dynamic> userInfoCache = Map();
-  static Map<String, dynamic> languageNames = Map();
+  static Map<String, dynamic> userInfoCache = {};
+  static Map<String, dynamic> languageNames = Data.languageNames;
 
   static Future<Response> login(String email, String password) async {
     final data = {'email': email, 'password': password};
@@ -41,6 +42,30 @@ class AuthHelper {
     }
   }
 
+  static Future<Response> logout() async {
+    String endPoint = '/logout';
+    var url = '$defaultHost$endPoint';
+
+    //this is the dio library making a post request
+    try {
+      final response = await RouteHandler.dio.post(url);
+      return response;
+
+      //on anything but a 200 response this code will run
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!;
+      } else {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'Unable to connect to server'},
+          statusCode: 500,
+          statusMessage: 'Unable to connect to server',
+        );
+      }
+    }
+  }  
+
   static Future<Response> signUp(String email, String password) async {
     final data = {'email': email, 'password': password};
     String endPoint = '/signup';
@@ -67,10 +92,31 @@ class AuthHelper {
   }
 
   static Future<bool> isLoggedIn() async {
+    // return false;
     var sessionCookie = await readCookie('session_cookie');
     if (sessionCookie == null) return false;
-    await cacheUserInfo();
-    return true;
+
+    //I want to make a request to the protected endpoint and check the response code
+    String endPoint = '/protected';
+    var url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.get(
+        url,
+        options: Options(contentType: Headers.jsonContentType),
+      );
+      if (response.statusCode == 200) {
+        await cacheUserInfo();
+        return true;
+      } else {
+        return false;
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return false;
+      } else {
+        return false;
+      }
+    }
   }
 
   static readCookie(String key) async {
@@ -103,32 +149,60 @@ class AuthHelper {
           queryParameters: params,
           options: Options(contentType: Headers.jsonContentType));
       var userInfo = response.data;
-      userInfoCache['_id'] = userInfo['_id'];
-      userInfoCache['email'] = userInfo['email'];
-      userInfoCache['username'] = userInfo['username'];
-      userInfoCache['language'] = userInfo['language'];
-      userInfoCache['nationality'] = userInfo['nationality'];
-      userInfoCache['profilePicture.url'] = userInfo['profilePicture.url'];
-      userInfoCache['profilePicture.fileId'] =
+      AuthHelper.userInfoCache['_id'] = userInfo['_id'];
+      AuthHelper.userInfoCache['email'] = userInfo['email'];
+      AuthHelper.userInfoCache['username'] = userInfo['username'];
+      AuthHelper.userInfoCache['language'] = userInfo['language'];
+      AuthHelper.userInfoCache['nationality'] = userInfo['nationality'];
+      AuthHelper.userInfoCache['profilePicture.url'] =
+          userInfo['profilePicture.url'];
+      AuthHelper.userInfoCache['profilePicture.fileId'] =
           userInfo['profilePicture.fileId'];
-      try {
-        endPoint = '/getLanguageDictionary';
-        url = '$defaultHost$endPoint';
-        final response2 = await RouteHandler.dio.get(url);
-        languageNames = json.decode(response2.data);
-      } on DioException catch (e) {
-        return Response(
-          requestOptions: RequestOptions(path: url),
-          data: {'message': e},
-          statusCode: 500,
-        );
-      }
+      userInfoCache['admin'] = userInfo['admin'];
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),
         data: {'message': e},
         statusCode: 500,
       );
+    }
+  }
+
+  static Future<Response> updateUser() async {
+    final data = {
+      'id': userInfoCache['_id'],
+      'email': userInfoCache['email'],
+      'username': userInfoCache['username'],
+      'language': userInfoCache['language'],
+      'nationality': userInfoCache['nationality'],
+      'profilePictureURL': userInfoCache['profilePicture.url'],
+      'profilePictureFileID': userInfoCache['profilePicture.fileId'],
+    };
+    String endPoint = '/updateUser';
+    var url = '$defaultHost$endPoint';
+
+    //this is the dio library making a post request
+    try {
+      final response = await RouteHandler.dio.post(
+        url,
+        data: jsonEncode(data),
+        options: Options(contentType: Headers.jsonContentType),
+      );
+      return response;
+
+      //on anything but a 200 response this code will run
+    } on DioException catch (e) {
+      print(e);
+      if (e.response != null) {
+        return e.response!;
+      } else {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'Unable to connect to server'},
+          statusCode: 500,
+          statusMessage: 'Unable to connect to server',
+        );
+      }
     }
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/ResetPassword.dart';
 import 'package:frontend/views/SignUp.dart';
@@ -34,7 +36,7 @@ class _LogInState extends State<LogIn> {
       navigateToPrimaryScreens();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(response.data["message"] ?? "Error"),
+        content: Text(response.data["message"] ?? Localize("Error")),
       ));
     }
   }
@@ -82,15 +84,8 @@ class _LogInState extends State<LogIn> {
   }
 
   void navigateToPrimaryScreens() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return const Scaffold(
-            body: CoreTemplate(),
-          );
-        },
-      ),
-    );
+    Navigator.pushAndRemoveUntil(context,
+        MaterialPageRoute(builder: (_) => CoreTemplate()), (route) => false);
   }
 
   @override

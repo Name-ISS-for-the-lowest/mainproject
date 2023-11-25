@@ -26,10 +26,76 @@ class PostHelper {
     }
   }
 
-  static getPosts(int start, int end) async {
+  static Future<Response> editPost(String postID, String postBody) async {
+    final params = {'postID': postID, 'postBody': postBody};
+    String endPoint = '/editPost';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.post(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response;
+    } on DioException catch (e) {
+      print(e);
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static Future<Response> deletePost(String postID) async {
+    final params = {'postID': postID};
+    String endPoint = '/deletePost';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.post(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static Future<Response> toggleRemoval(String postID) async {
+    final params = {'postID': postID};
+    String endPoint = '/toggleRemovalOfPost';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.post(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static getPosts(int start, int end,
+      [Map<String, String>? specialSearchOptions]) async {
+    if (specialSearchOptions == null) {
+      specialSearchOptions = {
+        'showReported': 'All',
+        'showRemoved': 'None',
+        'showDeleted': 'None'
+      };
+    }
     final params = {
       'start': start,
       'end': end,
+      'showReported': specialSearchOptions['showReported'],
+      'showRemoved': specialSearchOptions['showRemoved'],
+      'showDeleted': specialSearchOptions['showDeleted'],
     };
     String endPoint = '/getPosts';
     final url = '$defaultHost$endPoint';
@@ -47,12 +113,23 @@ class PostHelper {
     }
   }
 
-  static searchPosts(int start, int end, String search, String userID) async {
+  static searchPosts(int start, int end, String search, String userID,
+      [Map<String, String>? specialSearchOptions]) async {
+    if (specialSearchOptions == null) {
+      specialSearchOptions = {
+        'showReported': 'All',
+        'showRemoved': 'None',
+        'showDeleted': 'None'
+      };
+    }
     final data = {
       'start': start,
       'end': end,
       'search': search,
       'userID': userID,
+      'showReported': specialSearchOptions['showReported'],
+      'showRemoved': specialSearchOptions['showRemoved'],
+      'showDeleted': specialSearchOptions['showDeleted'],
     };
     String endPoint = '/searchPosts';
     final url = '$defaultHost$endPoint';

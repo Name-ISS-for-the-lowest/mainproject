@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/views/PasswordSetup.dart';
@@ -46,17 +47,17 @@ class _SignUpState extends State<SignUp> {
     if (!validEmail) {
       //show error message
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid email, must be a CSUS email'),
+        SnackBar(
+          content: Text(Localize('Invalid email, must be a CSUS email')),
         ),
       );
       return;
     }
     if (!validPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              "Password must be at least 8 characters long, have one uppercase letter, one lowercase letter, and one number"),
+        SnackBar(
+          content: Text(Localize(
+              "Password must be at least 8 characters long, have one uppercase letter, one lowercase letter, and one number")),
         ),
       );
       //show error message
@@ -109,6 +110,7 @@ class _SignUpState extends State<SignUp> {
             IconThemeData(color: Colors.white), // Set the back arrow color
       ),
       body: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
         child: Stack(
           children: [
             Column(
@@ -134,11 +136,11 @@ class _SignUpState extends State<SignUp> {
                   height: 120,
                 ),
                 //Log in title
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Welcome to the I.S.S.!",
+                      Localize("Welcome to the I.S.S!"),
                       style: TextStyle(
                         fontSize: 50,
                         fontWeight: FontWeight.w700,
@@ -148,11 +150,12 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Before we begin, please enter a valid Sacramento State email",
+                      Localize(
+                          "Before we begin, please enter a valid Sacramento State email"),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -162,11 +165,12 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "These can be identified by the “@csus.edu” handle near the end like this:",
+                      Localize(
+                          "These can be identified by the \u201c@csus.edu\u201d handle near the end like this:"),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -176,11 +180,11 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "“Example@csus.edu”",
+                      "\"${Localize("\u201cExample@csus.edu\u201d")}\"",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -208,7 +212,7 @@ class _SignUpState extends State<SignUp> {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                  labelText: 'Email',
+                                  labelText: Localize('Email'),
                                   contentPadding: const EdgeInsets.all(18),
                                   fillColor: Colors.white,
                                   filled: true,
@@ -275,8 +279,8 @@ class _SignUpState extends State<SignUp> {
                                   onPressed: () => {
                                     navigateToPassWordSetUp(),
                                   },
-                                  child: const Text(
-                                    "Next",
+                                  child: Text(
+                                    Localize("Next"),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,

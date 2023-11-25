@@ -46,6 +46,26 @@ class DBManager:
             return None
         else:
             return User.fromDict(user)
+        
+    @staticmethod
+    def updateUser(email: str, username:str, _id:str, language:str, nationality:str, profilePictureURL:str, profilePictureFileID:str):
+        id = ObjectId(_id)
+        user = DBManager.db["users"].find_one({"_id": id})
+        fields = ['email', 'username', 'language', 'nationality']
+        newDict = {}
+        for elem in fields:
+            if user.get(elem) != vars()[elem]:
+                newDict[elem] = vars()[elem]
+        profilePicture = user.get('profilePicture')
+        if profilePicture['url'] != profilePictureURL or profilePicture['fileId'] != profilePictureFileID:
+            profilePicture['url'] = profilePictureURL
+            profilePicture['fileId'] = profilePictureFileID
+            newDict['profilePicture'] = profilePicture
+        DBManager.db["users"].update_one({"_id": id},{"$set": newDict})
+
+
+
+
 
     @staticmethod
     def activateAccount(token):
@@ -86,28 +106,81 @@ class DBManager:
     def addPost(userID, content):
         newPost = Post(content, userID)
         user = DBManager.getUserById(userID)
-        newPost.username = user.username
-        newPost.profilePicture = user.profilePicture
         DBManager.db["posts"].insert_one(newPost.__dict__)
 
     @staticmethod
-    def getPosts(start, end, userID=None):
-        posts = DBManager.db["posts"].find().sort("_id", -1).skip(start).limit(end)
+    def editPost(postID, postBody):
+        postID = ObjectId(postID)
+        post = DBManager.db["posts"].find_one({"_id": postID})
+        contentHistory = post.get("contentHistory")
+        currentContent = post.get("content")
+        if postBody == currentContent:
+            translations = post.get("translations")
+        else:
+            translations = {}
+        contentHistory.append(currentContent)
+        DBManager.db["posts"].update_one({"_id": postID},{"$set": {"edited": True, "content": postBody, "contentHistory": contentHistory, "translations" : translations}})
+
+    @staticmethod
+    def deletePost(postID):
+        postID = ObjectId(postID)
+        DBManager.db["posts"].update_one({"_id": postID},{"$set": {"deleted": True}})
+
+    @staticmethod
+    def toggleRemovalOfPost(postID):
+        postID = ObjectId(postID)
+        post = DBManager.db["posts"].find_one({"_id": postID})
+        isRemoved = post.get("removed")
+        removalToggle = not isRemoved
+        DBManager.db["posts"].update_one({"_id": postID}, {"$set": {"removed": removalToggle}})
+        
+
+    @staticmethod
+    def getPosts(start, end, showRemoved, showDeleted, showReported, userID=None):
+        specialSearchParams = {}
+        if showRemoved == 'Only':
+            specialSearchParams['removed'] = True
+        elif showRemoved == 'None':
+            specialSearchParams['removed'] = False
+        if showDeleted == 'Only':
+            specialSearchParams['deleted'] = True
+        elif showDeleted == 'None':
+            specialSearchParams['deleted'] = False
+        posts = DBManager.db["posts"].find(specialSearchParams).sort("_id", -1).skip(start).limit(end)
         returnPosts = []
         for elem in posts:
             post = Post.fromDict(elem)
+            user = DBManager.db["users"].find_one({"_id": ObjectId(post.userID)})
+            post.profilePicture = user.get("profilePicture")
+            post.username = user.get("username")
+            post.posterIsAdmin = user.get("admin")
             comboID = str(post._id) + str(userID)
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
             if likedResult is not None:
                 post.liked = True
+           
             returnPosts.append(post)
         return returnPosts
 
     @staticmethod
-    def searchPosts(start, end, search, userID):
+    def getPostByID(postID):
+        post = DBManager.db["posts"].find_one({"_id": postID})
+        return post
+    
+    @staticmethod
+    def searchPosts(start, end, showRemoved, showDeleted, showReported, search, userID):
+        specialSearchParams = {"content": {"$regex": search, "$options": "i"}}
+        if showRemoved == 'Only':
+            specialSearchParams['removed'] = True
+        elif showRemoved == 'None':
+            specialSearchParams['removed'] = False
+        if showDeleted == 'Only':
+            specialSearchParams['deleted'] = True
+        elif showDeleted == 'None':
+            specialSearchParams['deleted'] = False
         posts = (
             DBManager.db["posts"]
-            .find({"content": {"$regex": search, "$options": "i"}})
+            .find(specialSearchParams)
             .sort("_id", -1)
             .skip(start)
             .limit(end)
@@ -115,6 +188,10 @@ class DBManager:
         returnPosts = []
         for elem in posts:
             post = Post.fromDict(elem)
+            user = DBManager.db["users"].find_one({"_id": ObjectId(post.userID)})
+            post.profilePicture = user.get("profilePicture")
+            post.username = user.get("username")
+            post.posterIsAdmin = user.get("admin")
             comboID = str(post._id) + str(userID)
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
             if likedResult is not None:
@@ -163,9 +240,20 @@ class DBManager:
             userJson = user.__dict__
             DBManager.db["users"].insert_one(userJson)
 
+    def setAdmins(adminEmails):
+        allUsers = DBManager.db["users"].find()
+        for user in allUsers:
+            userEmail = user['email']
+            isAdmin = False
+            if userEmail in adminEmails:
+                isAdmin = True
+            DBManager.db['users'].update_one({"_id": user["_id"]}, {"$set": {"admin": isAdmin}})
+        print("Admin privilleges assigned successfully!")
+
+
     @staticmethod
     def insertPostList(posts: [Post]):
         for post in posts:
             postJson = post.__dict__
-            postJson["user_id"] = ObjectId(postJson["user_id"]["$oid"])
+            postJson["userID"] = ObjectId(postJson["userID"]["$oid"])
             DBManager.db["posts"].insert_one(postJson)
