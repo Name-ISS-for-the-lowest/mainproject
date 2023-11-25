@@ -53,7 +53,7 @@ class EventHelper {
                 'url': event['permaLinkUrl'],
                 'description': _parseHtmlString(event['description']),
                 'recommended': 'True',
-                'id': event['eventID'],
+                'id': event['eventID'].toString(),
               });
             } else {
               DateTime dateTime = DateTime.parse(event['startDateTime']);
@@ -90,6 +90,7 @@ class EventHelper {
     String eventDescription =
         _parseHtmlString(event['description']).toLowerCase();
     String userNationality = AuthHelper.userInfoCache['nationality'];
+    List? userKeywords = keywordData.countryKeywords[userNationality];
     userNationality = userNationality.toLowerCase();
     String userLanguage =
         AuthHelper.languageNames[AuthHelper.userInfoCache['language']];
@@ -102,12 +103,12 @@ class EventHelper {
         eventDescription.contains(userLanguage)) {
       return true;
     }
-    List? userKeywords = keywordData.countryKeywords[userNationality];
     if (userKeywords == null) {
       userKeywords = [];
     }
     for (String keyword in userKeywords) {
-      if (eventTitle.contains(keyword) || eventDescription.contains(keyword)) {
+      if (eventTitle.contains(keyword.toLowerCase()) ||
+          eventDescription.contains(keyword.toLowerCase())) {
         return true;
       }
     }

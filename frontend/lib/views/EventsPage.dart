@@ -148,11 +148,7 @@ class _EventsPageState extends State<EventsPage> {
                         ),
                       ),
                       Text(
-<<<<<<< HEAD
-                        Localize(event['month']!).toUpperCase(),
-=======
                         Localize(event['month']!),
->>>>>>> origin/gabriel
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
