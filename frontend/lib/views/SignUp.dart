@@ -153,6 +153,7 @@ class _SignUpState extends State<SignUp> {
                         height: 25,
                     ),
 
+                    //This part is just text and formatting
                     SizedBox(
                       width: 300,
                       child : Text(
@@ -172,6 +173,7 @@ class _SignUpState extends State<SignUp> {
                         height: 20,
                     ),
 
+                    //This part is just text and formatting
                     SizedBox(
                       width: 300,
                       child : Text(
@@ -191,6 +193,7 @@ class _SignUpState extends State<SignUp> {
                         height: 20,
                     ),
 
+                    //This part is just text and formatting
                     SizedBox(
                       width: 300,
                       child : Text(
@@ -225,6 +228,8 @@ class _SignUpState extends State<SignUp> {
                             labelText: Localize('Email'),
                             filled: true,
                             fillColor: Colors.white,
+                            floatingLabelBehavior:
+                              FloatingLabelBehavior.never,
                           ),
                         ),
                       ), 

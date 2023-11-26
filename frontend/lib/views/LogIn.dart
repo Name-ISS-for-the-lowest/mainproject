@@ -124,7 +124,6 @@ class _LogInState extends State<LogIn> {
                       width: 240,
                       height: 100,
                       child : FittedBox(
-                        
                         child : DefaultTextStyle(
                             style: const TextStyle(
                                   fontFamily: 'Inter',
@@ -138,7 +137,7 @@ class _LogInState extends State<LogIn> {
                               animatedTexts: [
                                 RotateAnimatedText(
                                   transitionHeight: 100,
-                                  Localizer.localize('Welcome Back', 'en')
+                                  Localize('Welcome Back')
                                   ),
                                 RotateAnimatedText(
                                   transitionHeight: 100,
@@ -146,11 +145,15 @@ class _LogInState extends State<LogIn> {
                                   ),
                                 RotateAnimatedText(
                                   transitionHeight: 100,
-                                  Localizer.localize('Welcome Back', 'fr')
+                                  Localizer.localize('Welcome Back', 'de')
                                   ),
                                 RotateAnimatedText(
                                   transitionHeight: 100,
                                   Localizer.localize('Welcome Back', 'zh')
+                                  ),
+                                RotateAnimatedText(
+                                  transitionHeight: 100,
+                                  Localizer.localize('Welcome Back', 'uk')
                                   ),
                                 ]
                             ),
@@ -158,13 +161,11 @@ class _LogInState extends State<LogIn> {
                       )
                     ),
                     
-                    
                    //Spacer for Column elements
                     const SizedBox(
                       height: 45,
                     ),
 
-                    
                     //Email Field Styling
                     SizedBox(       
                       width: 330,
@@ -178,6 +179,8 @@ class _LogInState extends State<LogIn> {
                           labelText: Localize('Email'),
                           filled: true,
                           fillColor: Colors.white,
+                          floatingLabelBehavior:
+                            FloatingLabelBehavior.never,
                         ),
                       ),
                     ),
@@ -201,6 +204,8 @@ class _LogInState extends State<LogIn> {
                           labelText: Localize('Password'),
                           filled: true,
                           fillColor: Colors.white,
+                          floatingLabelBehavior:
+                            FloatingLabelBehavior.never,
                         ),
                       ),
                     ),
@@ -250,11 +255,11 @@ class _LogInState extends State<LogIn> {
                             ), 
                         ),
 
-                        child: Text(Localize('Log In')),
+                    child: Text(Localize('Log In')),
                         onPressed: () => {
                           executeLogin(context, emailController.text, passwordController.text)
                         },
-                     ),
+                    ),
                     
                 ],
             )

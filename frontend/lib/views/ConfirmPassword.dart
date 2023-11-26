@@ -127,6 +127,8 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                             labelText: Localize('Confirm Password'),
                             filled: true,
                             fillColor: Colors.white,
+                            floatingLabelBehavior:
+                              FloatingLabelBehavior.never,
                           ),
                         ),
                       ),
