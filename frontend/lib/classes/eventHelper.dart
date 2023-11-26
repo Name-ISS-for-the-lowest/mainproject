@@ -3,8 +3,12 @@ import 'package:frontend/classes/routeHandler.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:html/parser.dart' show parse;
 
+import 'package:frontend/classes/keywordData.dart';
+import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/classes/localize.dart';
+
 class EventHelper {
-  static final events = <Map<String, String>>[];
+  static var events = <Map<String, String>>[];
   static bool mounted = true;
   static bool fetched = false;
 
@@ -32,22 +36,42 @@ class EventHelper {
       var url = "https://www.trumba.com/calendars/sacramento-state-events.json";
       final response = await RouteHandler.dio.get(url);
       var results = response.data;
+      final eventsSecondary = <Map<String, String>>[];
 
-      //I need to fix the set state bug, if you click to another page while events are fetching,
-      //an error will be thrown because set state is called on an non-existent widget, RIP.
+      //Okay so how are the events being set as recommended?
       if (mounted) {
         setState(() {
           for (var event in results) {
-            DateTime dateTime = DateTime.parse(event['startDateTime']);
-            events.add({
-              'title': unescape.convert(event['title']),
-              'date': unescape.convert(event['dateTimeFormatted']),
-              'location': parse(event['location']).body!.text,
-              'day': dateTime.day.toString(),
-              'month': monthsOfYear[dateTime.month]!,
-              'url': event['permaLinkUrl'],
-              'description': _parseHtmlString(event['description']),
-            });
+            if (isEventRecommended(event)) {
+              DateTime dateTime = DateTime.parse(event['startDateTime']);
+              events.add({
+                'title': unescape.convert(event['title']),
+                'date': unescape.convert(event['dateTimeFormatted']),
+                'location': parse(event['location']).body!.text,
+                'day': dateTime.day.toString(),
+                'month': monthsOfYear[dateTime.month]!,
+                'url': event['permaLinkUrl'],
+                'description': _parseHtmlString(event['description']),
+                'recommended': 'True',
+                'id': event['eventID'].toString(),
+              });
+            } else {
+              DateTime dateTime = DateTime.parse(event['startDateTime']);
+              eventsSecondary.add({
+                'title': unescape.convert(event['title']),
+                'date': unescape.convert(event['dateTimeFormatted']),
+                'location': parse(event['location']).body!.text,
+                'day': dateTime.day.toString(),
+                'month': monthsOfYear[dateTime.month]!,
+                'url': event['permaLinkUrl'],
+                'description': _parseHtmlString(event['description']),
+                'recommended': 'False',
+                'id': event['eventID'].toString(),
+              });
+            }
+          }
+          for (var event in eventsSecondary) {
+            events.add(event);
           }
         });
       }
@@ -58,6 +82,37 @@ class EventHelper {
       // Handle the error, you might want to throw an exception or return a default response
       throw e;
     }
+  }
+
+  static bool isEventRecommended(var event) {
+    var unescape = HtmlUnescape();
+    String eventTitle = unescape.convert(event['title']).toLowerCase();
+    String eventDescription =
+        _parseHtmlString(event['description']).toLowerCase();
+    String userNationality = AuthHelper.userInfoCache['nationality'];
+    List? userKeywords = keywordData.countryKeywords[userNationality];
+    userNationality = userNationality.toLowerCase();
+    String userLanguage =
+        AuthHelper.languageNames[AuthHelper.userInfoCache['language']];
+    userLanguage = userLanguage.toLowerCase();
+    if (eventTitle.contains(userNationality) ||
+        eventDescription.contains(userNationality)) {
+      return true;
+    }
+    if (eventTitle.contains(userLanguage) ||
+        eventDescription.contains(userLanguage)) {
+      return true;
+    }
+    if (userKeywords == null) {
+      userKeywords = [];
+    }
+    for (String keyword in userKeywords) {
+      if (eventTitle.contains(keyword.toLowerCase()) ||
+          eventDescription.contains(keyword.toLowerCase())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   static String _parseHtmlString(String htmlString) {

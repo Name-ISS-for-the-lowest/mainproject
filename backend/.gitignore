@@ -4,3 +4,4 @@ run_backend.bat
 __pycache__
 __pycache__/
 **/__pycache__/
+/classes/ImageHelper.py

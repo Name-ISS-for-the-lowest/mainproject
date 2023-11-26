@@ -185,6 +185,24 @@ class PostHelper {
     }
   }
 
+  static reportPost(String postID) async {
+    final params = {'postID': postID};
+    String endPoint = '/reportPost';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.post(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
   static getTranslation(String input) async {
     String targetLang = AuthHelper.userInfoCache['language'];
     print(targetLang);

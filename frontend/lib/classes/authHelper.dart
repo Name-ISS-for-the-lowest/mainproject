@@ -42,6 +42,30 @@ class AuthHelper {
     }
   }
 
+  static Future<Response> logout() async {
+    String endPoint = '/logout';
+    var url = '$defaultHost$endPoint';
+
+    //this is the dio library making a post request
+    try {
+      final response = await RouteHandler.dio.post(url);
+      return response;
+
+      //on anything but a 200 response this code will run
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!;
+      } else {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'Unable to connect to server'},
+          statusCode: 500,
+          statusMessage: 'Unable to connect to server',
+        );
+      }
+    }
+  }
+
   static Future<Response> signUp(String email, String password) async {
     final data = {'email': email, 'password': password};
     String endPoint = '/signup';
@@ -68,7 +92,6 @@ class AuthHelper {
   }
 
   static Future<bool> isLoggedIn() async {
-    // return false;
     var sessionCookie = await readCookie('session_cookie');
     if (sessionCookie == null) return false;
 
@@ -135,6 +158,74 @@ class AuthHelper {
       AuthHelper.userInfoCache['profilePicture.fileId'] =
           userInfo['profilePicture.fileId'];
       userInfoCache['admin'] = userInfo['admin'];
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static Future<Response> updateUser() async {
+    final data = {
+      'id': userInfoCache['_id'],
+      'email': userInfoCache['email'],
+      'username': userInfoCache['username'],
+      'language': userInfoCache['language'],
+      'nationality': userInfoCache['nationality'],
+      'profilePictureURL': userInfoCache['profilePicture.url'],
+      'profilePictureFileID': userInfoCache['profilePicture.fileId'],
+    };
+    String endPoint = '/updateUser';
+    var url = '$defaultHost$endPoint';
+
+    //this is the dio library making a post request
+    try {
+      final response = await RouteHandler.dio.post(
+        url,
+        data: jsonEncode(data),
+        options: Options(contentType: Headers.jsonContentType),
+      );
+      return response;
+
+      //on anything but a 200 response this code will run
+    } on DioException catch (e) {
+      print(e);
+      if (e.response != null) {
+        return e.response!;
+      } else {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'Unable to connect to server'},
+          statusCode: 500,
+          statusMessage: 'Unable to connect to server',
+        );
+      }
+    }
+  }
+
+  static setProfilePicture(File photo) async {
+    var sessionCookie = await readCookie('session_cookie');
+    String userID = sessionCookie['user_id'];
+    String endPoint = '/uploadPhoto';
+    var url = '$defaultHost$endPoint';
+    String name = userInfoCache['email'] + "_profilePicture";
+
+    var formData = FormData.fromMap({
+      'photo': await MultipartFile.fromFile(photo.path, filename: name),
+    });
+    var params = {
+      'name': name,
+      'type': 'profilePictures',
+    };
+
+    try {
+      final response = await RouteHandler.dio.post(url,
+          data: formData,
+          queryParameters: params,
+          options: Options(contentType: Headers.multipartFormDataContentType));
+      return response.data;
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),
