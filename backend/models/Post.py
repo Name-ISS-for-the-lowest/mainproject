@@ -23,8 +23,8 @@ class Post:
     translations: {}
     posterIsAdmin: bool
     reports: int
-    imageURL : str
-    fileId : str
+    imageURL: str
+    fileId: str
 
     def __init__(self, content, user_id, attachment=None, parent_id=None):
         self.content = content
@@ -43,9 +43,9 @@ class Post:
         self.removed = False
         self.reports = 0
         if attachment == None:
-            attachment = 'Empty'
+            attachment = "Empty"
         self.attachedImage = attachment
-        if attachment != None and attachment != 'Empty':
+        if attachment != None and attachment != "Empty":
             self.imageURL = attachment.url
             self.fileId = attachment.fileID
         else:
@@ -75,7 +75,6 @@ class Post:
             history += "]"
         return history
 
-
     @staticmethod
     def toJson(post):
         # turn all to string
@@ -88,7 +87,7 @@ class Post:
         post.removed = str(post.removed)
         post.posterIsAdmin = str(post.posterIsAdmin)
         post.reports = str(post.reports)
-        return json.dumps(post.__dict__)
+        return post.__dict__
 
     @staticmethod
     def listToJson(posts, targetLang=None):

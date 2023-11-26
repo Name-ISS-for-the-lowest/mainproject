@@ -71,17 +71,17 @@ class DBManager:
             profilePicture["url"] != profilePictureURL
             or profilePicture["fileId"] != profilePictureFileID
         ):
-            profilePictureHistory = user.get('profilePictureHistory')
+            profilePictureHistory = user.get("profilePictureHistory")
             profilePictureHistory.append(oldProfilePicture)
             profilePicture["url"] = profilePictureURL
             profilePicture["fileId"] = profilePictureFileID
             newDict["profilePicture"] = profilePicture
-            newDict['profilePictureHistory'] = profilePictureHistory
+            newDict["profilePictureHistory"] = profilePictureHistory
         oldUsername = user.get("username")
         if oldUsername != username:
-            usernameHistory = user.get('usernameHistory')
+            usernameHistory = user.get("usernameHistory")
             usernameHistory.append(oldUsername)
-            newDict['usernameHistory'] = usernameHistory
+            newDict["usernameHistory"] = usernameHistory
         DBManager.db["users"].update_one({"_id": id}, {"$set": newDict})
 
     @staticmethod
@@ -122,7 +122,7 @@ class DBManager:
     @staticmethod
     def addPost(userID, content, imageURL, imageFileID):
         newPost = Post(content, userID)
-        if imageURL != 'False':
+        if imageURL != "False":
             Attachment = Picture(imageURL, imageFileID)
             newPost.attachedImage = Attachment.__dict__
         user = DBManager.getUserById(userID)
@@ -200,18 +200,19 @@ class DBManager:
         return returnPosts
 
     @staticmethod
-    def getPostByID(postID):
-        postID = ObjectId(postID)
-        post = DBManager.db["posts"].find_one({"_id": postID})
-        user = DBManager.db["users"].find_one({"_id": ObjectId(post.get("userID"))})
-        post['profilePicture'] = user.get("profilePicture")
-        post['profilePicture'] = user.get("username")
-        post['profilePicture'] = user.get("admin")
-        comboID = str(post.get("_id")) + str(post.get("userID"))
+    def getPostByID(postID: str):
+        objectID = ObjectId(postID)
+        post = DBManager.db["posts"].find_one({"_id": objectID})
+        user = DBManager.db["users"].find_one({"_id": ObjectId(post["userID"])})
+        post["profilePicture"] = user["profilePicture"]
+        post["username"] = user["username"]
+        post["posterIsAdmin"] = user["admin"]
+        comboID = str(post["_id"]) + str(post["userID"])
         likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
         if likedResult is not None:
-            post.liked = True
-        return post
+            post["liked"] = True
+        returnPost = Post.fromDict(post)
+        return returnPost
 
     @staticmethod
     def searchPosts(start, end, showRemoved, showDeleted, showReported, search, userID):
@@ -268,7 +269,7 @@ class DBManager:
             # remove the like from the likes collection
             DBManager.db["likes"].delete_one({"comboID": comboID})
             return {"message": "Post unliked"}
-        
+
     @staticmethod
     def reportPost(postID, userID):
         # check if the user has already liked the post
@@ -282,7 +283,9 @@ class DBManager:
             print(result.modified_count)
 
             # add the reports to the reports collection
-            DBManager.db["reports"].insert_one({"PostID": postID, "comboID": comboID, "Reason": 'harassment'})
+            DBManager.db["reports"].insert_one(
+                {"PostID": postID, "comboID": comboID, "Reason": "harassment"}
+            )
             print("Reported")
             return {"message": "Post reported"}
         else:

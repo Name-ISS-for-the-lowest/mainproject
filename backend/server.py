@@ -214,7 +214,7 @@ def protected(request: Request):
 # it will be protected so I can use the cookie to get the userID, and change the url of the profile picture  in the db
 # also add an optional signUp field for profile picture, and set it to the default profile picture
 @app.post("/uploadPhoto")
-async def uploadPhoto(photo: UploadFile, name: str, type:str):
+async def uploadPhoto(photo: UploadFile, name: str, type: str):
     try:
         image = await ImageHelper.uploadImage(photo, name, type)
         print("image: ", image.__dict__)
@@ -227,7 +227,7 @@ async def uploadPhoto(photo: UploadFile, name: str, type:str):
 
 
 @app.post("/createPost")
-def createPost(postBody: str, imageURL:str, imageFileID:str, request: Request):
+def createPost(postBody: str, imageURL: str, imageFileID: str, request: Request):
     id = IdFromCookie(request.cookies["session_cookie"])
     DBManager.addPost(id, postBody, imageURL, imageFileID)
     return JSONResponse({"message": "Post Added"}, status_code=200)
@@ -273,9 +273,9 @@ def getPosts(
     posts = Post.listToJson(posts)
     return posts
 
+
 @app.get("/getPostByID")
 def getPostByID(postID: str, request: Request):
-    userID = IdFromCookie(request.cookies["session_cookie"])
     post = DBManager.getPostByID(postID)
     post = Post.toJson(post)
     return post
@@ -287,6 +287,7 @@ def likePost(postID: str, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
     response = DBManager.likePost(postID, userID)
     return JSONResponse(response, status_code=200)
+
 
 @app.post("/reportPost", summary="Report a post")
 def reportPost(postID: str, request: Request):
