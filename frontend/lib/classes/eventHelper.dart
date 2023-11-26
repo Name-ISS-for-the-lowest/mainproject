@@ -8,13 +8,20 @@ import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/localize.dart';
 
 class EventHelper {
-  static final events = <Map<String, String>>[];
+  static final events = <Map<String, dynamic>>[];
   static bool mounted = true;
   static bool fetched = false;
+  static String previousLanguage = "en";
 
   static Future fetchEvents(Function setState) async {
     if (events.isNotEmpty) {
-      return;
+      var language = AuthHelper.userInfoCache['language'];
+      if (language == previousLanguage) {
+        return;
+      } else {
+        EventHelper.fetched == false;
+        events.clear();
+      }
     }
     final monthsOfYear = {
       1: 'JAN',
@@ -32,10 +39,21 @@ class EventHelper {
     };
 
     try {
-      var unescape = HtmlUnescape();
-      var url = "https://www.trumba.com/calendars/sacramento-state-events.json";
-      final response = await RouteHandler.dio.get(url);
+      String defaultHost = RouteHandler.defaultHost;
+      var language = AuthHelper.userInfoCache['language'];
+      EventHelper.previousLanguage = language;
+      print("language is $language");
+      String endPoint = '/getEvents';
+      final url = '$defaultHost$endPoint';
+      var params = {
+        'language': language,
+      };
+      final response = await RouteHandler.dio.get(url,
+          queryParameters: params,
+          options: Options(responseType: ResponseType.json));
+      print(response);
       var results = response.data;
+
       final eventsSecondary = <Map<String, String>>[];
 
       //Okay so how are the events being set as recommended?
@@ -43,30 +61,24 @@ class EventHelper {
         setState(() {
           for (var event in results) {
             if (isEventRecommended(event)) {
-              DateTime dateTime = DateTime.parse(event['startDateTime']);
               events.add({
-                'title': unescape.convert(event['title']),
-                'date': unescape.convert(event['dateTimeFormatted']),
-                'location': parse(event['location']).body!.text,
-                'day': dateTime.day.toString(),
-                'month': monthsOfYear[dateTime.month]!,
-                'url': event['permaLinkUrl'],
-                'description': _parseHtmlString(event['description']),
+                'title': event['title'][language],
+                'date': event['date'][language],
+                'location': event['location'],
+                'day': event['day'],
+                'month': event['month'],
+                'description': event['description'][language],
                 'recommended': 'True',
-                'id': event['eventID'],
               });
             } else {
-              DateTime dateTime = DateTime.parse(event['startDateTime']);
               eventsSecondary.add({
-                'title': unescape.convert(event['title']),
-                'date': unescape.convert(event['dateTimeFormatted']),
-                'location': parse(event['location']).body!.text,
-                'day': dateTime.day.toString(),
-                'month': monthsOfYear[dateTime.month]!,
-                'url': event['permaLinkUrl'],
-                'description': _parseHtmlString(event['description']),
-                'recommended': 'False',
-                'id': event['eventID'].toString(),
+                'title': event['title'][language],
+                'date': event['date'][language],
+                'location': event['location'],
+                'day': event['day'],
+                'month': event['month'],
+                'description': event['description'][language],
+                'recommended': 'false',
               });
             }
           }
@@ -85,10 +97,9 @@ class EventHelper {
   }
 
   static bool isEventRecommended(var event) {
-    var unescape = HtmlUnescape();
-    String eventTitle = unescape.convert(event['title']).toLowerCase();
-    String eventDescription =
-        _parseHtmlString(event['description']).toLowerCase();
+    var language = AuthHelper.userInfoCache['language'];
+    String eventTitle = event['title']["en"];
+    String eventDescription = event['description']["en"];
     String userNationality = AuthHelper.userInfoCache['nationality'];
     userNationality = userNationality.toLowerCase();
     String userLanguage =
@@ -112,14 +123,5 @@ class EventHelper {
       }
     }
     return false;
-  }
-
-  static String _parseHtmlString(String htmlString) {
-    final document = parse(htmlString);
-    if (document.body == null) return '';
-    final String? parsedString =
-        parse(document.body?.text).documentElement?.text;
-    if (parsedString == null) return htmlString;
-    return parsedString;
   }
 }
