@@ -91,7 +91,6 @@ class DBManager:
         # let's delete the token so they don't keep using it
         DBManager.db["users"].update_one({"token": token}, {"$unset": {"token": ""}})
 
-    #
     @staticmethod
     def deactivateAccount(userID):
         userID = ObjectId(userID)
