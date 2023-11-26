@@ -56,6 +56,7 @@ class _ResourceCenterState extends State<ResourceCenter> {
                     child: SvgPicture.asset(
                       iconPath,
                       semanticsLabel: text,
+                      color: Colors.white,
                     )),
               )
             ]),
@@ -115,13 +116,13 @@ class _ResourceCenterState extends State<ResourceCenter> {
               const Spacer(),
               _IconBuilder(
                 Localize("Multicultural Center"),
-                "assets/ResourceCenter/icon-earthearth.svg",
+                "assets/ResourceCenter/icon-globeoutline.svg",
                 "https://www-csus-edu.translate.goog/student-affairs/centers-programs/multi-cultural-center/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
               const Spacer(),
               _IconBuilder(
                 Localize("Serna Center"),
-                "assets/ResourceCenter/icon-serna.svg",
+                "assets/ResourceCenter/icon-americas.svg",
                 "https://www-csus-edu.translate.goog/student-affairs/centers-programs/serna-center/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
               const Spacer(),
@@ -134,7 +135,7 @@ class _ResourceCenterState extends State<ResourceCenter> {
               const Spacer(),
               _IconBuilder(
                 Localize("APIDA Center"),
-                "assets/ResourceCenter/icon-apida.svg",
+                "assets/ResourceCenter/icon-australasia.svg",
                 "https://www-csus-edu.translate.goog/student-affairs/centers-programs/asian-pacific-islander-desi-american-student-center/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
               const Spacer(),

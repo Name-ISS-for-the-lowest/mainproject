@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/routeHandler.dart';
@@ -8,10 +8,52 @@ class PostHelper {
   static String defaultHost = RouteHandler.defaultHost;
   static Map<String, String> cachedTranslations = Map();
 
-  static Future<Response> createPost(String userID, String postBody) async {
-    final params = {'postBody': postBody};
-    String endPoint = '/createPost';
-    final url = '$defaultHost$endPoint';
+  static Future<Response> createPost(
+      String userID, String postBody, File? Photo) async {
+    var params;
+    String endPoint;
+    String? imageURL;
+    String? fileID;
+    var url;
+    if (Photo != null) {
+      var formData = FormData.fromMap({
+        'photo': await MultipartFile.fromFile(Photo.path,
+            filename: AuthHelper.userInfoCache['username'] + '_postAttachment'),
+      });
+      params = {
+        'name': AuthHelper.userInfoCache['username'],
+        'type': 'postAttachments'
+      };
+      endPoint = '/uploadPhoto';
+      url = '$defaultHost$endPoint';
+      try {
+        final response = await RouteHandler.dio.post(url,
+            data: formData,
+            queryParameters: params,
+            options:
+                Options(contentType: Headers.multipartFormDataContentType));
+        imageURL = response.data['url'];
+        fileID = response.data['fileId'];
+      } on DioException catch (e) {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': e},
+          statusCode: 500,
+        );
+      }
+    }
+    endPoint = '/createPost';
+    url = '$defaultHost$endPoint';
+    params = {
+      'postBody': postBody,
+      'imageURL': 'False',
+      'imageFileID': 'False'
+    };
+    if (imageURL != null) {
+      params['imageURL'] = imageURL;
+      params['imageFileID'] = fileID;
+    }
+
     try {
       final response = await RouteHandler.dio.post(url,
           queryParameters: params,
@@ -113,6 +155,26 @@ class PostHelper {
     }
   }
 
+  static getPostByID(String postID ) async {
+    final params = {
+      'postID': postID,
+    };
+    String endPoint = '/getPostByID';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.get(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
   static searchPosts(int start, int end, String search, String userID,
       [Map<String, String>? specialSearchOptions]) async {
     if (specialSearchOptions == null) {
@@ -150,6 +212,24 @@ class PostHelper {
   static likePost(String postID) async {
     final params = {'postID': postID};
     String endPoint = '/likePost';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.post(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static reportPost(String postID) async {
+    final params = {'postID': postID};
+    String endPoint = '/reportPost';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.post(url,

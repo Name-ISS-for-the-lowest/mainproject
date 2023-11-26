@@ -2,6 +2,7 @@ import pymongo
 import json
 from models.User import User
 from models.Post import Post
+from models.Picture import Picture
 import bson
 from bson import ObjectId, binary, BSON
 import base64
@@ -65,13 +66,22 @@ class DBManager:
             if user.get(elem) != vars()[elem]:
                 newDict[elem] = vars()[elem]
         profilePicture = user.get("profilePicture")
+        oldProfilePicture = profilePicture.copy()
         if (
             profilePicture["url"] != profilePictureURL
             or profilePicture["fileId"] != profilePictureFileID
         ):
+            profilePictureHistory = user.get('profilePictureHistory')
+            profilePictureHistory.append(oldProfilePicture)
             profilePicture["url"] = profilePictureURL
             profilePicture["fileId"] = profilePictureFileID
             newDict["profilePicture"] = profilePicture
+            newDict['profilePictureHistory'] = profilePictureHistory
+        oldUsername = user.get("username")
+        if oldUsername != username:
+            usernameHistory = user.get('usernameHistory')
+            usernameHistory.append(oldUsername)
+            newDict['usernameHistory'] = usernameHistory
         DBManager.db["users"].update_one({"_id": id}, {"$set": newDict})
 
     @staticmethod
@@ -110,8 +120,11 @@ class DBManager:
         DBManager.db["session_cookies"].delete_one({"session_id": cookie["session_id"]})
 
     @staticmethod
-    def addPost(userID, content):
+    def addPost(userID, content, imageURL, imageFileID):
         newPost = Post(content, userID)
+        if imageURL != 'False':
+            Attachment = Picture(imageURL, imageFileID)
+            newPost.attachedImage = Attachment.__dict__
         user = DBManager.getUserById(userID)
         DBManager.db["posts"].insert_one(newPost.__dict__)
 
@@ -188,7 +201,16 @@ class DBManager:
 
     @staticmethod
     def getPostByID(postID):
+        postID = ObjectId(postID)
         post = DBManager.db["posts"].find_one({"_id": postID})
+        user = DBManager.db["users"].find_one({"_id": ObjectId(post.get("userID"))})
+        post['profilePicture'] = user.get("profilePicture")
+        post['profilePicture'] = user.get("username")
+        post['profilePicture'] = user.get("admin")
+        comboID = str(post.get("_id")) + str(post.get("userID"))
+        likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
+        if likedResult is not None:
+            post.liked = True
         return post
 
     @staticmethod
@@ -246,6 +268,25 @@ class DBManager:
             # remove the like from the likes collection
             DBManager.db["likes"].delete_one({"comboID": comboID})
             return {"message": "Post unliked"}
+        
+    @staticmethod
+    def reportPost(postID, userID):
+        # check if the user has already liked the post
+        comboID = str(postID) + str(userID)
+        postID = ObjectId(postID)
+        reportResult = DBManager.db["reports"].find_one({"comboID": comboID})
+        if reportResult is None:
+            result = DBManager.db["posts"].update_one(
+                {"_id": postID}, {"$inc": {"reports": 1}}
+            )
+            print(result.modified_count)
+
+            # add the reports to the reports collection
+            DBManager.db["reports"].insert_one({"PostID": postID, "comboID": comboID, "Reason": 'harassment'})
+            print("Reported")
+            return {"message": "Post reported"}
+        else:
+            return {"message": "Post already reported"}
 
     @staticmethod
     def addTranslationToPost(translatedText, userLang, postID):

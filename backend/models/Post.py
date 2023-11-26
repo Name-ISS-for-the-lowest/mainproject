@@ -10,8 +10,10 @@ class Post:
     userID: str
     username: str
     profilePicture = Picture()
+    attachedImage = Picture()
     date: datetime.datetime
     likes: int
+    reports: int
     imagelinks: list
     liked: bool = False
     edited: bool
@@ -20,12 +22,16 @@ class Post:
     contentHistory: []
     translations: {}
     posterIsAdmin: bool
+    reports: int
+    imageURL : str
+    fileId : str
 
-    def __init__(self, content, user_id, parent_id=None):
+    def __init__(self, content, user_id, attachment=None, parent_id=None):
         self.content = content
         self.userID = user_id
         self.date = datetime.datetime.now()
         self.likes = 0
+        self.reports = 0
         self.liked = False
         # if parent is none then post is not a reply
         # otherwise the post is a reply to parent
@@ -35,6 +41,16 @@ class Post:
         self.contentHistory = []
         self.deleted = False
         self.removed = False
+        self.reports = 0
+        if attachment == None:
+            attachment = 'Empty'
+        self.attachedImage = attachment
+        if attachment != None and attachment != 'Empty':
+            self.imageURL = attachment.url
+            self.fileId = attachment.fileID
+        else:
+            self.imageURL = None
+            self.fileId = None
 
     @staticmethod
     def fromDict(dict):
@@ -59,6 +75,7 @@ class Post:
             history += "]"
         return history
 
+
     @staticmethod
     def toJson(post):
         # turn all to string
@@ -70,6 +87,7 @@ class Post:
         post.deleted = str(post.deleted)
         post.removed = str(post.removed)
         post.posterIsAdmin = str(post.posterIsAdmin)
+        post.reports = str(post.reports)
         return json.dumps(post.__dict__)
 
     @staticmethod
@@ -83,6 +101,7 @@ class Post:
             post.deleted = str(post.deleted)
             post.removed = str(post.removed)
             post.posterIsAdmin = str(post.posterIsAdmin)
+            post.reports = str(post.reports)
             if targetLang in post.translations:
                 post.translations = str(post.translations[targetLang])
             else:

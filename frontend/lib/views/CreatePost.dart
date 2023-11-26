@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class CreatePost extends StatefulWidget {
   final bool isEditing;
@@ -26,6 +30,64 @@ class _CreatePostState extends State<CreatePost> {
           );
         },
       ),
+    );
+  }
+
+  File? imageAttachment;
+
+  Future pickImage() async {
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+
+    if (mounted) {
+      setState(() {
+        imageAttachment = File(image.path);
+      });
+    }
+    Navigator.of(context).pop();
+  }
+
+  Future pickCamera() async {
+    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (image == null) return;
+
+    if (mounted) {
+      setState(() {
+        imageAttachment = File(image.path);
+      });
+    }
+    Navigator.of(context).pop();
+  }
+
+  void openCameraDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Theme(
+          data: Theme.of(context)
+              .copyWith(dialogBackgroundColor: Color(0xfff7ebe1)),
+          child: SimpleDialog(
+            title: Text(Localize("Image Source")),
+            children: <Widget>[
+              SimpleDialogOption(
+                child: Text(Localize('Select from Gallery')),
+                onPressed: () => pickImage(),
+              ),
+              SimpleDialogOption(
+                child: Text(Localize('Open Camera')),
+                onPressed: () => pickCamera(),
+              ),
+              SimpleDialogOption(
+                child: Text(Localize('Close')),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -124,8 +186,8 @@ class _CreatePostState extends State<CreatePost> {
                       var response =
                           await PostHelper.editPost(postID, currentPostBody);
                     } else {
-                      var response =
-                          await PostHelper.createPost(userID, currentPostBody);
+                      var response = await PostHelper.createPost(
+                          userID, currentPostBody, imageAttachment);
                     }
 
                     navigateToPrimaryScreens();
@@ -177,6 +239,87 @@ class _CreatePostState extends State<CreatePost> {
                 ),
               ),
             ],
+          ),
+          Container(
+            height: 500,
+            width: 400,
+            child: Stack(
+              children: [
+                Positioned(
+                  top: 20,
+                  width: 400,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          openCameraDialog(context);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: Colors.white,
+                          ),
+                          child: Text(
+                            (imageAttachment == null)
+                                ? "Attach Image"
+                                : "Change Image",
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  bottom: 50,
+                  right: 25,
+                  height: 350,
+                  width: 350,
+                  child: (imageAttachment != null)
+                      ? Stack(
+                          children: [
+                            Positioned(
+                              child: Container(
+                                height: 350,
+                                width: 350,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Positioned(
+                              child: Image.file(
+                                imageAttachment!,
+                                height: 350,
+                                width: 350,
+                              ),
+                            ),
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: GestureDetector(
+                                onTap: () async {
+                                  imageAttachment = null;
+                                  if (mounted) {
+                                    setState(() {});
+                                  }
+                                },
+                                child: SvgPicture.asset(
+                                  'assets/PostUI/icon-xcircle.svg',
+                                  color: Colors.grey,
+                                  height: 40,
+                                  width: 40,
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                      : const SizedBox(),
+                ),
+              ],
+            ),
           ),
         ],
       ),

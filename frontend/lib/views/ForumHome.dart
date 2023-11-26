@@ -1,13 +1,17 @@
 import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/postHelper.dart';
-import 'package:frontend/views/CreatePost.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:frontend/views/Comments.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ReportPage.dart';
+import 'package:frontend/classes/keywordData.dart';
+import 'package:html_unescape/html_unescape.dart';
+import 'package:http/http.dart';
 
 class ForumHome extends StatefulWidget {
   const ForumHome({super.key});
@@ -126,17 +130,28 @@ class _ForumHomeState extends State<ForumHome> {
   }
 
   String formatLargeNumber(int number) {
+    String userLang = AuthHelper.userInfoCache['language'];
     if (number < 1000) {
       return number.toString();
     }
     double num = number / 1000.0;
-    String suffix = 'K';
+
+    String suffix = keywordData.thousandSuffix[userLang]!;
+
+    String returnedNumber;
 
     if (num >= 1000) {
       num /= 1000.0;
-      suffix = 'M';
+      suffix = keywordData.millionSuffix[userLang]!;
     }
-    return '${num.toStringAsFixed(1)}$suffix';
+
+    if (keywordData.commaDecimals.contains(userLang)) {
+      returnedNumber = num.toStringAsFixed(1).replaceAll('.', ',');
+    } else {
+      returnedNumber = num.toStringAsFixed(1);
+    }
+
+    return '${returnedNumber}$suffix';
   }
 
   Future<void> translatePost(String originalText, int index) async {
@@ -257,10 +272,15 @@ class _ForumHomeState extends State<ForumHome> {
 
   Widget _buildPost(int index) {
     String imageURL = postData[index]["profilePicture"]['url'];
+    String attachmentURL = 'Empty';
+    if (postData[index]['attachedImage'] != 'Empty') {
+      attachmentURL = postData[index]['attachedImage']['url'];
+    }
     String posterName = postData[index]["username"];
     String postContent = postData[index]["content"];
     String postID = postData[index]["_id"];
     String posterID = postData[index]['userID'];
+    String reportNumber = postData[index]['reports'];
     late int likes = postData[index]['likes'];
     bool posterIsAdmin = false;
     bool userIsAdmin = false;
@@ -284,6 +304,7 @@ class _ForumHomeState extends State<ForumHome> {
     if (postData[index]['removed'] == 'True') {
       removed = true;
     }
+    var unescape = HtmlUnescape();
 
     String formattedLikes = formatLargeNumber(likes);
     postContent = postContent.replaceAll('\n', ' ');
@@ -293,6 +314,8 @@ class _ForumHomeState extends State<ForumHome> {
       postContent = postContent.substring(0, 200);
       postContent += "...";
     }
+
+    String commentNumber = '0';
 
     Container postBodyContainer = Container(
       width: 280,
@@ -304,7 +327,8 @@ class _ForumHomeState extends State<ForumHome> {
               children: [
                 TextSpan(
                     text: (currentlyTranslated.containsKey(postID))
-                        ? PostHelper.cachedTranslations[postContent]
+                        ? unescape.convert(
+                            PostHelper.cachedTranslations[postContent]!)
                         : postContent,
                     style: TextStyle(
                       color: Colors.black,
@@ -448,16 +472,33 @@ class _ForumHomeState extends State<ForumHome> {
         return menuItems;
       },
       color: Color(0xffffffff),
-      child: SvgPicture.asset(
-        "assets/PostUI/icon-3dots.svg",
-        width: 20,
-        height: 5,
-        color: Colors.black,
+      child: Stack(
+        children: [
+          Positioned(
+            child: Container(
+              width: 40,
+              height: 25,
+            ),
+          ),
+          Positioned(
+            left: 10,
+            top: 10,
+            child: SvgPicture.asset(
+              "assets/PostUI/icon-3dots.svg",
+              width: 20,
+              height: 5,
+              color: Colors.black,
+            ),
+          ),
+        ],
       ),
     );
 
     double calculatedHeight = (postContent.length / 25 * 14) + 50;
     if (postTooLong) calculatedHeight += 35;
+    if (attachmentURL != 'Empty') {
+      calculatedHeight += 400;
+    }
 
     return Padding(
       padding: const EdgeInsets.all(6.0),
@@ -526,8 +567,8 @@ class _ForumHomeState extends State<ForumHome> {
                             : SizedBox()
                     : SizedBox()),
             Positioned(
-              left: 350,
-              top: 22.5,
+              left: 340,
+              top: 12.5,
               child: Container(
                 child: threeDotMenu,
               ),
@@ -547,91 +588,127 @@ class _ForumHomeState extends State<ForumHome> {
               child: postBodyContainer,
             ),
             Positioned(
-              bottom: 33,
+              bottom: 20,
               left: 50,
-              child: GestureDetector(
-                  onTap: () async {
-                    var response = await PostHelper.likePost(postID);
-                    setState(() {
-                      postData[index]['liked'] = !liked;
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          var response = await PostHelper.likePost(postID);
+                          setState(() {
+                            postData[index]['liked'] = !liked;
 
-                      liked = !liked;
+                            liked = !liked;
 
-                      if (liked) {
-                        postData[index]['likes']++;
-                      } else {
-                        postData[index]['likes']--;
-                      }
-                    });
-                  },
-                  child: Icon(
-                    liked ? Icons.favorite : Icons.favorite_border,
-                    color: liked ? Colors.red : Colors.black,
-                    size: 20,
-                  )),
-            ),
-            Positioned(
-              bottom: 15,
-              left: 45,
-              child: Text(formattedLikes, style: TextStyle(fontSize: 11)),
-            ),
-            Positioned(
-              bottom: 33,
-              left: 85,
-              child: GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text("Comment Tapped")));
-                },
-                child: SvgPicture.asset(
-                  "assets/PostUI/icon-comment.svg",
-                  height: 20,
-                  width: 20,
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 33,
-              left: 120,
-              child: GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text("Flag Tapped")));
-                },
-                child: (userIsAdmin)
-                    ? SvgPicture.asset(
-                        "assets/PostUI/icon-flag.svg",
-                        height: 20,
-                        width: 20,
-                        color: Colors.deepOrange,
-                      )
-                    : SizedBox(),
-              ),
-            ),
-            Positioned(
-              bottom: 33,
-              left: 155,
-              child: (userIsAdmin)
-                  ? (deleted)
-                      ? SizedBox()
-                      : GestureDetector(
-                          onTap: () async {
-                            await loadRemovalToggle(postID);
-                          },
-                          child: (removed)
-                              ? SvgPicture.asset(
-                                  "assets/PostUI/icon-approve.svg",
+                            if (liked) {
+                              postData[index]['likes']++;
+                            } else {
+                              postData[index]['likes']--;
+                            }
+                          });
+                        },
+                        child: (liked)
+                            ? Stack(
+                                children: [
+                                  Positioned(
+                                    left: 1,
+                                    child: SvgPicture.asset(
+                                      'assets/PostUI/icon-heartFilled.svg',
+                                      color: Colors.red,
+                                      height: 20,
+                                      width: 20,
+                                    ),
+                                  ),
+                                  SvgPicture.asset(
+                                    'assets/PostUI/icon-heart.svg',
+                                    color: Colors.black,
+                                    height: 20,
+                                    width: 20,
+                                  )
+                                ],
+                              )
+                            : SvgPicture.asset(
+                                'assets/PostUI/icon-heart.svg',
+                                color: Colors.black,
+                                height: 20,
+                                width: 20,
+                              ),
+                      ),
+                      Text(formattedLikes, style: TextStyle(fontSize: 11))
+                    ],
+                  ),
+                  const SizedBox(width: 5),
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Comments(postID: postID)));
+                          /*ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Comment Tapped")));*/
+                        },
+                        child: SvgPicture.asset(
+                          "assets/PostUI/icon-comment.svg",
+                          height: 20,
+                          width: 20,
+                        ),
+                      ),
+                      Text(commentNumber, style: TextStyle(fontSize: 11))
+                    ],
+                  ),
+                  (userIsAdmin) ? const SizedBox(width: 5) : const SizedBox(),
+                  (userIsAdmin)
+                      ? Column(
+                          children: [
+                            GestureDetector(
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("Flag Tapped")));
+                                },
+                                child: SvgPicture.asset(
+                                  "assets/PostUI/icon-flag.svg",
                                   height: 20,
                                   width: 20,
-                                  color: Colors.green,
-                                )
-                              : SvgPicture.asset(
-                                  "assets/PostUI/icon-remove.svg",
-                                  height: 18,
-                                  width: 18,
-                                  color: Colors.red,
-                                ))
-                  : SizedBox(),
+                                  color: Colors.deepOrange,
+                                )),
+                            Text(reportNumber, style: TextStyle(fontSize: 11))
+                          ],
+                        )
+                      : const SizedBox(),
+                  (userIsAdmin)
+                      ? (deleted)
+                          ? const SizedBox()
+                          : const SizedBox(width: 5)
+                      : const SizedBox(),
+                  (userIsAdmin)
+                      ? (deleted)
+                          ? SizedBox()
+                          : GestureDetector(
+                              onTap: () async {
+                                await loadRemovalToggle(postID);
+                              },
+                              child: (removed)
+                                  ? SvgPicture.asset(
+                                      "assets/PostUI/icon-approve.svg",
+                                      height: 20,
+                                      width: 20,
+                                      color: Colors.green,
+                                    )
+                                  : SvgPicture.asset(
+                                      "assets/PostUI/icon-remove.svg",
+                                      height: 18,
+                                      width: 18,
+                                      color: Colors.red,
+                                    ))
+                      : SizedBox(),
+                ],
+              ),
             ),
             Positioned(
               bottom: 33,
@@ -702,8 +779,14 @@ class _ForumHomeState extends State<ForumHome> {
     if (adminOptionsToggled) {
       toggleColor = Colors.black;
     }
+
+    Color unselectedOption = Color(0xffF2F0F4);
+    Color selectedOption = Color(0xffC9C9C9);
+    Color selectedText = Colors.black;
+    Color unselectedText = unselected;
+
     return Container(
-      height: (adminOptionsToggled) ? 295 : 25,
+      height: (adminOptionsToggled) ? 343 : 25,
       width: 400,
       child: Stack(
         children: [
@@ -734,6 +817,26 @@ class _ForumHomeState extends State<ForumHome> {
           (adminOptionsToggled)
               ? Positioned(
                   top: 40,
+                  child: Container(
+                    color: Colors.grey,
+                    height: 1,
+                    width: 500,
+                  ),
+                )
+              : emptyBox,
+          (adminOptionsToggled)
+              ? Positioned(
+                  top: 144,
+                  child: Container(
+                    color: Colors.grey,
+                    height: 1,
+                    width: 500,
+                  ),
+                )
+              : emptyBox,
+          (adminOptionsToggled)
+              ? Positioned(
+                  top: 243,
                   child: Container(
                     color: Colors.grey,
                     height: 1,
@@ -775,13 +878,24 @@ class _ForumHomeState extends State<ForumHome> {
                           specialSearchArgs['showReported'] = 'All';
                           await loadUpdate();
                         },
-                        child: Text(
-                          Localize("All"),
-                          style: TextStyle(
-                              color:
-                                  (specialSearchArgs['showReported'] == 'All')
-                                      ? Colors.black
-                                      : unselected),
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: (specialSearchArgs['showReported'] == 'All')
+                                ? selectedOption
+                                : unselectedOption,
+                          ),
+                          child: Text(
+                            Localize("All"),
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showReported'] == 'All')
+                                        ? selectedText
+                                        : unselectedText),
+                          ),
                         ),
                       ),
                       Spacer(),
@@ -790,13 +904,24 @@ class _ForumHomeState extends State<ForumHome> {
                           specialSearchArgs['showReported'] = 'Only';
                           await loadUpdate();
                         },
-                        child: Text(
-                          Localize("Only"),
-                          style: TextStyle(
-                              color:
-                                  (specialSearchArgs['showReported'] == 'Only')
-                                      ? Colors.black
-                                      : unselected),
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: (specialSearchArgs['showReported'] == 'Only')
+                                ? selectedOption
+                                : unselectedOption,
+                          ),
+                          child: Text(
+                            Localize("Only"),
+                            style: TextStyle(
+                                color: (specialSearchArgs['showReported'] ==
+                                        'Only')
+                                    ? selectedText
+                                    : unselectedText),
+                          ),
                         ),
                       ),
                       Spacer(),
@@ -806,7 +931,7 @@ class _ForumHomeState extends State<ForumHome> {
               : emptyBox,
           (adminOptionsToggled)
               ? Positioned(
-                  top: 140,
+                  top: 156,
                   width: 400,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -817,7 +942,7 @@ class _ForumHomeState extends State<ForumHome> {
               : emptyBox,
           (adminOptionsToggled)
               ? Positioned(
-                  top: 180,
+                  top: 196,
                   width: 400,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -828,12 +953,24 @@ class _ForumHomeState extends State<ForumHome> {
                           specialSearchArgs['showRemoved'] = 'All';
                           await loadUpdate();
                         },
-                        child: Text(
-                          Localize("All"),
-                          style: TextStyle(
-                              color: (specialSearchArgs['showRemoved'] == 'All')
-                                  ? Colors.black
-                                  : unselected),
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: (specialSearchArgs['showRemoved'] == 'All')
+                                ? selectedOption
+                                : unselectedOption,
+                          ),
+                          child: Text(
+                            Localize("All"),
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showRemoved'] == 'All')
+                                        ? selectedText
+                                        : unselectedText),
+                          ),
                         ),
                       ),
                       Spacer(),
@@ -842,13 +979,24 @@ class _ForumHomeState extends State<ForumHome> {
                           specialSearchArgs['showRemoved'] = 'Only';
                           await loadUpdate();
                         },
-                        child: Text(
-                          Localize("Only"),
-                          style: TextStyle(
-                              color:
-                                  (specialSearchArgs['showRemoved'] == 'Only')
-                                      ? Colors.black
-                                      : unselected),
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: (specialSearchArgs['showRemoved'] == 'Only')
+                                ? selectedOption
+                                : unselectedOption,
+                          ),
+                          child: Text(
+                            Localize("Only"),
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showRemoved'] == 'Only')
+                                        ? selectedText
+                                        : unselectedText),
+                          ),
                         ),
                       ),
                       Spacer(),
@@ -857,13 +1005,24 @@ class _ForumHomeState extends State<ForumHome> {
                           specialSearchArgs['showRemoved'] = 'None';
                           await loadUpdate();
                         },
-                        child: Text(
-                          Localize("None"),
-                          style: TextStyle(
-                              color:
-                                  (specialSearchArgs['showRemoved'] == 'None')
-                                      ? Colors.black
-                                      : unselected),
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: (specialSearchArgs['showRemoved'] == 'None')
+                                ? selectedOption
+                                : unselectedOption,
+                          ),
+                          child: Text(
+                            Localize("None"),
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showRemoved'] == 'None')
+                                        ? selectedText
+                                        : unselectedText),
+                          ),
                         ),
                       ),
                       Spacer(),
@@ -873,7 +1032,7 @@ class _ForumHomeState extends State<ForumHome> {
               : emptyBox,
           (adminOptionsToggled)
               ? Positioned(
-                  top: 220,
+                  top: 252,
                   width: 400,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -885,7 +1044,7 @@ class _ForumHomeState extends State<ForumHome> {
               : emptyBox,
           (adminOptionsToggled)
               ? Positioned(
-                  top: 260,
+                  top: 292,
                   width: 400,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -896,12 +1055,24 @@ class _ForumHomeState extends State<ForumHome> {
                           specialSearchArgs['showDeleted'] = 'All';
                           await loadUpdate();
                         },
-                        child: Text(
-                          Localize("All"),
-                          style: TextStyle(
-                              color: (specialSearchArgs['showDeleted'] == 'All')
-                                  ? Colors.black
-                                  : unselected),
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: (specialSearchArgs['showDeleted'] == 'All')
+                                ? selectedOption
+                                : unselectedOption,
+                          ),
+                          child: Text(
+                            Localize("All"),
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showDeleted'] == 'All')
+                                        ? selectedText
+                                        : unselectedText),
+                          ),
                         ),
                       ),
                       Spacer(),
@@ -910,13 +1081,24 @@ class _ForumHomeState extends State<ForumHome> {
                           specialSearchArgs['showDeleted'] = 'Only';
                           await loadUpdate();
                         },
-                        child: Text(
-                          Localize("Only"),
-                          style: TextStyle(
-                              color:
-                                  (specialSearchArgs['showDeleted'] == 'Only')
-                                      ? Colors.black
-                                      : unselected),
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: (specialSearchArgs['showDeleted'] == 'Only')
+                                ? selectedOption
+                                : unselectedOption,
+                          ),
+                          child: Text(
+                            Localize("Only"),
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showDeleted'] == 'Only')
+                                        ? selectedText
+                                        : unselectedText),
+                          ),
                         ),
                       ),
                       Spacer(),
@@ -925,13 +1107,24 @@ class _ForumHomeState extends State<ForumHome> {
                           specialSearchArgs['showDeleted'] = 'None';
                           await loadUpdate();
                         },
-                        child: Text(
-                          Localize("None"),
-                          style: TextStyle(
-                              color:
-                                  (specialSearchArgs['showDeleted'] == 'None')
-                                      ? Colors.black
-                                      : unselected),
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: (specialSearchArgs['showDeleted'] == 'None')
+                                ? selectedOption
+                                : unselectedOption,
+                          ),
+                          child: Text(
+                            Localize("None"),
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showDeleted'] == 'None')
+                                        ? selectedText
+                                        : unselectedText),
+                          ),
                         ),
                       ),
                       Spacer(),

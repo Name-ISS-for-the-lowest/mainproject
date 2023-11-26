@@ -64,7 +64,7 @@ class AuthHelper {
         );
       }
     }
-  }  
+  }
 
   static Future<Response> signUp(String email, String password) async {
     final data = {'email': email, 'password': password};
@@ -92,7 +92,6 @@ class AuthHelper {
   }
 
   static Future<bool> isLoggedIn() async {
-    // return false;
     var sessionCookie = await readCookie('session_cookie');
     if (sessionCookie == null) return false;
 
@@ -203,6 +202,36 @@ class AuthHelper {
           statusMessage: 'Unable to connect to server',
         );
       }
+    }
+  }
+
+  static setProfilePicture(File photo) async {
+    var sessionCookie = await readCookie('session_cookie');
+    String userID = sessionCookie['user_id'];
+    String endPoint = '/uploadPhoto';
+    var url = '$defaultHost$endPoint';
+    String name = userInfoCache['email'] + "_profilePicture";
+
+    var formData = FormData.fromMap({
+      'photo': await MultipartFile.fromFile(photo.path, filename: name),
+    });
+    var params = {
+      'name': name,
+      'type': 'profilePictures',
+    };
+
+    try {
+      final response = await RouteHandler.dio.post(url,
+          data: formData,
+          queryParameters: params,
+          options: Options(contentType: Headers.multipartFormDataContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
     }
   }
 }

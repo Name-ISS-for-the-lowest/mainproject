@@ -13,6 +13,7 @@ from classes.ImageHelper import ImageHelper
 import json
 import urllib.parse
 from models.Post import Post
+from models.Report import Report
 from bson import ObjectId
 import migrate
 from classes.Translator import Translator
@@ -213,9 +214,9 @@ def protected(request: Request):
 # it will be protected so I can use the cookie to get the userID, and change the url of the profile picture  in the db
 # also add an optional signUp field for profile picture, and set it to the default profile picture
 @app.post("/uploadPhoto")
-async def uploadPhoto(photo: UploadFile, name: str):
+async def uploadPhoto(photo: UploadFile, name: str, type:str):
     try:
-        image = await ImageHelper.uploadImage(photo, name)
+        image = await ImageHelper.uploadImage(photo, name, type)
         print("image: ", image.__dict__)
         jsonImage = json.dumps(image.__dict__, ensure_ascii=False)
 
@@ -226,9 +227,9 @@ async def uploadPhoto(photo: UploadFile, name: str):
 
 
 @app.post("/createPost")
-def createPost(postBody: str, request: Request):
+def createPost(postBody: str, imageURL:str, imageFileID:str, request: Request):
     id = IdFromCookie(request.cookies["session_cookie"])
-    DBManager.addPost(id, postBody)
+    DBManager.addPost(id, postBody, imageURL, imageFileID)
     return JSONResponse({"message": "Post Added"}, status_code=200)
 
 
@@ -272,12 +273,25 @@ def getPosts(
     posts = Post.listToJson(posts)
     return posts
 
+@app.get("/getPostByID")
+def getPostByID(postID: str, request: Request):
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    post = DBManager.getPostByID(postID)
+    post = Post.toJson(post)
+    return post
+
 
 ##if post is liked then it will unlike it
 @app.post("/likePost", summary="Like a post, if already liked it will be unliked")
 def likePost(postID: str, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
     response = DBManager.likePost(postID, userID)
+    return JSONResponse(response, status_code=200)
+
+@app.post("/reportPost", summary="Report a post")
+def reportPost(postID: str, request: Request):
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    response = DBManager.reportPost(postID, userID)
     return JSONResponse(response, status_code=200)
 
 
