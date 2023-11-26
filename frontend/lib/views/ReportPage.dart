@@ -181,7 +181,8 @@ class _ReportPageState extends State<ReportPage> {
           GestureDetector(
             onTap: () async {
               //String reasonValue = await reason;
-              var response = await PostHelper.reportPost(widget.postID);
+              var response =
+                  await PostHelper.reportPost(widget.postID, reasonsSelected);
               navigateToConfirm();
               print(widget.postID);
             },

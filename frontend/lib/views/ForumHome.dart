@@ -9,6 +9,8 @@ import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/views/Comments.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ReportPage.dart';
+import 'package:frontend/views/ConfirmReport.dart';
+import 'package:frontend/views/AdminView.dart';
 import 'package:frontend/classes/keywordData.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:http/http.dart';
@@ -202,6 +204,30 @@ class _ForumHomeState extends State<ForumHome> {
     );
   }
 
+  void navigateToAdminView(String postID) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: AdminView(postID: postID),
+          );
+        },
+      ),
+    );
+  }
+
+  void navigateToConfirmPost() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ConfirmReport(),
+          );
+        },
+      ),
+    );
+  }
+
   void deletePost(String postID) {
     loadDelete(postID);
   }
@@ -292,6 +318,8 @@ class _ForumHomeState extends State<ForumHome> {
     }
     bool isEdited = false;
     var liked = postData[index]['liked'];
+    var reportedByUser = postData[index]['reportedByUser'];
+    var unreviewedReport = postData[index]['unreviewedReport'];
     if (postData[index]['edited'] == 'True') {
       isEdited = true;
     }
@@ -359,7 +387,11 @@ class _ForumHomeState extends State<ForumHome> {
         } else if (result == 'deletePost') {
           deletePost(postID);
         } else if (result == 'reportPost') {
-          navigateToReportPost(postID);
+          if (reportedByUser) {
+            navigateToConfirmPost();
+          } else {
+            navigateToReportPost(postID);
+          }
         }
       },
       itemBuilder: (BuildContext context) {
@@ -686,14 +718,15 @@ class _ForumHomeState extends State<ForumHome> {
                           children: [
                             GestureDetector(
                                 onTap: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Flag Tapped")));
+                                  navigateToAdminView(postID);
                                 },
                                 child: SvgPicture.asset(
                                   "assets/PostUI/icon-flag.svg",
                                   height: 20,
                                   width: 20,
-                                  color: Colors.deepOrange,
+                                  color: (unreviewedReport)
+                                      ? Colors.deepOrange
+                                      : Colors.black,
                                 )),
                             Text(reportNumber, style: TextStyle(fontSize: 11))
                           ],

@@ -193,8 +193,11 @@ class DBManager:
             post.posterIsAdmin = user.get("admin")
             comboID = str(post._id) + str(userID)
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
+            reportedResult = DBManager.db["reports"].find_one({"comboID": comboID})
             if likedResult is not None:
                 post.liked = True
+            if reportedResult is not None:
+                post.reportedByUser = True
 
             returnPosts.append(post)
         return returnPosts
@@ -209,8 +212,11 @@ class DBManager:
         post['profilePicture'] = user.get("admin")
         comboID = str(post.get("_id")) + str(post.get("userID"))
         likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
+        reportedResult = DBManager.db["reports"].find_one({"comboID": comboID})
         if likedResult is not None:
             post.liked = True
+        if reportedResult is not None:
+                post.reportedByUser = True
         return post
 
     @staticmethod
@@ -270,19 +276,30 @@ class DBManager:
             return {"message": "Post unliked"}
         
     @staticmethod
-    def reportPost(postID, userID):
+    def reportPost(postID, userID, specialDict):
         # check if the user has already liked the post
         comboID = str(postID) + str(userID)
         postID = ObjectId(postID)
         reportResult = DBManager.db["reports"].find_one({"comboID": comboID})
+        postResult = DBManager.db['posts'].find_one({'_id': postID})
+        reasonDict = postResult.get('reportReasons')
         if reportResult is None:
+            postDict = {"reports" : 1}
+            reasons = ['hateSpeech', 'illegalContent', 'targetedHarassment', 'inappropriateContent', 'otherReason']
+            for reason in reasons:
+                if specialDict[reason]:
+                    reasonDict[reason] += 1
             result = DBManager.db["posts"].update_one(
                 {"_id": postID}, {"$inc": {"reports": 1}}
             )
+            result2 = DBManager.db["posts"].update_one(
+                {"_id": postID}, {"$set": {'reportReasons' : reasonDict, 'unreviewedReport' : True}}
+            )
             print(result.modified_count)
 
-            # add the reports to the reports collection
-            DBManager.db["reports"].insert_one({"PostID": postID, "comboID": comboID, "Reason": 'harassment'})
+            # add the reports to the reports collection\
+            newReport = {"PostID": postID, "comboID": comboID, "hateSpeech": specialDict['hateSpeech'], 'illegalContent': specialDict['illegalContent'], 'targetedHarassment' : specialDict['targetedHarassment'], 'inappropriateContent': specialDict['inappropriateContent'], 'otherReason': specialDict['otherReason']}
+            DBManager.db["reports"].insert_one(newReport)
             print("Reported")
             return {"message": "Post reported"}
         else:

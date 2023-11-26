@@ -155,7 +155,7 @@ class PostHelper {
     }
   }
 
-  static getPostByID(String postID ) async {
+  static getPostByID(String postID) async {
     final params = {
       'postID': postID,
     };
@@ -227,8 +227,16 @@ class PostHelper {
     }
   }
 
-  static reportPost(String postID) async {
-    final params = {'postID': postID};
+  static reportPost(String postID, Map<String, bool> reasonsSelected) async {
+    final params = {
+      'postID': postID,
+      'hateSpeech': reasonsSelected['hateSpeech'].toString(),
+      'illegalContent': reasonsSelected['illegalContent'].toString(),
+      'targetedHarassment': reasonsSelected['targetedHarassment'].toString(),
+      'inappropriateContent':
+          reasonsSelected['inappropriateContent'].toString(),
+      'otherReason': reasonsSelected['otherReason'].toString()
+    };
     String endPoint = '/reportPost';
     final url = '$defaultHost$endPoint';
     try {

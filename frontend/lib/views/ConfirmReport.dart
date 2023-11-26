@@ -10,7 +10,15 @@ class ConfirmReport extends StatefulWidget {
 
 class _ConfirmReportState extends State<ConfirmReport> {
   void navigateToPrimaryScreens() {
-    Navigator.of(context).pop();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return const Scaffold(
+            body: CoreTemplate(),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -55,7 +63,7 @@ class _ConfirmReportState extends State<ConfirmReport> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Thank you for your report.",
+                  "We have received your report, thank you for submitting it.",
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,

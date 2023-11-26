@@ -16,15 +16,19 @@ class Post:
     reports: int
     imagelinks: list
     liked: bool = False
+    reportedByUser: bool = False
     edited: bool
     deleted: bool
     removed: bool
     contentHistory: []
     translations: {}
-    posterIsAdmin: bool
+    posterIsAdmin: bool = False
     reports: int
     imageURL : str
     fileId : str
+    reportReasons: dict
+    unreviewedReport: bool = False
+
 
     def __init__(self, content, user_id, attachment=None, parent_id=None):
         self.content = content
@@ -33,15 +37,19 @@ class Post:
         self.likes = 0
         self.reports = 0
         self.liked = False
+        self.reportedByUser = False
+        self.posterIsAdmin = False
         # if parent is none then post is not a reply
         # otherwise the post is a reply to parent
         self.parent_id = parent_id
         self.translations = {}
         self.edited = False
         self.contentHistory = []
+        self.reportReasons = {'hateSpeech' : 0, 'targetedHarassment': 0, 'illegalContent' : 0, 'inappropriateContent': 0, 'otherReason': 0}
         self.deleted = False
         self.removed = False
         self.reports = 0
+        self.unreviewedReport = False
         if attachment == None:
             attachment = 'Empty'
         self.attachedImage = attachment

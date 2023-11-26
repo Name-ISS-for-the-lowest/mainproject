@@ -290,9 +290,16 @@ def likePost(postID: str, request: Request):
     return JSONResponse(response, status_code=200)
 
 @app.post("/reportPost", summary="Report a post")
-def reportPost(postID: str, request: Request):
+def reportPost(postID: str, hateSpeech:str, illegalContent: str, targetedHarassment: str, inappropriateContent:str, otherReason:str, request: Request):
+    specialParams = ['hateSpeech', 'illegalContent', 'targetedHarassment', 'inappropriateContent', 'otherReason']
+    specialDict = {}
+    for param in specialParams:
+        if vars()[param] == 'true':
+            specialDict[param] = True
+        else:
+            specialDict[param] = False
     userID = IdFromCookie(request.cookies["session_cookie"])
-    response = DBManager.reportPost(postID, userID)
+    response = DBManager.reportPost(postID, userID, specialDict)
     return JSONResponse(response, status_code=200)
 
 
