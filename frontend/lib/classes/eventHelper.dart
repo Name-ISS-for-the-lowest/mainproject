@@ -2,12 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:frontend/classes/routeHandler.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:html/parser.dart' show parse;
-import 'package:frontend/classes/Data.dart';
+
 import 'package:frontend/classes/keywordData.dart';
 import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/classes/localize.dart';
 
 class EventHelper {
-  static final events = <Map<String, String>>[];
+  static var events = <Map<String, String>>[];
   static bool mounted = true;
   static bool fetched = false;
 
@@ -37,8 +38,7 @@ class EventHelper {
       var results = response.data;
       final eventsSecondary = <Map<String, String>>[];
 
-      //I need to fix the set state bug, if you click to another page while events are fetching,
-      //an error will be thrown because set state is called on an non-existent widget, RIP.
+      //Okay so how are the events being set as recommended?
       if (mounted) {
         setState(() {
           for (var event in results) {
@@ -53,6 +53,7 @@ class EventHelper {
                 'url': event['permaLinkUrl'],
                 'description': _parseHtmlString(event['description']),
                 'recommended': 'True',
+                'id': event['eventID'].toString(),
               });
             } else {
               DateTime dateTime = DateTime.parse(event['startDateTime']);
@@ -65,6 +66,7 @@ class EventHelper {
                 'url': event['permaLinkUrl'],
                 'description': _parseHtmlString(event['description']),
                 'recommended': 'False',
+                'id': event['eventID'].toString(),
               });
             }
           }
@@ -88,6 +90,7 @@ class EventHelper {
     String eventDescription =
         _parseHtmlString(event['description']).toLowerCase();
     String userNationality = AuthHelper.userInfoCache['nationality'];
+    List? userKeywords = keywordData.countryKeywords[userNationality];
     userNationality = userNationality.toLowerCase();
     String userLanguage =
         AuthHelper.languageNames[AuthHelper.userInfoCache['language']];
@@ -100,12 +103,12 @@ class EventHelper {
         eventDescription.contains(userLanguage)) {
       return true;
     }
-    List? userKeywords = keywordData.countryKeywords[userNationality];
     if (userKeywords == null) {
       userKeywords = [];
     }
     for (String keyword in userKeywords) {
-      if (eventTitle.contains(keyword) || eventDescription.contains(keyword)) {
+      if (eventTitle.contains(keyword.toLowerCase()) ||
+          eventDescription.contains(keyword.toLowerCase())) {
         return true;
       }
     }

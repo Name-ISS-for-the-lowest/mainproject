@@ -7,6 +7,7 @@ import 'package:frontend/classes/postHelper.dart';
 import '../languagePicker/languages.dart';
 import '../languagePicker/language_picker.dart';
 import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/classes/eventHelper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:image_picker/image_picker.dart';
@@ -79,6 +80,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           onSelect: (Country country) async {
             AuthHelper.userInfoCache['nationality'] = country.name;
+            EventHelper.events = <Map<String, String>>[];
             await updateUser();
           });
     }
@@ -263,6 +265,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     // print(_selectedDialogLanguage.name);
                     // print(_selectedDialogLanguage.isoCode);
+                    EventHelper.events = <Map<String, String>>[];
                     await updateUser();
                   },
                   itemBuilder: _buildDialogItem)),
@@ -281,8 +284,9 @@ class _ProfilePageState extends State<ProfilePage> {
       Widget continueButton = TextButton(
         child: Text(Localize("Continue")),
         onPressed: () async {
-          AuthHelper.logout();          
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Home()), (route) => false);
+          AuthHelper.logout();
+          Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (_) => Home()), (route) => false);
         },
       );
 
@@ -291,9 +295,9 @@ class _ProfilePageState extends State<ProfilePage> {
         //backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0))),
-        title: Text("ACCOUNT DELETION"),
-        content: Text(
-            "THIS ACTION IS IRREVERSABLE. ARE YOU SURE YOU WANT TO CONTINUE?"),
+        title: Text(Localize("ACCOUNT DEACTIVATION")),
+        content: Text(Localize(
+            "THIS ACTION CANNOT BE UNDONE FROM THE APP. ARE YOU SURE YOU WANT TO CONTINUE?")),
         actions: [
           cancelButton,
           continueButton,
@@ -323,7 +327,8 @@ class _ProfilePageState extends State<ProfilePage> {
         onPressed: () async {
           AuthHelper.logout();
 
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Home()), (route) => false);
+          Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (_) => Home()), (route) => false);
         },
       );
 
@@ -351,33 +356,34 @@ class _ProfilePageState extends State<ProfilePage> {
 
     //NAME BUTTON
     Future<String?> openNameDialog() => showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Your Name'),
-        backgroundColor: Color(0xfff7ebe1),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0))),
-        content: TextField(
-          autofocus: true,
-          decoration: InputDecoration(hintText: 'Enter your name'),
-          controller: controller,
-        ),
-        actions: [
-          TextButton(
-            child: Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(Localize('Your Screen Name')),
+            backgroundColor: Color(0xfff7ebe1),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            content: TextField(
+              autofocus: true,
+              decoration:
+                  InputDecoration(hintText: Localize('Enter your name')),
+              controller: controller,
+            ),
+            actions: [
+              TextButton(
+                child: Text(Localize('Cancel')),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text(Localize('Submit')),
+                onPressed: () {
+                  submit();
+                },
+              ),
+            ],
           ),
-          TextButton(
-            child: Text('Submit'),
-            onPressed: () {
-              submit();
-            },
-          ),
-        ],
-      ),
-    );
+        );
 
     //CAMERA CODE
     File? image;
@@ -387,6 +393,12 @@ class _ProfilePageState extends State<ProfilePage> {
       if (image == null) return;
 
       final imageTemporary = File(image.path);
+      Navigator.of(context).pop();
+      var profilePicture = await AuthHelper.setProfilePicture(imageTemporary);
+      AuthHelper.userInfoCache['profilePicture.url'] = profilePicture['url'];
+      AuthHelper.userInfoCache['profilePicture.fileId'] =
+          profilePicture['fileId'];
+      await updateUser();
       //setState(() => this.image = imageTemporary);
     }
 
@@ -395,6 +407,14 @@ class _ProfilePageState extends State<ProfilePage> {
       if (image == null) return;
 
       final imageTemporary = File(image.path);
+      Navigator.of(context).pop();
+      var profilePicture = await AuthHelper.setProfilePicture(imageTemporary);
+      print(AuthHelper.userInfoCache['profilePicture.url']);
+      print(AuthHelper.userInfoCache['profilePicture.fileId']);
+      AuthHelper.userInfoCache['profilePicture.url'] = profilePicture['url'];
+      AuthHelper.userInfoCache['profilePicture.fileId'] =
+          profilePicture['fileId'];
+      await updateUser();
       //setState(() => this.image = imageTemporary);
     }
 
@@ -407,18 +427,18 @@ class _ProfilePageState extends State<ProfilePage> {
             data: Theme.of(context)
                 .copyWith(dialogBackgroundColor: Color(0xfff7ebe1)),
             child: SimpleDialog(
-              title: const Text("Image Picker"),
+              title: Text(Localize("Image Source")),
               children: <Widget>[
                 SimpleDialogOption(
-                  child: const Text('Select from Gallery'),
+                  child: Text(Localize('Select from Gallery')),
                   onPressed: () => pickImage(),
                 ),
                 SimpleDialogOption(
-                  child: const Text('Open Camera'),
+                  child: Text(Localize('Open Camera')),
                   onPressed: () => pickCamera(),
                 ),
                 SimpleDialogOption(
-                  child: const Text('Close'),
+                  child: Text(Localize('Close')),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -602,8 +622,9 @@ class _ProfilePageState extends State<ProfilePage> {
               child: ListTile(
                 leading: Icon(Icons.delete),
                 iconColor: Colors.redAccent,
-                title: Text(Localize('Delete Account')),
-                subtitle: Text(Localize('This action cannot be restored.')),
+                title: Text(Localize('Deactivate Account')),
+                subtitle: Text(
+                    Localize('This action cannot be restored from the app.')),
                 textColor: Colors.redAccent,
                 onTap: () {
                   showDeleteAlertDialog(context);

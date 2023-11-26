@@ -1,4 +1,5 @@
 import datetime
+import json
 
 
 class Report:
@@ -18,3 +19,12 @@ class Report:
         for key in dict:
             setattr(report, key, dict[key])
         return report
+
+    @staticmethod
+    def toJson(report):
+        # turn all to string
+        report.date = str(report.date)
+        report.post_id = str(report.post_id)
+        report.user_id = str(report.user_id)
+        report.reason = str(report.reason)
+        return json.dumps(report.__dict__)

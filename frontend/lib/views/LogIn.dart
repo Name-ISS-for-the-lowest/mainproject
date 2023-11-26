@@ -5,6 +5,7 @@ import 'package:frontend/views/ResetPassword.dart';
 import 'package:frontend/views/SignUp.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 import 'package:lottie/lottie.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
@@ -83,65 +84,76 @@ class _LogInState extends State<LogIn> {
   }
 
   void navigateToPrimaryScreens() {
-    Navigator.pushAndRemoveUntil(context,
-        MaterialPageRoute(builder: (_) => const CoreTemplate()), (route) => false);
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const CoreTemplate()),
+        (route) => false);
   }
 
   @override
   Widget build(BuildContext context) {
- 
     final screenHeight = MediaQuery.sizeOf(context).height;
-    
+
     return Scaffold(
-      
-      backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
-      resizeToAvoidBottomInset: false,
+        backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
+        resizeToAvoidBottomInset: false,
+        body: Stack(
+          alignment: Alignment.center,
+          children: [
+            //Background animation (increase top offset value to move anim down, decrease to move up)
+            Positioned(
+                top: 200,
+                child: SizedBox(
+                  height: screenHeight,
+                  child: LottieBuilder.asset(
+                    'assets/BackgroundWave.json',
+                    fit: BoxFit.fill,
+                  ),
+                )),
 
-      body: Stack(
-
-        alignment: Alignment.center,
-        children: [
-
-          //Background animation (increase top offset value to move anim down, decrease to move up)
-          Positioned(
-            top: 200,
-            child: SizedBox(
-            height: screenHeight,
-            child: LottieBuilder.asset('assets/BackgroundWave.json',
-              fit: BoxFit.fill,),
-          )),
-            
-          //Returning User Form begins Here--------------------------
-          Positioned(
-            top: 100,
-            child: Column(
-            
-                  children: [  
-                    
+            //Returning User Form begins Here--------------------------
+            Positioned(
+                top: 100,
+                child: Column(
+                  children: [
                     //This part is just text and formatting
                     SizedBox(
-                      width: 210,
-                      child : Text(
-                          Localize('Welcome Back'),
-                          style: const TextStyle(
+                        width: 240,
+                        height: 100,
+                        child: FittedBox(
+                          child: DefaultTextStyle(
+                            style: const TextStyle(
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.bold,
-                                fontSize: 45,
-                                color: Color.fromRGBO(230, 183, 17, 1)
-                              ),
-                          textAlign: TextAlign.center,
-                        ),
-                    ),
-                    
-                    
-                   //Spacer for Column elements
+                                fontSize: 50,
+                                color: Color.fromRGBO(230, 183, 17, 1)),
+                            textAlign: TextAlign.center,
+                            child: AnimatedTextKit(
+                                isRepeatingAnimation: true,
+                                animatedTexts: [
+                                  RotateAnimatedText(
+                                      transitionHeight: 100,
+                                      Localizer.localize('Welcome Back', 'en')),
+                                  RotateAnimatedText(
+                                      transitionHeight: 100,
+                                      Localizer.localize('Welcome Back', 'es')),
+                                  RotateAnimatedText(
+                                      transitionHeight: 100,
+                                      Localizer.localize('Welcome Back', 'fr')),
+                                  RotateAnimatedText(
+                                      transitionHeight: 100,
+                                      Localizer.localize('Welcome Back', 'zh')),
+                                ]),
+                          ),
+                        )),
+
+                    //Spacer for Column elements
                     const SizedBox(
-                      height: 37,
+                      height: 45,
                     ),
 
-                    
                     //Email Field Styling
-                    SizedBox(       
+                    SizedBox(
                       width: 330,
                       height: 55,
                       child: TextField(
@@ -156,14 +168,14 @@ class _LogInState extends State<LogIn> {
                         ),
                       ),
                     ),
-                    
+
                     //Spacer for Column elements
                     const SizedBox(
                       height: 21,
                     ),
-                    
+
                     //Password Field Styling
-                    SizedBox(         
+                    SizedBox(
                       width: 330,
                       height: 55,
                       child: TextField(
@@ -195,13 +207,12 @@ class _LogInState extends State<LogIn> {
                         child: Text(
                           Localize('Forgot Password?'),
                           style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.white
-                          ),
-                          textAlign:TextAlign.end,
-                          ),
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.white),
+                          textAlign: TextAlign.end,
+                        ),
                       ),
                     ),
 
@@ -212,77 +223,68 @@ class _LogInState extends State<LogIn> {
 
                     //Log In Button Styling
                     ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            fixedSize: const Size(330, 50),
-                            shape: RoundedRectangleBorder( 
-                              borderRadius: BorderRadius.circular(5.0)),
-                            backgroundColor: const Color.fromRGBO(230, 183, 17, 1),
-                            foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
-                            textStyle: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16, 
-                            ), 
-                        ),
-
-                        child: Text(Localize('Log In')),
-                        onPressed: () => {
-                          executeLogin(context, emailController.text, passwordController.text)
-                        },
-                     ),
-                    
-                ],
-            )
-          ),
-
-          //New User Forms Begin here -------------------------------
-          Positioned(
-            bottom: 42,
-            child: Column(
-                children: [
-
-                    //This part is just text and formatting
-                    Text(
-                      Localize('Don\'t have an account?'),
-                      style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Color.fromRGBO(230, 183, 17, 1)
-                          ),
-                      ),
-
-                    //Spacer
-                    const SizedBox(
-                      height: 9,
-                    ),
-
-                    //Sign Up button Formatting
-                    ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          fixedSize: const Size(330, 50),
-                          shape: RoundedRectangleBorder( 
+                        fixedSize: const Size(330, 50),
+                        shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5.0)),
-                          backgroundColor: const Color.fromRGBO(221, 151, 26, 1),
-                          foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
-                          textStyle: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16, 
-                           ), 
+                        backgroundColor: const Color.fromRGBO(230, 183, 17, 1),
+                        foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
+                        textStyle: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
-
-                      child: Text(Localize('Sign Up')),
+                      ),
+                      child: Text(Localize('Log In')),
                       onPressed: () => {
-                        navigateToSignUp()
+                        executeLogin(context, emailController.text,
+                            passwordController.text)
                       },
                     ),
+                  ],
+                )),
+
+            //New User Forms Begin here -------------------------------
+            Positioned(
+              bottom: 42,
+              child: Column(
+                children: [
+                  //This part is just text and formatting
+                  Text(
+                    Localize('Don\'t have an account?'),
+                    style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color.fromRGBO(230, 183, 17, 1)),
+                  ),
+
+                  //Spacer
+                  const SizedBox(
+                    height: 9,
+                  ),
+
+                  //Sign Up button Formatting
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: const Size(330, 50),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0)),
+                      backgroundColor: const Color.fromRGBO(221, 151, 26, 1),
+                      foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
+                      textStyle: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    child: Text(Localize('Sign Up')),
+                    onPressed: () => {navigateToSignUp()},
+                  ),
                 ],
               ),
-
             ),
-        ],
-        )
-      );
+          ],
+        ));
   }
 }

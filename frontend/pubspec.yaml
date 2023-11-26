@@ -53,6 +53,7 @@ dependencies:
   path_provider: ^2.1.1
   image_picker: ^1.0.4
   lottie: ^2.7.0
+  animated_text_kit: ^4.2.2
 
 dev_dependencies:
   flutter_test:
