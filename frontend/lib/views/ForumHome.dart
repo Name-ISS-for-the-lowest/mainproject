@@ -497,7 +497,7 @@ class _ForumHomeState extends State<ForumHome> {
     double calculatedHeight = (postContent.length / 25 * 14) + 50;
     if (postTooLong) calculatedHeight += 35;
     if (attachmentURL != 'Empty') {
-      calculatedHeight += 400;
+      calculatedHeight += 450;
     }
 
     return Padding(
@@ -588,18 +588,18 @@ class _ForumHomeState extends State<ForumHome> {
               child: postBodyContainer,
             ),
             Positioned(
-              bottom: 100,
+              bottom: 80,
               right: 10,
               child: (attachmentURL != 'Empty')
                   ? Container(
-                      width: 300, // Set your desired width
-                      height: 300, // Set your desired height
+                      height: 400,
+                      width: 340,
+                      color: Colors.black,
                       child: CachedNetworkImage(
-                        imageUrl: "$attachmentURL?tr=w-300,h-300",
+                        imageUrl: "$attachmentURL?tr=w-340,h-auto",
                         placeholder: (context, url) =>
                             CircularProgressIndicator(),
                         errorWidget: (context, url, error) => Icon(Icons.error),
-                        fit: BoxFit.fill,
                       ),
                     )
                   : SizedBox(),
