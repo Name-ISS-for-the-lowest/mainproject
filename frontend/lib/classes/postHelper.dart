@@ -155,6 +155,26 @@ class PostHelper {
     }
   }
 
+  static getPostByID(String postID ) async {
+    final params = {
+      'postID': postID,
+    };
+    String endPoint = '/getPostByID';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.get(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
   static searchPosts(int start, int end, String search, String userID,
       [Map<String, String>? specialSearchOptions]) async {
     if (specialSearchOptions == null) {

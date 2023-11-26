@@ -203,6 +203,14 @@ class DBManager:
     def getPostByID(postID):
         postID = ObjectId(postID)
         post = DBManager.db["posts"].find_one({"_id": postID})
+        user = DBManager.db["users"].find_one({"_id": ObjectId(post.get("userID"))})
+        post['profilePicture'] = user.get("profilePicture")
+        post['profilePicture'] = user.get("username")
+        post['profilePicture'] = user.get("admin")
+        comboID = str(post.get("_id")) + str(post.get("userID"))
+        likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
+        if likedResult is not None:
+            post.liked = True
         return post
 
     @staticmethod

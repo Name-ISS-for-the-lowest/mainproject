@@ -272,6 +272,13 @@ def getPosts(
     posts = Post.listToJson(posts)
     return posts
 
+@app.get("/getPostByID")
+def getPostByID(postID: str, request: Request):
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    post = DBManager.getPostByID(postID)
+    post = Post.toJson(post)
+    return post
+
 
 ##if post is liked then it will unlike it
 @app.post("/likePost", summary="Like a post, if already liked it will be unliked")

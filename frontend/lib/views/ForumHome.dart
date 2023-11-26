@@ -649,7 +649,7 @@ class _ForumHomeState extends State<ForumHome> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Comments()));
+                                  builder: (context) => Comments(postID: postID)));
                           /*ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Comment Tapped")));*/
                         },
