@@ -9,6 +9,7 @@ class Post:
     content: str
     userID: str
     username: str
+    email: str
     profilePicture = Picture()
     attachedImage = Picture()
     date: datetime.datetime

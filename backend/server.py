@@ -279,6 +279,8 @@ def getPostByID(postID: str, request: Request):
     post = DBManager.getPostByID(postID)
     post = Post.fromDict(post)
     post = Post.toJson(post)
+    print('POST LOOK LIKE THIS')
+    print(post)
     return post
 
 
