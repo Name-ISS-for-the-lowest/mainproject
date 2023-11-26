@@ -136,7 +136,7 @@ class _ResourceCenterState extends State<ResourceCenter> {
               _IconBuilder(
                 Localize("APIDA Center"),
                 "assets/ResourceCenter/icon-australasia.svg",
-                "https://www-csus-edu.translate.goog/student-affairs/centers-programs/asian-pacific-islander-desi-american-student-center/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
+                "https://www-csus-edu.translate.goog/student-affairs/centers-programs/asian-pacific-islander-desi-american-student-center/?_x_tr_sl=auto&_x_tr_tl=$userLang&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
               const Spacer(),
               _IconBuilder(

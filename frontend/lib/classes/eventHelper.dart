@@ -8,11 +8,7 @@ import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/localize.dart';
 
 class EventHelper {
-<<<<<<< HEAD
   static final events = <Map<String, dynamic>>[];
-=======
-  static var events = <Map<String, String>>[];
->>>>>>> origin/nazar2
   static bool mounted = true;
   static bool fetched = false;
   static String previousLanguage = "en";
@@ -73,10 +69,6 @@ class EventHelper {
                 'month': event['month'],
                 'description': event['description'][language],
                 'recommended': 'True',
-<<<<<<< HEAD
-=======
-                'id': event['eventID'].toString(),
->>>>>>> origin/nazar2
               });
             } else {
               eventsSecondary.add({

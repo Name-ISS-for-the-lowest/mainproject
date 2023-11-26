@@ -36,7 +36,7 @@ class _EventsPageState extends State<EventsPage> {
     }
   }
 
-  void showExpandedInformation(Map<String, String> event) {
+  void showExpandedInformation(Map<String, dynamic> event) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
