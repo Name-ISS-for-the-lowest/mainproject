@@ -91,6 +91,15 @@ class DBManager:
         # let's delete the token so they don't keep using it
         DBManager.db["users"].update_one({"token": token}, {"$unset": {"token": ""}})
 
+    #
+    @staticmethod
+    def deactivateAccount(userID):
+        userID = ObjectId(userID)
+        DBManager.db["users"].update_one(
+            {"_id": userID}, {"$set": {"accountActivated": False}}
+        )
+        
+
     @staticmethod
     def insertCookie(cookie):
         DBManager.db["session_cookies"].insert_one(cookie)

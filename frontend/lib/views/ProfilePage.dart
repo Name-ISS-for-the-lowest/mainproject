@@ -281,10 +281,8 @@ class _ProfilePageState extends State<ProfilePage> {
       Widget continueButton = TextButton(
         child: Text(Localize("Continue")),
         onPressed: () async {
+          AuthHelper.deactivate();
           AuthHelper.logout();
-
-
-
           Navigator.pushAndRemoveUntil(context,
               MaterialPageRoute(builder: (_) => Home()), (route) => false);
         },
@@ -325,7 +323,6 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Text(Localize("Continue")),
         onPressed: () async {
           AuthHelper.logout();
-
           Navigator.pushAndRemoveUntil(context,
               MaterialPageRoute(builder: (_) => Home()), (route) => false);
         },

@@ -370,3 +370,11 @@ def getEvents(request: Request):
     language = user.language
     events = DBManager.getEvents(language)
     return events
+
+
+# deactivate account
+@app.post("/deactivateAccount")
+def deactivateAccount(request: Request):
+    id = IdFromCookie(request.cookies["session_cookie"])
+    DBManager.deactivateAccount(id)
+    return JSONResponse({"message": "Account Deactivated"}, status_code=200)
