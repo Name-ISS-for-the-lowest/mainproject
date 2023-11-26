@@ -12,7 +12,6 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:async';
-import 'package:path_provider/path_provider.dart';
 import 'package:frontend/home.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -231,7 +230,6 @@ class _ProfilePageState extends State<ProfilePage> {
       Language.fromIsoCode('yi'),
       Language.fromIsoCode('yo'),
       Language.fromIsoCode('zu'),
-      //Language.fromIsoCode('deezNuts'),
     ];
 
 //LANGUAGE SELECTOR
@@ -250,7 +248,6 @@ class _ProfilePageState extends State<ProfilePage> {
               child: LanguagePickerDialog(
                   languages: supportedLanguages,
                   titlePadding: EdgeInsets.all(8.0),
-                  //searchCursorColor: Colors.pinkAccent,
                   searchInputDecoration:
                       InputDecoration(hintText: Localize('Search')),
                   isSearchable: true,
@@ -260,9 +257,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     AuthHelper.userInfoCache['language'] = language.isoCode;
                     _selectedDialogLanguage = language;
                     PostHelper.cachedTranslations = {};
-
-                    // print(_selectedDialogLanguage.name);
-                    // print(_selectedDialogLanguage.isoCode);
                     await updateUser();
                   },
                   itemBuilder: _buildDialogItem)),
@@ -282,13 +276,16 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Text(Localize("Continue")),
         onPressed: () async {
           AuthHelper.logout();          
+
+          //ACCOUNT DELETION CODE GOES HERE
+
+
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Home()), (route) => false);
         },
       );
 
       AlertDialog alert = AlertDialog(
         backgroundColor: Color(0xfff7ebe1),
-        //backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0))),
         title: Text("ACCOUNT DELETION"),
