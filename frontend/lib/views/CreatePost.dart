@@ -22,7 +22,7 @@ class CreatePost extends StatefulWidget {
 
 class _CreatePostState extends State<CreatePost> {
   void navigateToPrimaryScreens() {
-    Navigator.of(context).push(
+    Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (BuildContext context) {
           return const Scaffold(
@@ -34,6 +34,7 @@ class _CreatePostState extends State<CreatePost> {
   }
 
   File? imageAttachment;
+  String currentPostBody = "";
 
   Future pickImage() async {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -98,11 +99,8 @@ class _CreatePostState extends State<CreatePost> {
     String? originalID = widget.postID;
     String imageURL = userInfo['profilePicture.url'];
     String screenName = userInfo['username'];
-    String currentPostBody;
     String postID;
-    if (originalText == null) {
-      currentPostBody = "";
-    } else {
+    if (originalText != null) {
       currentPostBody = originalText;
     }
     if (originalID == null) {
@@ -240,87 +238,90 @@ class _CreatePostState extends State<CreatePost> {
               ),
             ],
           ),
-          Container(
-            height: 500,
-            width: 400,
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 20,
+          (isEditing == false)
+              ? Container(
+                  height: 500,
                   width: 400,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  child: Stack(
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          openCameraDialog(context);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.only(
-                              top: 8, bottom: 8, left: 16, right: 16),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.0),
-                            border: Border.all(color: Colors.black, width: 1.0),
-                            color: Colors.white,
-                          ),
-                          child: Text(
-                            (imageAttachment == null)
-                                ? "Attach Image"
-                                : "Change Image",
-                          ),
+                      Positioned(
+                        top: 20,
+                        width: 400,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                openCameraDialog(context);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.only(
+                                    top: 8, bottom: 8, left: 16, right: 16),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  border: Border.all(
+                                      color: Colors.black, width: 1.0),
+                                  color: Colors.white,
+                                ),
+                                child: Text(
+                                  (imageAttachment == null)
+                                      ? "Attach Image"
+                                      : "Change Image",
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
+                      ),
+                      Positioned(
+                        bottom: 50,
+                        right: 25,
+                        height: 350,
+                        width: 350,
+                        child: (imageAttachment != null)
+                            ? Stack(
+                                children: [
+                                  Positioned(
+                                    child: Container(
+                                      height: 350,
+                                      width: 350,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    child: Image.file(
+                                      imageAttachment!,
+                                      height: 350,
+                                      width: 350,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    right: 0,
+                                    top: 0,
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        imageAttachment = null;
+                                        if (mounted) {
+                                          setState(() {});
+                                        }
+                                      },
+                                      child: SvgPicture.asset(
+                                        'assets/PostUI/icon-xcircle.svg',
+                                        color: Colors.grey,
+                                        height: 40,
+                                        width: 40,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              )
+                            : const SizedBox(),
                       ),
                     ],
                   ),
-                ),
-                Positioned(
-                  bottom: 50,
-                  right: 25,
-                  height: 350,
-                  width: 350,
-                  child: (imageAttachment != null)
-                      ? Stack(
-                          children: [
-                            Positioned(
-                              child: Container(
-                                height: 350,
-                                width: 350,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Positioned(
-                              child: Image.file(
-                                imageAttachment!,
-                                height: 350,
-                                width: 350,
-                              ),
-                            ),
-                            Positioned(
-                              right: 0,
-                              top: 0,
-                              child: GestureDetector(
-                                onTap: () async {
-                                  imageAttachment = null;
-                                  if (mounted) {
-                                    setState(() {});
-                                  }
-                                },
-                                child: SvgPicture.asset(
-                                  'assets/PostUI/icon-xcircle.svg',
-                                  color: Colors.grey,
-                                  height: 40,
-                                  width: 40,
-                                ),
-                              ),
-                            )
-                          ],
-                        )
-                      : const SizedBox(),
-                ),
-              ],
-            ),
-          ),
+                )
+              : const SizedBox(),
         ],
       ),
     );
