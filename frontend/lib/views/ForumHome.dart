@@ -11,6 +11,7 @@ import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ReportPage.dart';
 import 'package:frontend/classes/keywordData.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'package:http/http.dart';
 
 class ForumHome extends StatefulWidget {
   const ForumHome({super.key});
@@ -271,6 +272,10 @@ class _ForumHomeState extends State<ForumHome> {
 
   Widget _buildPost(int index) {
     String imageURL = postData[index]["profilePicture"]['url'];
+    String attachmentURL = 'Empty';
+    if (postData[index]['attachedImage'] != 'Empty') {
+      attachmentURL = postData[index]['attachedImage']['url'];
+    }
     String posterName = postData[index]["username"];
     String postContent = postData[index]["content"];
     String postID = postData[index]["_id"];
@@ -491,6 +496,9 @@ class _ForumHomeState extends State<ForumHome> {
 
     double calculatedHeight = (postContent.length / 25 * 14) + 50;
     if (postTooLong) calculatedHeight += 35;
+    if (attachmentURL != 'Empty') {
+      calculatedHeight += 400;
+    }
 
     return Padding(
       padding: const EdgeInsets.all(6.0),

@@ -10,6 +10,7 @@ class Post:
     userID: str
     username: str
     profilePicture = Picture()
+    attachedImage = Picture()
     date: datetime.datetime
     likes: int
     reports: int
@@ -22,8 +23,10 @@ class Post:
     translations: {}
     posterIsAdmin: bool
     reports: int
+    imageURL : str
+    fileId : str
 
-    def __init__(self, content, user_id, parent_id=None):
+    def __init__(self, content, user_id, attachment=None, parent_id=None):
         self.content = content
         self.userID = user_id
         self.date = datetime.datetime.now()
@@ -39,6 +42,15 @@ class Post:
         self.deleted = False
         self.removed = False
         self.reports = 0
+        if attachment == None:
+            attachment = 'Empty'
+        self.attachedImage = attachment
+        if attachment != None and attachment != 'Empty':
+            self.imageURL = attachment.url
+            self.fileId = attachment.fileID
+        else:
+            self.imageURL = None
+            self.fileId = None
 
     @staticmethod
     def fromDict(dict):
@@ -62,6 +74,7 @@ class Post:
                 i += 1
             history += "]"
         return history
+
 
     @staticmethod
     def toJson(post):

@@ -226,9 +226,9 @@ async def uploadPhoto(photo: UploadFile, name: str, type:str):
 
 
 @app.post("/createPost")
-def createPost(postBody: str, request: Request):
+def createPost(postBody: str, imageURL:str, imageFileID:str, request: Request):
     id = IdFromCookie(request.cookies["session_cookie"])
-    DBManager.addPost(id, postBody)
+    DBManager.addPost(id, postBody, imageURL, imageFileID)
     return JSONResponse({"message": "Post Added"}, status_code=200)
 
 

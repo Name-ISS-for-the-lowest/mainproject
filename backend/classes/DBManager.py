@@ -2,6 +2,7 @@ import pymongo
 import json
 from models.User import User
 from models.Post import Post
+from models.Picture import Picture
 import bson
 from bson import ObjectId, binary, BSON
 import base64
@@ -119,8 +120,11 @@ class DBManager:
         DBManager.db["session_cookies"].delete_one({"session_id": cookie["session_id"]})
 
     @staticmethod
-    def addPost(userID, content):
+    def addPost(userID, content, imageURL, imageFileID):
         newPost = Post(content, userID)
+        if imageURL != 'False':
+            Attachment = Picture(imageURL, imageFileID)
+            newPost.attachedImage = Attachment.__dict__
         user = DBManager.getUserById(userID)
         DBManager.db["posts"].insert_one(newPost.__dict__)
 
@@ -197,6 +201,7 @@ class DBManager:
 
     @staticmethod
     def getPostByID(postID):
+        postID = ObjectId(postID)
         post = DBManager.db["posts"].find_one({"_id": postID})
         return post
 
