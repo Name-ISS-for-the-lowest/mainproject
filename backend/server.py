@@ -277,10 +277,7 @@ def getPosts(
 @app.get("/getPostByID")
 def getPostByID(postID: str, request: Request):
     post = DBManager.getPostByID(postID)
-    post = Post.fromDict(post)
     post = Post.toJson(post)
-    print('POST LOOK LIKE THIS')
-    print(post)
     return post
 
 
@@ -293,11 +290,25 @@ def likePost(postID: str, request: Request):
 
 
 @app.post("/reportPost", summary="Report a post")
-def reportPost(postID: str, hateSpeech:str, illegalContent: str, targetedHarassment: str, inappropriateContent:str, otherReason:str, request: Request):
-    specialParams = ['hateSpeech', 'illegalContent', 'targetedHarassment', 'inappropriateContent', 'otherReason']
+def reportPost(
+    postID: str,
+    hateSpeech: str,
+    illegalContent: str,
+    targetedHarassment: str,
+    inappropriateContent: str,
+    otherReason: str,
+    request: Request,
+):
+    specialParams = [
+        "hateSpeech",
+        "illegalContent",
+        "targetedHarassment",
+        "inappropriateContent",
+        "otherReason",
+    ]
     specialDict = {}
     for param in specialParams:
-        if vars()[param] == 'true':
+        if vars()[param] == "true":
             specialDict[param] = True
         else:
             specialDict[param] = False
