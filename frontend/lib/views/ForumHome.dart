@@ -588,6 +588,23 @@ class _ForumHomeState extends State<ForumHome> {
               child: postBodyContainer,
             ),
             Positioned(
+              bottom: 100,
+              right: 10,
+              child: (attachmentURL != 'Empty')
+                  ? Container(
+                      width: 300, // Set your desired width
+                      height: 300, // Set your desired height
+                      child: CachedNetworkImage(
+                        imageUrl: "$attachmentURL?tr=w-300,h-300",
+                        placeholder: (context, url) =>
+                            CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
+                        fit: BoxFit.fill,
+                      ),
+                    )
+                  : SizedBox(),
+            ),
+            Positioned(
               bottom: 20,
               left: 50,
               child: Row(
@@ -649,7 +666,8 @@ class _ForumHomeState extends State<ForumHome> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Comments(postID: postID)));
+                                  builder: (context) =>
+                                      Comments(postID: postID)));
                           /*ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Comment Tapped")));*/
                         },

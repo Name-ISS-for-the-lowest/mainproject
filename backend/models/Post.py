@@ -86,7 +86,6 @@ class Post:
         post.contentHistory = Post.contentHistoryToString(post)
         post.deleted = str(post.deleted)
         post.removed = str(post.removed)
-        post.posterIsAdmin = str(post.posterIsAdmin)
         post.reports = str(post.reports)
         return json.dumps(post.__dict__)
 
@@ -100,7 +99,6 @@ class Post:
             post.edited = str(post.edited)
             post.deleted = str(post.deleted)
             post.removed = str(post.removed)
-            post.posterIsAdmin = str(post.posterIsAdmin)
             post.reports = str(post.reports)
             if targetLang in post.translations:
                 post.translations = str(post.translations[targetLang])

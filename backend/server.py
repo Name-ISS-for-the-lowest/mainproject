@@ -227,6 +227,7 @@ async def uploadPhoto(photo: UploadFile, name: str, type:str):
 
 @app.post("/createPost")
 def createPost(postBody: str, imageURL:str, imageFileID:str, request: Request):
+    print(f"Post Body: ${postBody} imageURL: ${imageURL} imageFileID: ${imageFileID}")
     id = IdFromCookie(request.cookies["session_cookie"])
     DBManager.addPost(id, postBody, imageURL, imageFileID)
     return JSONResponse({"message": "Post Added"}, status_code=200)
@@ -276,6 +277,7 @@ def getPosts(
 def getPostByID(postID: str, request: Request):
     userID = IdFromCookie(request.cookies["session_cookie"])
     post = DBManager.getPostByID(postID)
+    post = Post.fromDict(post)
     post = Post.toJson(post)
     return post
 
