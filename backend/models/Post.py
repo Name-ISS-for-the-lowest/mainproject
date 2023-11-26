@@ -87,6 +87,7 @@ class Post:
         post.deleted = str(post.deleted)
         post.removed = str(post.removed)
         post.reports = str(post.reports)
+        post.posterIsAdmin = str(post.posterIsAdmin)
         return json.dumps(post.__dict__)
 
     @staticmethod
@@ -100,6 +101,7 @@ class Post:
             post.deleted = str(post.deleted)
             post.removed = str(post.removed)
             post.reports = str(post.reports)
+            post.posterIsAdmin = str(post.posterIsAdmin)
             if targetLang in post.translations:
                 post.translations = str(post.translations[targetLang])
             else:
