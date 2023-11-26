@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,21 +10,61 @@ import 'package:frontend/views/CoreTemplate.dart';
 import 'package:frontend/views/CreatePost.dart';
 
 class Comments extends StatefulWidget {
-  const Comments({super.key});
+  final String postID;
+
+  Comments({Key? key, required this.postID}) : super(key: key);
 
   @override
-  State<Comments> createState() => _CommentsState();
+  _CommentsState createState() => _CommentsState();
 }
 
 class _CommentsState extends State<Comments> {
-  final List postData = [];
+  var post;
+  bool init = true;
   final Map<String, String> currentlyTranslated = {};
-  Map searchParams = {"search": "", "postsFetched": 0};
-  final Map<String, String> specialSearchArgs = {
-    'showReported': 'All',
-    'showRemoved': 'None',
-    'showDeleted': 'None'
-  };
+  Map postData = {};
+
+void load() async {
+  var dataCall = await PostHelper.getPostByID(widget.postID);
+  print("printing data call...");
+  print(dataCall);
+  if (mounted) {
+    setState(() {
+      post = dataCall;
+      print("printing...");
+      
+      print(post);
+      init = false;
+      //postData = jsonDecode(dataCall) as Map<String, dynamic>;
+    });
+  }
+}
+
+void firstload() {
+  load();
+}
+
+void deletePost(String postID) {
+    loadDelete(postID);
+}
+
+  Future<void> loadDelete(String postID) async {
+    await PostHelper.deletePost(postID);
+    var dataCall = await PostHelper.getPostByID(postID);
+    if (mounted) {
+      setState(() {
+      });
+    }
+  }
+
+    Future<void> loadRemovalToggle(String postID) async {
+    await PostHelper.toggleRemoval(postID);
+    var dataCall = await PostHelper.getPostByID(postID);
+    if (mounted) {
+      setState(() {
+      });
+    }
+  }
 
   String formatLargeNumber(int number) {
     if (number < 1000) {
@@ -51,48 +93,14 @@ class _CommentsState extends State<Comments> {
     );
   }
 
-  void deletePost(String postID) {
-    loadDelete(postID);
-  }
-
-  Future<void> loadDelete(String postID) async {
-    await PostHelper.deletePost(postID);
-    var dataCall = await PostHelper.getPosts(
-        0, searchParams["postsFetched"], specialSearchArgs);
-    if (mounted) {
-      setState(() {
-        postData.clear();
-        postData.addAll(dataCall);
-        num fetchedLength = dataCall.length;
-        int convertedFetch = fetchedLength.toInt();
-        searchParams["postsFetched"] = convertedFetch;
-      });
-    }
-  }
-
-  Future<void> loadRemovalToggle(String postID) async {
-    await PostHelper.toggleRemoval(postID);
-    var dataCall = await PostHelper.getPosts(
-        0, searchParams['postsFetched'], specialSearchArgs);
-    if (mounted) {
-      setState(() {
-        postData.clear();
-        postData.addAll(dataCall);
-        num fetchedLength = dataCall.length;
-        int convertedFetch = fetchedLength.toInt();
-        searchParams["postsFetched"] = convertedFetch;
-      });
-    }
-  }
-
-  Future<void> translatePost(String originalText, int index) async {
+  Future<void> translatePost(String originalText) async {
     if (PostHelper.cachedTranslations.containsKey(originalText)) {
       return;
-    } else if (postData[index]['translations'] != '') {
+    } else if (post['translations'] != '') {
       if (mounted) {
         setState(() {
           PostHelper.cachedTranslations[originalText] =
-              postData[index]['translations'];
+              post['translations'];
         });
         return;
       }
@@ -107,13 +115,13 @@ class _CommentsState extends State<Comments> {
     }
   }
 
-  Widget _buildPost(int index) {
-    String imageURL = postData[index]["profilePicture"]['url'];
-    String posterName = postData[index]["username"];
-    String postContent = postData[index]["content"];
-    String postID = postData[index]["_id"];
-    String posterID = postData[index]['userID'];
-    late int likes = postData[index]['likes'];
+  Widget _buildPost() {
+    //String imageURL = post["profilePicture"]["url"];
+    String posterName = post["username"];
+    String postContent = post["content"];
+    String postID = post["_id"];
+    String posterID = post['userID'];
+    late int likes = post['likes'];
     bool posterIsAdmin = false;
     bool userIsAdmin = false;
     //These booleans below may come in handy when we are making admin views
@@ -123,17 +131,17 @@ class _CommentsState extends State<Comments> {
       userIsAdmin = true;
     }
     bool isEdited = false;
-    var liked = postData[index]['liked'];
-    if (postData[index]['edited'] == 'True') {
+    var liked = post['liked'];
+    if (post['edited'] == 'True') {
       isEdited = true;
     }
-    if (postData[index]['posterIsAdmin'] == 'True') {
+    if (post['posterIsAdmin'] == 'True') {
       posterIsAdmin = true;
     }
-    if (postData[index]['deleted'] == 'True') {
+    if (post['deleted'] == 'True') {
       deleted = true;
     }
-    if (postData[index]['removed'] == 'True') {
+    if (post['removed'] == 'True') {
       removed = true;
     }
 
@@ -183,7 +191,7 @@ class _CommentsState extends State<Comments> {
         if (result == 'closeMenu') {
           // Closes menu and does absolutely nothing
         } else if (result == 'editPost') {
-          navigateToEditPost(postData[index]["content"], postID);
+          navigateToEditPost(post["content"], postID);
         } else if (result == 'deletePost') {
           deletePost(postID);
         } else if (result == 'reportPost') {
@@ -326,12 +334,12 @@ class _CommentsState extends State<Comments> {
                   shape: BoxShape.circle,
                 ),
                 child: ClipOval(
-                  child: CachedNetworkImage(
+                  /*child: CachedNetworkImage(
                     imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
                     placeholder: (context, url) => CircularProgressIndicator(),
                     errorWidget: (context, url, error) => Icon(Icons.error),
                     fit: BoxFit.fill,
-                  ),
+                  ),*/
                 ),
               ),
             ),
@@ -407,14 +415,14 @@ class _CommentsState extends State<Comments> {
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(response['message'])));
                     setState(() {
-                      postData[index]['liked'] = !liked;
+                      post['liked'] = !liked;
 
                       liked = !liked;
 
                       if (liked) {
-                        postData[index]['likes']++;
+                        post['likes']++;
                       } else {
-                        postData[index]['likes']--;
+                        post['likes']--;
                       }
                     });
                   },
@@ -434,7 +442,7 @@ class _CommentsState extends State<Comments> {
               left: 85,
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(context,MaterialPageRoute(builder: (context) =>Comments()));
+                  Navigator.push(context,MaterialPageRoute(builder: (context) => Comments(postID: postID)));
                   /*ScaffoldMessenger.of(context)
                       .showSnackBar(SnackBar(content: Text("Comment Tapped")));*/
                 },
@@ -493,11 +501,11 @@ class _CommentsState extends State<Comments> {
               left: 280,
               child: GestureDetector(
                 onTap: () async {
-                  await translatePost(postContent, index);
-                  if (postData[index]['translations'] == '') {
+                  await translatePost(postContent);
+                  if (post['translations'] == '') {
                     await PostHelper.storeTranslation(
                         PostHelper.cachedTranslations[postContent]!,
-                        postData[index]['_id']);
+                        post['_id']);
                   }
                   if (mounted) {
                     setState(() {
@@ -547,10 +555,20 @@ class _CommentsState extends State<Comments> {
     );
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
+    if (init) {
+      firstload();
+      init = false;
+    } 
+    bool userIsAdmin = false;
+    if (AuthHelper.userInfoCache['admin'] == 'True') {
+      userIsAdmin = true;
+    }
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -581,9 +599,13 @@ class _CommentsState extends State<Comments> {
           ),
       ),
       backgroundColor: const Color(0xffece7d5),
-      /*body: Column(
+      body: Column(
         children: [
-          
+          SizedBox(height: 5),
+          Expanded(
+            child:
+                _buildPost()
+          )
         ]
       ),*/
     );

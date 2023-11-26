@@ -557,7 +557,7 @@ class _ForumHomeState extends State<ForumHome> {
               left: 85,
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(context,MaterialPageRoute(builder: (context) =>Comments()));
+                  Navigator.push(context, new MaterialPageRoute(builder: (context) => new Comments(postID: postID)));
                   /*ScaffoldMessenger.of(context)
                       .showSnackBar(SnackBar(content: Text("Comment Tapped")));*/
                 },
