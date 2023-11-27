@@ -36,6 +36,7 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/docs"
             or request.url.path == "/logout"
             or request.url.path == "/openapi.json"
+            or request.url.path == "/setProfilePictureOnSignUp"
         ):
             return await call_next(request)
         # check if the user has a cookie
@@ -214,7 +215,7 @@ def protected(request: Request):
 # it will be protected so I can use the cookie to get the userID, and change the url of the profile picture  in the db
 # also add an optional signUp field for profile picture, and set it to the default profile picture
 @app.post("/uploadPhoto")
-async def uploadPhoto(photo: UploadFile, name: str, type:str):
+async def uploadPhoto(photo: UploadFile, name: str, type: str):
     try:
         image = await ImageHelper.uploadImage(photo, name, type)
         print("image: ", image.__dict__)
@@ -226,9 +227,32 @@ async def uploadPhoto(photo: UploadFile, name: str, type:str):
         return JSONResponse({"message": "Unable to upload photo"}), 400
 
 
+@app.post("/setProfilePictureOnSignUp")
+async def setProfilePictureOnSignUp(photo: UploadFile, email: str, request: Request):
+    try:
+        # first get user by email
+        user = DBManager.getUserByEmail(email)
+        print("user: ", user.__dict__)
+        # check user is not activated
+        if user["accountActivated"] == True:
+            return JSONResponse({"message": "User already activated"}), 400
+        else:
+            # upload image
+            image = await ImageHelper.uploadImage(photo, "default", "profilePictures")
+            print("made it here", image.__dict__)
+            user.__setattr__("profilePicture", image.__dict__)
+
+            # user["profilePicture"] = image.__dict__
+            print("user: ", user)
+            # update user
+            DBManager.db["users"].update_one({"email": email}, {"$set": user.__dict__})
+    except Exception as e:
+        print(e)
+        return JSONResponse({"message": "Unable to upload photo"}), 400
+
+
 @app.post("/createPost")
-def createPost(postBody: str, imageURL:str, imageFileID:str, request: Request):
-    print(f"Post Body: ${postBody} imageURL: ${imageURL} imageFileID: ${imageFileID}")
+def createPost(postBody: str, imageURL: str, imageFileID: str, request: Request):
     id = IdFromCookie(request.cookies["session_cookie"])
     DBManager.addPost(id, postBody, imageURL, imageFileID)
     return JSONResponse({"message": "Post Added"}, status_code=200)
@@ -274,14 +298,11 @@ def getPosts(
     posts = Post.listToJson(posts)
     return posts
 
+
 @app.get("/getPostByID")
 def getPostByID(postID: str, request: Request):
-    userID = IdFromCookie(request.cookies["session_cookie"])
     post = DBManager.getPostByID(postID)
-    post = Post.fromDict(post)
     post = Post.toJson(post)
-    print('POST LOOK LIKE THIS')
-    print(post)
     return post
 
 
@@ -292,12 +313,27 @@ def likePost(postID: str, request: Request):
     response = DBManager.likePost(postID, userID)
     return JSONResponse(response, status_code=200)
 
+
 @app.post("/reportPost", summary="Report a post")
-def reportPost(postID: str, hateSpeech:str, illegalContent: str, targetedHarassment: str, inappropriateContent:str, otherReason:str, request: Request):
-    specialParams = ['hateSpeech', 'illegalContent', 'targetedHarassment', 'inappropriateContent', 'otherReason']
+def reportPost(
+    postID: str,
+    hateSpeech: str,
+    illegalContent: str,
+    targetedHarassment: str,
+    inappropriateContent: str,
+    otherReason: str,
+    request: Request,
+):
+    specialParams = [
+        "hateSpeech",
+        "illegalContent",
+        "targetedHarassment",
+        "inappropriateContent",
+        "otherReason",
+    ]
     specialDict = {}
     for param in specialParams:
-        if vars()[param] == 'true':
+        if vars()[param] == "true":
             specialDict[param] = True
         else:
             specialDict[param] = False

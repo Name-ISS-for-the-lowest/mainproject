@@ -19,20 +19,18 @@ class Comments extends StatefulWidget {
 }
 
 class _CommentsState extends State<Comments> {
-  var post;
+  var post = {};
   bool init = true;
+  bool fetched = false;
   final Map<String, String> currentlyTranslated = {};
   Map postData = {};
 
   void load() async {
     var dataCall = await PostHelper.getPostByID(widget.postID);
-    print("printing data call...");
-    print(dataCall);
     if (mounted) {
       setState(() {
         post = dataCall;
         print("printing...");
-
         print(post);
         init = false;
         //postData = jsonDecode(dataCall) as Map<String, dynamic>;
@@ -113,7 +111,12 @@ class _CommentsState extends State<Comments> {
   }
 
   Widget _buildPost() {
-    //String imageURL = post["profilePicture"]["url"];
+    if (post.isEmpty) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     String posterName = post["username"];
     String postContent = post["content"];
     String postID = post["_id"];
@@ -566,7 +569,7 @@ class _CommentsState extends State<Comments> {
       userIsAdmin = true;
     }
     return Scaffold(
-        /*appBar: AppBar(
+      appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -598,14 +601,7 @@ class _CommentsState extends State<Comments> {
       ),
       backgroundColor: const Color(0xffece7d5),
       body: Column(
-        children: [
-          SizedBox(height: 5),
-          Expanded(
-            child:
-                _buildPost()
-          )
-        ]
-      ),*/
-        );
+          children: [SizedBox(height: 5), Expanded(child: _buildPost())]),
+    );
   }
 }

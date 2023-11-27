@@ -9,15 +9,21 @@ import 'package:frontend/classes/localize.dart';
 
 class EventHelper {
 <<<<<<< HEAD
+<<<<<<< HEAD
   static var events = <Map<String, String>>[];
+=======
+  static final events = <Map<String, dynamic>>[];
+>>>>>>> origin/gabriel
 =======
   static final events = <Map<String, dynamic>>[];
 >>>>>>> origin/gabriel
   static bool mounted = true;
   static bool fetched = false;
+  static bool fetching = false;
+  static Function setState = () {};
   static String previousLanguage = "en";
 
-  static Future fetchEvents(Function setState) async {
+  static Future fetchEvents() async {
     if (events.isNotEmpty) {
       var language = AuthHelper.userInfoCache['language'];
       if (language == previousLanguage) {
@@ -43,6 +49,10 @@ class EventHelper {
     };
 
     try {
+      if (fetching) {
+        return;
+      }
+      EventHelper.fetching = true;
       String defaultHost = RouteHandler.defaultHost;
       var language = AuthHelper.userInfoCache['language'];
       EventHelper.previousLanguage = language;
@@ -62,7 +72,7 @@ class EventHelper {
 
       //Okay so how are the events being set as recommended?
       if (mounted) {
-        setState(() {
+        EventHelper.setState(() {
           for (var event in results) {
             if (isEventRecommended(event)) {
               events.add({
@@ -74,7 +84,10 @@ class EventHelper {
                 'description': event['description'][language],
                 'recommended': 'True',
 <<<<<<< HEAD
+<<<<<<< HEAD
                 'id': event['eventID'].toString(),
+=======
+>>>>>>> origin/gabriel
 =======
 >>>>>>> origin/gabriel
               });
@@ -96,6 +109,7 @@ class EventHelper {
         });
       }
       fetched = true;
+      fetching = false;
       return response;
     } on DioException catch (e) {
       print(e);
