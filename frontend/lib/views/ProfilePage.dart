@@ -80,7 +80,6 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           onSelect: (Country country) async {
             AuthHelper.userInfoCache['nationality'] = country.name;
-            // EventHelper.events = <Map<String, dynamic>>[];
             await updateUser();
           });
     }
@@ -262,10 +261,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     AuthHelper.userInfoCache['language'] = language.isoCode;
                     _selectedDialogLanguage = language;
                     PostHelper.cachedTranslations = {};
-
-                    // print(_selectedDialogLanguage.name);
-                    // print(_selectedDialogLanguage.isoCode);
-                    // EventHelper.events = <Map<String, dynamic>>[];
                     await updateUser();
                   },
                   itemBuilder: _buildDialogItem)),

@@ -29,6 +29,9 @@ class DBManager:
             return None
         else:
             return User.fromDict(user)
+        
+   # def resetUserPassword(email, new_password):
+
 
     @staticmethod
     def getUserByToken(token):
@@ -186,6 +189,14 @@ class DBManager:
             specialSearchParams["deleted"] = True
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
+<<<<<<< HEAD
+=======
+        if showReported == "Only":
+            specialSearchParams["reports"] = {"$gt" : 0}
+        elif showReported == "Unreviewed":
+            specialSearchParams["unreviewedReport"] = True
+
+>>>>>>> origin/dylan-branch
         posts = (
             DBManager.db["posts"]
             .find(specialSearchParams)
@@ -242,6 +253,13 @@ class DBManager:
             specialSearchParams["deleted"] = True
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
+<<<<<<< HEAD
+=======
+        if showReported == "Only":
+            specialSearchParams["reports"] = {"$gt" : 0}
+        elif showReported == "Unreviewed":
+            specialSearchParams["unreviewedReport"] = True
+>>>>>>> origin/dylan-branch
         posts = (
             DBManager.db["posts"]
             .find(specialSearchParams)

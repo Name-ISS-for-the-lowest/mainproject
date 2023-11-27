@@ -42,6 +42,32 @@ class AuthHelper {
     }
   }
 
+//need reset password function
+  static Future<Response> resetPassword(String email) async {
+    final data = {'email': email};
+    String endPoint = '/reset';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.post(
+        url,
+        data: jsonEncode(data),
+        options: Options(contentType: Headers.jsonContentType),
+      );
+      return response;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!;
+      } else {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'Unable to connect to server'},
+          statusCode: 500,
+          statusMessage: 'Unable to connect to server',
+        );
+      }
+    }
+  }
+
   static Future<Response> logout() async {
     String endPoint = '/logout';
     var url = '$defaultHost$endPoint';
@@ -92,7 +118,6 @@ class AuthHelper {
   }
 
   static Future<bool> isLoggedIn() async {
-    return false;
     var sessionCookie = await readCookie('session_cookie');
     if (sessionCookie == null) return false;
 
