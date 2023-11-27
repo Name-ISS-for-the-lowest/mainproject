@@ -251,6 +251,7 @@ class DBManager:
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
         if showReported == "Only":
+            #print(specialSearchParams["reports"])
             specialSearchParams["reports"] = {"$gt" : 0}
         elif showReported == "Unreviewed":
             specialSearchParams["unreviewedReport"] = True
@@ -330,9 +331,10 @@ class DBManager:
 
             # add the reports to the reports collection
             DBManager.db["reports"].insert_one(
-                {"PostID": postID, "comboID": comboID, "Reason": "harassment"}
+                {"PostID": postID, "comboID": comboID, "hateSpeech": specialDict['hateSpeech'],
+                'illegalContent': specialDict['illegalContent'], 'targetedHarassment' : specialDict['targetedHarassment'],
+                'inappropriateContent': specialDict['inappropriateContent'], 'otherReason': specialDict['otherReason']}
             )
-            print("Reported")
             return {"message": "Post reported"}
         else:
             return {"message": "Post already reported"}
