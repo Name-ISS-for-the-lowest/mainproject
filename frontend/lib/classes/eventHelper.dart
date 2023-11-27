@@ -118,10 +118,11 @@ class EventHelper {
         eventDescription.contains(userLanguage)) {
       return true;
     }
-    userKeywords ??= [];
+    userKeywords =
+        keywordData.countryKeywords[AuthHelper.userInfoCache['nationality']]!;
     for (String keyword in userKeywords) {
-      if (eventTitle.contains(keyword.toLowerCase()) ||
-          eventDescription.contains(keyword.toLowerCase())) {
+      if (eventTitle.toLowerCase().contains(keyword.toLowerCase()) ||
+          eventDescription.toLowerCase().contains(keyword.toLowerCase())) {
         return true;
       }
     }

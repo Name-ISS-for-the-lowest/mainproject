@@ -48,6 +48,29 @@ class _EventsPageState extends State<EventsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                GestureDetector(
+                  onTap: () {
+                    String? eventId = event['id'];
+                    var language = AuthHelper.userInfoCache['language'];
+                    var url = Navigator.of(context).pop();
+                  },
+                  child: Container(
+                    width: 300,
+                    color: Colors.transparent,
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8.0),
+                          child: const Icon(Icons.close),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text("Close Screen"),
+                      ],
+                    ),
+                  ),
+                ),
                 Row(children: [
                   Expanded(
                       child: Text(
@@ -57,21 +80,6 @@ class _EventsPageState extends State<EventsPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   )),
-                  GestureDetector(
-                    onTap: () {
-                      String? eventId = event['id'];
-                      var language = AuthHelper.userInfoCache['language'];
-                      var url =
-                          "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$language";
-                      _launchURL(Uri.parse(url));
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      child: const Icon(
-                        Icons.arrow_forward,
-                      ),
-                    ),
-                  ),
                 ]),
                 const SizedBox(height: 10.0),
                 Text(
@@ -93,6 +101,40 @@ class _EventsPageState extends State<EventsPage> {
                 Text(
                   event['description']!,
                   style: const TextStyle(fontSize: 14.0),
+                ),
+                const SizedBox(
+                  height: 50,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        String? eventId = event['id'];
+                        var language = AuthHelper.userInfoCache['language'];
+                        var url =
+                            "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$language";
+                        _launchURL(Uri.parse(url));
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.only(
+                            top: 8, bottom: 8, left: 16, right: 16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(color: Colors.black, width: 1.0),
+                          color: Colors.white,
+                        ),
+                        child: Text(
+                          'Open Translated Website',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -124,13 +166,6 @@ class _EventsPageState extends State<EventsPage> {
   Widget _buildEvent(Map<String, dynamic> event) {
     return GestureDetector(
       onTap: () {
-        String? eventId = event['id'];
-        var language = AuthHelper.userInfoCache['language'];
-        var url =
-            "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$language";
-        _launchURL(Uri.parse(url));
-      },
-      onLongPress: () {
         showExpandedInformation(event);
       },
       child: Column(

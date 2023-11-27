@@ -66,8 +66,8 @@ class _ForumHomeState extends State<ForumHome> {
     // print("Posts Per Fetch:$postsPerFetch");
     if (search == "") {
       try {
-        var dataCall = await PostHelper.getPosts(
-            searchParams["postsFetched"], postsPerFetch);
+        var dataCall = await await PostHelper.getPosts(
+            0, searchParams["postsFetched"], specialSearchArgs);
         print("Data Call:$dataCall");
         Map dataCallMap = {};
         for (var item in dataCall) {
@@ -573,18 +573,24 @@ class _ForumHomeState extends State<ForumHome> {
           children: [
             Positioned(
               left: 15,
-              child: Container(
-                width: 50, // Set your desired width
-                height: 50, // Set your desired height
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
-                    placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
-                    fit: BoxFit.fill,
+              child: GestureDetector(
+                onTap: () {
+                  navigateToViewProfile(postID, posterID);
+                },
+                child: Container(
+                  width: 50, // Set your desired width
+                  height: 50, // Set your desired height
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
               ),
@@ -661,15 +667,21 @@ class _ForumHomeState extends State<ForumHome> {
               bottom: 80,
               right: 10,
               child: (attachmentURL != 'Empty')
-                  ? Container(
-                      height: 340,
-                      width: 340,
-                      color: Colors.black,
-                      child: CachedNetworkImage(
-                        imageUrl: "$attachmentURL?tr=w-340,h-340,fo-auto",
-                        placeholder: (context, url) =>
-                            CircularProgressIndicator(),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
+                  ? GestureDetector(
+                      onTap: () {
+                        navigateToViewImage([attachmentURL]);
+                      },
+                      child: Container(
+                        height: 340,
+                        width: 340,
+                        color: Colors.black,
+                        child: CachedNetworkImage(
+                          imageUrl: "$attachmentURL?tr=w-340,h-340,fo-auto",
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
                       ),
                     )
                   : const SizedBox(),

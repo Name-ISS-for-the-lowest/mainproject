@@ -2,6 +2,7 @@ import pymongo
 import json
 from models.User import User
 from models.Post import Post
+from models.Picture import Picture
 import bson
 from bson import ObjectId, binary, BSON
 import base64
@@ -295,23 +296,31 @@ class DBManager:
             return {"message": "Post unliked"}
         
     @staticmethod
-    def reportPost(postID, userID):
+    def reportPost(postID, userID, specialDict):
         # check if the user has already liked the post
         comboID = str(postID) + str(userID)
         postID = ObjectId(postID)
         reportResult = DBManager.db["reports"].find_one({"comboID": comboID})
+        postResult = DBManager.db['posts'].find_one({'_id': postID})
+        reasonDict = postResult.get('reportReasons')
         if reportResult is None:
+            postDict = {"reports" : 1}
+            reasons = ['hateSpeech', 'illegalContent', 'targetedHarassment', 'inappropriateContent', 'otherReason']
+            for reason in reasons:
+                if specialDict[reason]:
+                    reasonDict[reason] += 1
             result = DBManager.db["posts"].update_one(
                 {"_id": postID}, {"$inc": {"reports": 1}}
             )
+            result2 = DBManager.db["posts"].update_one(
+                {"_id": postID}, {"$set": {'reportReasons' : reasonDict, 'unreviewedReport' : True}}
+            )
             print(result.modified_count)
 
-            # add the reports to the reports collection
-            DBManager.db["reports"].insert_one(
-                {"PostID": postID, "comboID": comboID, "hateSpeech": specialDict['hateSpeech'],
-                'illegalContent': specialDict['illegalContent'], 'targetedHarassment' : specialDict['targetedHarassment'],
-                'inappropriateContent': specialDict['inappropriateContent'], 'otherReason': specialDict['otherReason']}
-            )
+            # add the reports to the reports collection\
+            newReport = {"PostID": postID, "comboID": comboID, "hateSpeech": specialDict['hateSpeech'], 'illegalContent': specialDict['illegalContent'], 'targetedHarassment' : specialDict['targetedHarassment'], 'inappropriateContent': specialDict['inappropriateContent'], 'otherReason': specialDict['otherReason']}
+            DBManager.db["reports"].insert_one(newReport)
+            print("Reported")
             return {"message": "Post reported"}
         else:
             return {"message": "Post already reported"}

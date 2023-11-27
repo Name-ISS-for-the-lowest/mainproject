@@ -117,7 +117,11 @@ class AuthHelper {
 
   static Future<bool> isLoggedIn() async {
     var sessionCookie = await readCookie('session_cookie');
-    if (sessionCookie == null) return false;
+    print('COOKIES!');
+    print(sessionCookie);
+    if (sessionCookie == null) {
+      return false;
+    }
 
     //I want to make a request to the protected endpoint and check the response code
     String endPoint = '/protected';
