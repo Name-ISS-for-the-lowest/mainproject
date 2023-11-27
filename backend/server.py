@@ -436,16 +436,47 @@ def getEvents(request: Request, language: str = "en"):
     jsonEvents = EventsManager.translateEvents(language, events)
     return JSONResponse(content=jsonEvents, status_code=200)
 
+@app.post("/resetPassword")
+def resetPassword(email: str):
+    user = DBManager.getUserByEmail(email)
+    if user is None:
+        return JSONResponse(content={"message": "invalid email"}, status_code=400)
+    token = EmailSender.sendResetPasswordEmail(email)
+    createdAt = datetime.now()
+    user["token"] = token
+    user["tokenCreatedAt"] = createdAt
+    DBManager.db["users"].update_one({"email": email}, {"$set": user})
+    return JSONResponse(content={"message": "email sent"}, status_code=200)
+
 @app.get("/resetPassword")
 def getResetPassword(token: str):
-    # user = DBManager.getUserByToken(token)
-    # if user is None:
-    #     return JSONResponse(content={"message": "invalid link"}, status_code=400)
-    # if createAt + 1800 < datetime.now():
-    #     return JSONResponse(content={"message": "link expired"}, status_code=400)
-    # else:
-    #     token = user["token"]
-    #     createAt = user["tokenCreatedAt"]
+    user = DBManager.getUserByToken(token)
+    if user is None:
+        return JSONResponse(content={"message": "invalid link"}, status_code=400)
+    if createAt + 1800 < datetime.now():
+        return JSONResponse(content={"message": "link expired"}, status_code=400)
+    else:
+        token = user["token"]
+        createAt = user["tokenCreatedAt"]
     return HTMLResponse(
         content=open("static/resetPassword/index.html", "r").read(), status_code=200
     )
+
+
+@app.patch("/resetPassword")
+def receivePassword(password: str, token: str):
+    user = DBManager.getUserByToken(token)
+    createAt = user['tokenExpiresAt']
+    expires = createAt + 1800 < datetime.now()
+    if createAt + 1800 < datetime.now():
+        return JSONResponse(content={"message": "link expired"}, status_code=400)
+    
+    user['tokenCreatedAt'].clear()
+    salt = PassHasher.generateSalt()
+    passwordHash = PassHasher.hashPassword(password, salt)
+    user['passwordHash'] = passwordHash
+    user['salt'] = salt
+    DBManager.db["users"].update_one({"token": token}, {"$set": user})
+    
+    
+    return JSONResponse(content={"message": "Password reset successfully"})
