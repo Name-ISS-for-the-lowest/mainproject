@@ -5,7 +5,6 @@ import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -67,7 +66,7 @@ class _CreatePostState extends State<CreatePost> {
       builder: (context) {
         return Theme(
           data: Theme.of(context)
-              .copyWith(dialogBackgroundColor: Color(0xfff7ebe1)),
+              .copyWith(dialogBackgroundColor: const Color(0xfff7ebe1)),
           child: SimpleDialog(
             title: Text(Localize("Image Source")),
             children: <Widget>[
@@ -92,6 +91,7 @@ class _CreatePostState extends State<CreatePost> {
     );
   }
 
+  @override
   Widget build(BuildContext context) {
     var userInfo = AuthHelper.userInfoCache;
     bool isEditing = widget.isEditing;
@@ -127,7 +127,7 @@ class _CreatePostState extends State<CreatePost> {
           title: Text(
             (isEditing) ? Localize("Edit Post") : Localize("New Post"),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: Colors.black,
@@ -153,16 +153,16 @@ class _CreatePostState extends State<CreatePost> {
                     Container(
                       width: 50, // Set your desired width
                       height: 50, // Set your desired height
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                       ),
                       child: ClipOval(
                         child: CachedNetworkImage(
                           imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
                           placeholder: (context, url) =>
-                              CircularProgressIndicator(),
+                              const CircularProgressIndicator(),
                           errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
+                              const Icon(Icons.error),
                           fit: BoxFit.fill,
                         ),
                       ),
@@ -192,7 +192,7 @@ class _CreatePostState extends State<CreatePost> {
                   },
                   child: Text(
                     Localize("Publish Post"),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xff007EF1),
                     ),
                   ),
@@ -239,7 +239,7 @@ class _CreatePostState extends State<CreatePost> {
             ],
           ),
           (isEditing == false)
-              ? Container(
+              ? SizedBox(
                   height: 500,
                   width: 400,
                   child: Stack(
@@ -256,7 +256,7 @@ class _CreatePostState extends State<CreatePost> {
                                 openCameraDialog(context);
                               },
                               child: Container(
-                                padding: EdgeInsets.only(
+                                padding: const EdgeInsets.only(
                                     top: 8, bottom: 8, left: 16, right: 16),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8.0),

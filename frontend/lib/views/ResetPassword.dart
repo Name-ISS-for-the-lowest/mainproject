@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:lottie/lottie.dart';
 
@@ -43,6 +41,7 @@ class _ResetPasswordState extends State<ResetPassword> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.sizeOf(context).height;
 

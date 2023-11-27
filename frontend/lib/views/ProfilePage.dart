@@ -7,13 +7,10 @@ import 'package:frontend/classes/postHelper.dart';
 import '../languagePicker/languages.dart';
 import '../languagePicker/language_picker.dart';
 import 'package:frontend/classes/authHelper.dart';
-import 'package:frontend/classes/eventHelper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:async';
-import 'package:path_provider/path_provider.dart';
 import 'package:frontend/home.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -63,7 +60,7 @@ class _ProfilePageState extends State<ProfilePage> {
     String language =
         AuthHelper.languageNames[AuthHelper.userInfoCache['language']];
     String emailAddress = AuthHelper.userInfoCache['email'];
-    Language _selectedDialogLanguage = Languages.english;
+    Language selectedDialogLanguage = Languages.english;
 
 //COUNTRY SELECTOR
     void countryselect() {
@@ -71,7 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
           context: context,
           favorite: <String>['US', 'CN', 'MX', 'IN'],
           //exclude: <String>['FR'],
-          countryListTheme: CountryListThemeData(
+          countryListTheme: const CountryListThemeData(
             backgroundColor: Color(0xffece7d5),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(10),
@@ -87,10 +84,10 @@ class _ProfilePageState extends State<ProfilePage> {
     Widget _buildDialogItem(Language language) {
       return Row(
         children: <Widget>[
-          SizedBox(
+          const SizedBox(
             width: 0.0,
           ),
-          Text("${language.name}"),
+          Text(language.name),
           //Text("${language.name}"),
           //Text("${language.name} (${language.isoCode})"),
         ],
@@ -241,7 +238,7 @@ class _ProfilePageState extends State<ProfilePage> {
           builder: (context) => Theme(
               data: Theme.of(context).copyWith(
                 primaryColor: Colors.pink,
-                dialogBackgroundColor: Color(0xfff7ebe1),
+                dialogBackgroundColor: const Color(0xfff7ebe1),
                 dialogTheme: DialogTheme(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
@@ -250,7 +247,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               child: LanguagePickerDialog(
                   languages: supportedLanguages,
-                  titlePadding: EdgeInsets.all(8.0),
+                  titlePadding: const EdgeInsets.all(8.0),
                   //searchCursorColor: Colors.pinkAccent,
                   searchInputDecoration:
                       InputDecoration(hintText: Localize('Search')),
@@ -259,7 +256,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   onValuePicked: (Language language) async {
                     print(AuthHelper.userInfoCache['language']);
                     AuthHelper.userInfoCache['language'] = language.isoCode;
-                    _selectedDialogLanguage = language;
+                    selectedDialogLanguage = language;
                     PostHelper.cachedTranslations = {};
                     await updateUser();
                   },
@@ -281,14 +278,14 @@ class _ProfilePageState extends State<ProfilePage> {
         onPressed: () async {
           AuthHelper.logout();
           Navigator.pushAndRemoveUntil(context,
-              MaterialPageRoute(builder: (_) => Home()), (route) => false);
+              MaterialPageRoute(builder: (_) => const Home()), (route) => false);
         },
       );
 
       AlertDialog alert = AlertDialog(
-        backgroundColor: Color(0xfff7ebe1),
+        backgroundColor: const Color(0xfff7ebe1),
         //backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0))),
         title: Text(Localize("ACCOUNT DEACTIVATION")),
         content: Text(Localize(
@@ -323,13 +320,13 @@ class _ProfilePageState extends State<ProfilePage> {
           AuthHelper.logout();
 
           Navigator.pushAndRemoveUntil(context,
-              MaterialPageRoute(builder: (_) => Home()), (route) => false);
+              MaterialPageRoute(builder: (_) => const Home()), (route) => false);
         },
       );
 
       AlertDialog alert = AlertDialog(
-        backgroundColor: Color(0xfff7ebe1),
-        shape: RoundedRectangleBorder(
+        backgroundColor: const Color(0xfff7ebe1),
+        shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0))),
         title: Text(Localize("Log Out")),
         content: Text(
@@ -354,8 +351,8 @@ class _ProfilePageState extends State<ProfilePage> {
           context: context,
           builder: (context) => AlertDialog(
             title: Text(Localize('Your Screen Name')),
-            backgroundColor: Color(0xfff7ebe1),
-            shape: RoundedRectangleBorder(
+            backgroundColor: const Color(0xfff7ebe1),
+            shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
             content: TextField(
               autofocus: true,
@@ -420,7 +417,7 @@ class _ProfilePageState extends State<ProfilePage> {
         builder: (context) {
           return Theme(
             data: Theme.of(context)
-                .copyWith(dialogBackgroundColor: Color(0xfff7ebe1)),
+                .copyWith(dialogBackgroundColor: const Color(0xfff7ebe1)),
             child: SimpleDialog(
               title: Text(Localize("Image Source")),
               children: <Widget>[
@@ -447,7 +444,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     //ACTUAL PAGE
     return Scaffold(
-        backgroundColor: Color(0xffece7d5),
+        backgroundColor: const Color(0xffece7d5),
         // body: Center(child: Text("Profile Page")),
 
         body: ListView(
@@ -460,16 +457,16 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Container(
                       width: 150, // Set your desired width
                       height: 150, // Set your desired height
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                       ),
                       child: ClipOval(
                         child: CachedNetworkImage(
                           imageUrl: "$imageURL?tr=w-150,h-150,fo-auto",
                           placeholder: (context, url) =>
-                              CircularProgressIndicator(),
+                              const CircularProgressIndicator(),
                           errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
+                              const Icon(Icons.error),
                           fit: BoxFit.fill,
                         ),
                       ),
@@ -482,7 +479,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: IconButton(
-                      icon: Icon(Icons.camera_alt),
+                      icon: const Icon(Icons.camera_alt),
                       iconSize: 50,
                       onPressed: () {
                         openCameraDialog(context);
@@ -513,7 +510,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: IconButton(
-                      icon: Icon(Icons.edit_note),
+                      icon: const Icon(Icons.edit_note),
                       onPressed: () async {
                         final name = await openNameDialog();
                         if (name == null || name.isEmpty) return;
@@ -534,7 +531,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: ListTile(
-                      leading: Icon(Icons.flag),
+                      leading: const Icon(Icons.flag),
                       title: Text(
                         Localize('Nationality'),
                         textAlign: TextAlign.left,
@@ -547,7 +544,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: IconButton(
-                      icon: Icon(Icons.edit_note),
+                      icon: const Icon(Icons.edit_note),
                       onPressed: () {
                         countryselect();
                       },
@@ -564,7 +561,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: ListTile(
-                      leading: Icon(Icons.chat_rounded),
+                      leading: const Icon(Icons.chat_rounded),
                       title: Text(
                         Localize('Language'),
                         textAlign: TextAlign.left,
@@ -577,7 +574,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: IconButton(
-                      icon: Icon(Icons.edit_note),
+                      icon: const Icon(Icons.edit_note),
                       onPressed: () {
                         _openLanguagePickerDialog();
                       },
@@ -590,7 +587,7 @@ class _ProfilePageState extends State<ProfilePage> {
             //EMAIL ADDRESS
             Container(
               child: ListTile(
-                leading: Icon(Icons.mail),
+                leading: const Icon(Icons.mail),
                 title: Text(Localize('Email Address')),
                 subtitle: Text(emailAddress),
               ),
@@ -599,7 +596,7 @@ class _ProfilePageState extends State<ProfilePage> {
             //LOG OUT
             Container(
               child: ListTile(
-                leading: Icon(Icons.logout),
+                leading: const Icon(Icons.logout),
 
                 //LOCALIZE NOT FUNCTIONING AT THE MOMENT
                 //title: Text(Localize('Log Out')),
@@ -615,7 +612,7 @@ class _ProfilePageState extends State<ProfilePage> {
             //DELETE ACCOUNT
             Container(
               child: ListTile(
-                leading: Icon(Icons.delete),
+                leading: const Icon(Icons.delete),
                 iconColor: Colors.redAccent,
                 title: Text(Localize('Deactivate Account')),
                 subtitle: Text(

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/Localize.dart';
-import 'package:dio/dio.dart';
 import 'package:frontend/views/PasswordSetup.dart';
 import 'package:lottie/lottie.dart';
 

@@ -1,11 +1,7 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 import 'package:frontend/classes/postHelper.dart';
-import 'package:frontend/classes/authHelper.dart';
-import 'package:html_unescape/html_unescape.dart';
-import 'package:http/http.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class AdminView extends StatefulWidget {
@@ -61,8 +57,8 @@ class _AdminViewState extends State<AdminView> {
     }
 
     if (post == null) {
-      return Scaffold(
-        backgroundColor: const Color(0xffece7d5),
+      return const Scaffold(
+        backgroundColor: Color(0xffece7d5),
         body: Center(child: Text("Loading Post...")),
       );
     }
@@ -134,7 +130,7 @@ class _AdminViewState extends State<AdminView> {
               color: const Color(0x5f000000),
             ),
           )),
-      body: Container(
+      body: SizedBox(
         width: 500,
         child: SingleChildScrollView(
           child: Column(
@@ -143,7 +139,7 @@ class _AdminViewState extends State<AdminView> {
               const SizedBox(
                 height: 20,
               ),
-              Text(
+              const Text(
                 "Posted By",
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
@@ -153,44 +149,44 @@ class _AdminViewState extends State<AdminView> {
               Container(
                 width: 200, // Set your desired width
                 height: 200, // Set your desired height
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                 ),
                 child: ClipOval(
                   child: CachedNetworkImage(
                     imageUrl: "$pfpURL?tr=w-200,h-200,fo-auto",
-                    placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    placeholder: (context, url) => const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => const Icon(Icons.error),
                     fit: BoxFit.fill,
                   ),
                 ),
               ),
-              Text(
+              const Text(
                 "Screen Name: ",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
                 posterName,
-                style: TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(
                 height: 15,
               ),
-              Text(
+              const Text(
                 "Email Address: ",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
                 posterEmail,
-                style: TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: 18),
               ),
-              Divider(),
-              Text(
+              const Divider(),
+              const Text(
                 "Image Attached",
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               (attachmentURL == 'Empty')
-                  ? Text(
+                  ? const Text(
                       "No Image Attached",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -198,11 +194,11 @@ class _AdminViewState extends State<AdminView> {
                   : CachedNetworkImage(
                       imageUrl: "$attachmentURL?tr=w-400,h-auto",
                       placeholder: (context, url) =>
-                          CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => const Icon(Icons.error),
                     ),
-              Divider(),
-              Text(
+              const Divider(),
+              const Text(
                 "Post Content",
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
@@ -212,7 +208,7 @@ class _AdminViewState extends State<AdminView> {
                   (currentlyTranslated.containsKey(currentlyViewedContent))
                       ? PostHelper.cachedTranslations[currentlyViewedContent]!
                       : currentlyViewedContent,
-                  style: TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 18),
                   softWrap: true,
                   textAlign: TextAlign.center,
                 ),
@@ -247,7 +243,7 @@ class _AdminViewState extends State<AdminView> {
                 },
                 child: Container(
                   padding:
-                      EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 16),
+                      const EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 16),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8.0),
                     border: Border.all(color: Colors.black, width: 1.0),
@@ -257,16 +253,16 @@ class _AdminViewState extends State<AdminView> {
                       (currentlyTranslated.containsKey(currentlyViewedContent))
                           ? 'Original Text'
                           : 'Translate',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Color(0xff0094FF),
                       )),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               (contentHistory.length > 1)
-                  ? Text("Navigate Edit History",
+                  ? const Text("Navigate Edit History",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold))
                   : const SizedBox(),
@@ -279,7 +275,7 @@ class _AdminViewState extends State<AdminView> {
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Spacer(),
+                        const Spacer(),
                         (contentIndex - 1 >= 0)
                             ? GestureDetector(
                                 onTap: () {
@@ -288,7 +284,7 @@ class _AdminViewState extends State<AdminView> {
                                   });
                                 },
                                 child: Container(
-                                  padding: EdgeInsets.only(
+                                  padding: const EdgeInsets.only(
                                       top: 8, bottom: 8, left: 16, right: 16),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8.0),
@@ -296,11 +292,11 @@ class _AdminViewState extends State<AdminView> {
                                         color: Colors.black, width: 1.0),
                                     color: Colors.white,
                                   ),
-                                  child: Text('Older Version'),
+                                  child: const Text('Older Version'),
                                 ),
                               )
                             : const SizedBox(),
-                        Spacer(),
+                        const Spacer(),
                         (contentIndex + 1 < contentHistory.length)
                             ? GestureDetector(
                                 onTap: () {
@@ -309,7 +305,7 @@ class _AdminViewState extends State<AdminView> {
                                   });
                                 },
                                 child: Container(
-                                  padding: EdgeInsets.only(
+                                  padding: const EdgeInsets.only(
                                       top: 8, bottom: 8, left: 16, right: 16),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8.0),
@@ -317,26 +313,26 @@ class _AdminViewState extends State<AdminView> {
                                         color: Colors.black, width: 1.0),
                                     color: Colors.white,
                                   ),
-                                  child: Text(
+                                  child: const Text(
                                     'Newer Version',
                                   ),
                                 ),
                               )
-                            : SizedBox(),
-                        Spacer(),
+                            : const SizedBox(),
+                        const Spacer(),
                       ],
                     )
-                  : Text("Post Has No Edit History",
+                  : const Text("Post Has No Edit History",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              Divider(),
-              Text(
+              const Divider(),
+              const Text(
                 "Reports Submitted",
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               Text(
-                "Total Reports Gathered: " + reports,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                "Total Reports Gathered: $reports",
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Column(
                 children: [
@@ -352,7 +348,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text("Hate Speech: " + hateSpeech.toString()),
+                      Text("Hate Speech: $hateSpeech"),
                     ],
                   ),
                   Row(
@@ -367,8 +363,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text("Targeted Harassment: " +
-                          targetedHarassment.toString()),
+                      Text("Targeted Harassment: $targetedHarassment"),
                     ],
                   ),
                   Row(
@@ -383,8 +378,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text("Inappropriate Content: " +
-                          inappropriateContent.toString()),
+                      Text("Inappropriate Content: $inappropriateContent"),
                     ],
                   ),
                   Row(
@@ -399,7 +393,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text("Illegal Content: " + illegalContent.toString()),
+                      Text("Illegal Content: $illegalContent"),
                     ],
                   ),
                   Row(
@@ -414,7 +408,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text("Other Reasons: " + otherReason.toString()),
+                      Text("Other Reasons: $otherReason"),
                     ],
                   ),
                 ],
@@ -422,8 +416,8 @@ class _AdminViewState extends State<AdminView> {
               const SizedBox(
                 height: 20,
               ),
-              Divider(),
-              Text(
+              const Divider(),
+              const Text(
                 "Take Action",
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
@@ -433,7 +427,7 @@ class _AdminViewState extends State<AdminView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Spacer(),
+                  const Spacer(),
                   GestureDetector(
                     onTap: () async {
                       var response = await PostHelper.toggleRemoval(
@@ -441,20 +435,20 @@ class _AdminViewState extends State<AdminView> {
                       navigateToPrimaryScreens();
                     },
                     child: Container(
-                      padding: EdgeInsets.only(
+                      padding: const EdgeInsets.only(
                           top: 8, bottom: 8, left: 16, right: 16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8.0),
                         border: Border.all(color: Colors.black, width: 1.0),
                         color: Colors.white,
                       ),
-                      child: Text(
+                      child: const Text(
                         'Approve Post',
                         style: TextStyle(color: Colors.black),
                       ),
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   GestureDetector(
                     onTap: () async {
                       var response = await PostHelper.toggleRemoval(
@@ -462,20 +456,20 @@ class _AdminViewState extends State<AdminView> {
                       navigateToPrimaryScreens();
                     },
                     child: Container(
-                      padding: EdgeInsets.only(
+                      padding: const EdgeInsets.only(
                           top: 8, bottom: 8, left: 16, right: 16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8.0),
                         border: Border.all(color: Colors.black, width: 1.0),
                         color: Colors.white,
                       ),
-                      child: Text(
+                      child: const Text(
                         'Remove Post',
                         style: TextStyle(color: Colors.black),
                       ),
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                 ],
               ),
               const SizedBox(
@@ -484,13 +478,13 @@ class _AdminViewState extends State<AdminView> {
               GestureDetector(
                 child: Container(
                   padding:
-                      EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 16),
+                      const EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 16),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8.0),
                     border: Border.all(color: Colors.black, width: 1.0),
                     color: Colors.white,
                   ),
-                  child: Text(
+                  child: const Text(
                     'Ban User',
                     style: TextStyle(color: Colors.black),
                   ),

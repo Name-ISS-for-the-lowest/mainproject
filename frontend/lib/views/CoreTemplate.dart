@@ -17,11 +17,11 @@ class _CoreTemplateState extends State<CoreTemplate> {
   int selectedIndex = 0;
   bool isKeyBoardVisable = false;
   final screens = [
-    ForumHome(),
-    ResourceCenter(),
-    CreatePost(isEditing: false),
-    EventsPage(),
-    ProfilePage(),
+    const ForumHome(),
+    const ResourceCenter(),
+    const CreatePost(isEditing: false),
+    const EventsPage(),
+    const ProfilePage(),
   ];
 
   void onItemTapped(int index) {
@@ -38,7 +38,7 @@ class _CoreTemplateState extends State<CoreTemplate> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return Scaffold(
+          return const Scaffold(
             body: CreatePost(isEditing: false),
           );
         },
@@ -49,7 +49,7 @@ class _CoreTemplateState extends State<CoreTemplate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffece7d5),
+      backgroundColor: const Color(0xffece7d5),
       resizeToAvoidBottomInset: false,
       body: Column(
         children: [
@@ -60,10 +60,10 @@ class _CoreTemplateState extends State<CoreTemplate> {
           ),
           Container(
             height: 1.0, // Set the desired height of the line
-            color: Color(0x5f000000),
-            margin: EdgeInsets.symmetric(vertical: 0),
+            color: const Color(0x5f000000),
+            margin: const EdgeInsets.symmetric(vertical: 0),
           ),
-          Container(
+          SizedBox(
             height: 734,
             width: 412,
             child: screens[selectedIndex],
@@ -73,83 +73,83 @@ class _CoreTemplateState extends State<CoreTemplate> {
       bottomNavigationBar: SizedBox(
         height: 80,
         child: BottomNavigationBar(
-            backgroundColor: Color(0xff08231A),
+            backgroundColor: const Color(0xff08231A),
             type: BottomNavigationBarType.fixed,
             showSelectedLabels: false,
             showUnselectedLabels: false,
-            selectedItemColor: Color(0xffFFE89A),
-            unselectedItemColor: Color(0xff89875A),
+            selectedItemColor: const Color(0xffFFE89A),
+            unselectedItemColor: const Color(0xff89875A),
             items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(
-                icon: Container(
+                icon: SizedBox(
                   width: 40,
                   height: 40,
                   child: SvgPicture.asset('assets/NavBarUI/icon-home.svg',
-                      color: Color(0xff89875A)),
+                      color: const Color(0xff89875A)),
                 ),
-                activeIcon: Container(
+                activeIcon: SizedBox(
                   width: 40,
                   height: 40,
                   child: SvgPicture.asset('assets/NavBarUI/icon-home.svg',
-                      color: Color(0xffFFE89A)),
+                      color: const Color(0xffFFE89A)),
                 ),
                 label: '',
               ),
               BottomNavigationBarItem(
-                icon: Container(
+                icon: SizedBox(
                   width: 40,
                   height: 40,
                   child: SvgPicture.asset('assets/NavBarUI/icon-search.svg'),
                 ),
-                activeIcon: Container(
+                activeIcon: SizedBox(
                   width: 40,
                   height: 40,
                   child: SvgPicture.asset('assets/NavBarUI/icon-search.svg',
-                      color: Color(0xffFFE89A)),
+                      color: const Color(0xffFFE89A)),
                 ),
                 label: '',
               ),
               BottomNavigationBarItem(
-                icon: Container(
+                icon: SizedBox(
                   width: 40,
                   height: 40,
                   child:
                       SvgPicture.asset('assets/NavBarUI/icon-createpost.svg'),
                 ),
-                activeIcon: Container(
+                activeIcon: SizedBox(
                   width: 40,
                   height: 40,
                   child: SvgPicture.asset('assets/NavBarUI/icon-createpost.svg',
-                      color: Color(0xffFFE89A)),
+                      color: const Color(0xffFFE89A)),
                 ),
                 label: '',
               ),
               BottomNavigationBarItem(
-                icon: Container(
+                icon: SizedBox(
                   width: 40,
                   height: 40,
                   child: SvgPicture.asset('assets/NavBarUI/icon-resources.svg',
-                      color: Color(0xff89875A)),
+                      color: const Color(0xff89875A)),
                 ),
-                activeIcon: Container(
+                activeIcon: SizedBox(
                   width: 40,
                   height: 40,
                   child: SvgPicture.asset('assets/NavBarUI/icon-resources.svg',
-                      color: Color(0xffFFE89A)),
+                      color: const Color(0xffFFE89A)),
                 ),
                 label: '',
               ),
               BottomNavigationBarItem(
-                icon: Container(
+                icon: SizedBox(
                   width: 40,
                   height: 40,
                   child: SvgPicture.asset('assets/NavBarUI/icon-profile.svg'),
                 ),
-                activeIcon: Container(
+                activeIcon: SizedBox(
                   width: 40,
                   height: 40,
                   child: SvgPicture.asset('assets/NavBarUI/icon-profile.svg',
-                      color: Color(0xffFFE89A)),
+                      color: const Color(0xffFFE89A)),
                 ),
                 label: '',
               ),

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:frontend/languagePicker/languages.dart';
 
 Map<String, dynamic> languageNames = {
   'af': 'Afrikaans',
@@ -164,13 +163,13 @@ main() async {
   //loop thru each key in localizations
   List wordsToAdd = [];
   List wordsToRemove = [];
-  appText.forEach((value) {
+  for (var value in appText) {
     //check if key exists in appText
     if (!localizations.containsKey(value)) {
       //add key to appText
       wordsToAdd.add(value);
     }
-  });
+  }
   for (var key in localizations.keys) {
     //check if key exists in appText
     if (!appText.contains(key)) {
@@ -181,23 +180,23 @@ main() async {
     localizations.remove(key);
   }
 
-  if (wordsToRemove.length > 0 && wordsToAdd.length == 0) {
+  if (wordsToRemove.isNotEmpty && wordsToAdd.isEmpty) {
     print("Words removed: ${wordsToRemove.length}");
-    JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+    JsonEncoder encoder = const JsonEncoder.withIndent('  ');
     String formattedJson = encoder.convert(localizations);
     File('bin/localizations.json').writeAsStringSync(formattedJson);
     return;
   }
 
-  if (wordsToAdd.length == 0) {
+  if (wordsToAdd.isEmpty) {
     print("No new words to add");
     return;
   }
 
   //set up map of languages
-  wordsToAdd.forEach((element) {
+  for (var element in wordsToAdd) {
     localizations[element] = {...mapOfLanguages};
-  });
+  }
 
   var start = DateTime.now();
   print(
@@ -209,7 +208,7 @@ main() async {
   await Future.wait(futures);
   updateProgressBar(totalSteps, totalSteps);
   //save localizations to json file
-  JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+  JsonEncoder encoder = const JsonEncoder.withIndent('  ');
   String formattedJson = encoder.convert(localizations);
   File('bin/localizations.json').writeAsStringSync(formattedJson);
   //run generateDataFile.dart
@@ -273,27 +272,24 @@ translateListFromEnglishTo(List appText, String language) async {
     return result['result'];
 
     //on anything but a 200 response this code will run
-  } on DioException catch (e) {
+  } on DioException {
     //return array of Error string
     // print("ERROR: $e $language");
     List returnArray = [];
-    appText.forEach((element) {
+    for (var element in appText) {
       returnArray.add("Error");
-    });
+    }
     return returnArray;
   }
 }
 
 void updateProgressBar(int currentStep, int totalSteps) {
-  final int progressBarLength = 20;
+  const int progressBarLength = 20;
   final double progress = currentStep / totalSteps;
   final int filledLength = (progress * progressBarLength).round();
 
   // Build the progress bar string
-  final String progressBar = "Current Progress[" +
-      "=" * filledLength +
-      " " * (progressBarLength - filledLength) +
-      "] ${(progress * 100).toStringAsFixed(1)}%";
+  final String progressBar = "Current Progress[${"=" * filledLength}${" " * (progressBarLength - filledLength)}] ${(progress * 100).toStringAsFixed(1)}%";
 
   // Print the progress bar on the same line
   stdout.write('\r$progressBar');
