@@ -85,10 +85,8 @@ class _LogInState extends State<LogIn> {
   }
 
   void navigateToPrimaryScreens() {
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const CoreTemplate()),
-        (route) => false);
+    Navigator.pushAndRemoveUntil(context,
+        MaterialPageRoute(builder: (_) => CoreTemplate()), (route) => false);
   }
 
   @override

@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/classes/keywordData.dart';
 import 'package:frontend/classes/postHelper.dart';
+import 'package:frontend/views/AdminView.dart';
 import 'package:frontend/views/Comments.dart';
+import 'package:frontend/views/ConfirmReport.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ReportPage.dart';
-import 'package:frontend/views/ConfirmReport.dart';
-import 'package:frontend/views/AdminView.dart';
-import 'package:frontend/classes/keywordData.dart';
+import 'package:frontend/views/ViewImage.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 class ForumHome extends StatefulWidget {
@@ -215,6 +216,30 @@ class _ForumHomeState extends State<ForumHome> {
     );
   }
 
+  void navigateToViewImage(List<String> inputs) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ViewImage(imageUrls: inputs),
+          );
+        },
+      ),
+    );
+  }
+
+  void navigateToViewImage(List<String> inputs) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ViewImage(imageUrls: inputs),
+          );
+        },
+      ),
+    );
+  }
+
   void navigateToConfirmPost() {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -232,22 +257,25 @@ class _ForumHomeState extends State<ForumHome> {
   }
 
   Widget _buildList() {
-    return ListView.builder(
-      itemBuilder: (BuildContext context, int index) {
-        print("Current Index:$index");
-        print("Current Length:${postData.length}");
-        if (postData.isEmpty && index == 0) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
+    return RefreshIndicator(
+      onRefresh: () => loadUpdate(),
+      child: ListView.builder(
+        itemBuilder: (BuildContext context, int index) {
+          print("Current Index:$index");
+          print("Current Length:${postData.length}");
+          if (postData.isEmpty && index == 0) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
-        if (index >= postData.length) {
-          searchPosts(searchParams["search"], scrolling: true);
-          return null;
-        }
-        return _buildPost(index);
-      },
+          if (index >= postData.length) {
+            searchPosts(searchParams["search"], scrolling: true);
+            return null;
+          }
+          return _buildPost(index);
+        },
+      ),
     );
   }
 
@@ -293,6 +321,10 @@ class _ForumHomeState extends State<ForumHome> {
         searchParams["postsFetched"] = convertedFetch;
       });
     }
+  }
+
+  void refresh() {
+    loadUpdate();
   }
 
   Widget _buildPost(int index) {
@@ -528,7 +560,7 @@ class _ForumHomeState extends State<ForumHome> {
     double calculatedHeight = (postContent.length / 25 * 14) + 50;
     if (postTooLong) calculatedHeight += 35;
     if (attachmentURL != 'Empty') {
-      calculatedHeight += 450;
+      calculatedHeight += 410;
     }
 
     return Padding(
@@ -624,16 +656,21 @@ class _ForumHomeState extends State<ForumHome> {
               bottom: 80,
               right: 10,
               child: (attachmentURL != 'Empty')
-                  ? Container(
-                      height: 400,
-                      width: 340,
-                      color: Colors.black,
-                      child: CachedNetworkImage(
-                        imageUrl: "$attachmentURL?tr=w-340,h-auto",
-                        placeholder: (context, url) =>
-                            const CircularProgressIndicator(),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
+                  ? GestureDetector(
+                      onTap: () {
+                        navigateToViewImage([attachmentURL]);
+                      },
+                      child: Container(
+                        height: 340,
+                        width: 340,
+                        color: Colors.black,
+                        child: CachedNetworkImage(
+                          imageUrl: "$attachmentURL?tr=w-340,h-340,fo-auto",
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
                       ),
                     )
                   : const SizedBox(),
@@ -978,7 +1015,34 @@ class _ForumHomeState extends State<ForumHome> {
                           ),
                         ),
                       ),
-                      const Spacer(),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          specialSearchArgs['showReported'] = 'Unreviewed';
+                          await loadUpdate();
+                        },
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: (specialSearchArgs['showReported'] ==
+                                    'Unreviewed')
+                                ? selectedOption
+                                : unselectedOption,
+                          ),
+                          child: Text(
+                            Localize("Unreviewed"),
+                            style: TextStyle(
+                                color: (specialSearchArgs['showReported'] ==
+                                        'Unreviewed')
+                                    ? selectedText
+                                    : unselectedText),
+                          ),
+                        ),
+                      ),
+                      Spacer(),
                     ],
                   ),
                 )

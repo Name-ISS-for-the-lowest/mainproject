@@ -600,7 +600,7 @@ class keywordData {
       'Africa',
       'Swahili'
     ],
-    'Democratic Republic Congo': [
+    'Democratic Republic of the Congo': [
       'Democratic Republic of the Congo',
       'Kinshasa',
       'Central Africa',
@@ -612,7 +612,7 @@ class keywordData {
       'Great Lakes',
       'Africa'
     ],
-    'Republic of Congo': [
+    'Republic of the Congo': [
       'Republic of the Congo',
       'Brazzaville',
       'Central Africa',
@@ -707,7 +707,7 @@ class keywordData {
       'Cyprus problem',
       'Olive'
     ],
-    'Czech Republic': [
+    'Czechia': [
       'Czech',
       'Prague',
       'Central Europe',
@@ -2020,7 +2020,7 @@ class keywordData {
       'Pacific Ocean',
       'Jellyfish Lake'
     ],
-    'Palestinian Territories': [
+    'Palestine': [
       'Palestinian',
       'Ramallah',
       'Gaza Strip',
@@ -2210,7 +2210,7 @@ class keywordData {
       'South Atlantic',
       'Africa'
     ],
-    'St. Kitts': [
+    'Saint Kitts': [
       'Kittitian',
       'Basseterre',
       'Caribbean',
@@ -2221,7 +2221,7 @@ class keywordData {
       'Caribbean Sea',
       'Commonwealth'
     ],
-    'St. Lucia': [
+    'Saint Lucia': [
       'Saint Lucian',
       'Castries',
       'Caribbean',
@@ -2255,7 +2255,7 @@ class keywordData {
       'Atlantic Ocean',
       'Island'
     ],
-    'St. Vincent': [
+    'Saint Vincent': [
       'Saint Vincentian',
       'Kingstown',
       'Caribbean',
@@ -2648,7 +2648,7 @@ class keywordData {
       'Pacific Ocean',
       'Friendly Islands'
     ],
-    'Trinidad/Tobago': [
+    'Trinidad and Tobago': [
       'Trinidadian',
       'Port of Spain',
       'Tobagonian',
@@ -2719,7 +2719,7 @@ class keywordData {
       'Isolation',
       'Climate Change'
     ],
-    'U.S. Virgin Islands': [
+    'United States Virgin Islands': [
       'Virgin Islander',
       'Charlotte Amalie',
       'Caribbean',

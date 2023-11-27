@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/postHelper.dart';
+import 'package:frontend/classes/selectorHelper.dart';
 // import 'package:language_picker/language_picker.dart';
 // import 'package:language_picker/languages.dart';
 import '../languagePicker/languages.dart';
@@ -12,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:frontend/home.dart';
+import 'package:frontend/views/ViewImage.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -48,6 +50,18 @@ class _ProfilePageState extends State<ProfilePage> {
   void submit() async {
     Navigator.of(context).pop(controller.text);
     await updateUser();
+  }
+
+  void navigateToViewImage(List<String> inputs) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ViewImage(imageUrls: inputs),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -277,8 +291,10 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Text(Localize("Continue")),
         onPressed: () async {
           AuthHelper.logout();
-          Navigator.pushAndRemoveUntil(context,
-              MaterialPageRoute(builder: (_) => const Home()), (route) => false);
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const Home()),
+              (route) => false);
         },
       );
 
@@ -305,6 +321,108 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
+    void ListPicker(BuildContext context) {
+      Map<String, String> trueItems = {};
+      List items = [];
+      SelectorHelper.countryList.forEach((element) {
+        String localizedElem = Localize(element);
+        items.add(localizedElem);
+        trueItems[localizedElem] = element;
+      });
+      List filteredItems = List.from(items);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return AlertDialog(
+                title: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        onChanged: (query) {
+                          setState(() {
+                            filteredItems = items
+                                .where((item) => item
+                                    .toLowerCase()
+                                    .contains(query.toLowerCase()))
+                                .toList();
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Search',
+                          hintText: 'Enter your search query',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                content: Container(
+                  width: double.maxFinite,
+                  height: 500,
+                  child: ListView.builder(
+                    itemCount: filteredItems.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () async {
+                          AuthHelper.userInfoCache['nationality'] =
+                              trueItems[filteredItems[index]];
+                          await updateUser();
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          //dont ask me why but this color argument is necessary
+                          color: Colors.transparent,
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 280,
+                                    child: Text(
+                                      SelectorHelper.countryEmojiMap[trueItems[
+                                              filteredItems[index]]]! +
+                                          '  ' +
+                                          filteredItems[index],
+                                      style: TextStyle(fontSize: 20),
+                                      softWrap: true,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Divider(),
+                            ],
+                          ),
+                        ),
+                      );
+
+                      return ListTile(
+                        title: Text(filteredItems[index]),
+                        onTap: () async {
+                          AuthHelper.userInfoCache['nationality'] =
+                              trueItems[index];
+                          await updateUser();
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    },
+                  ),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    child: Text('Cancel'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+    }
+
     //LOGOUT BUTTON
     showLogoutAlertDialog(BuildContext context) {
       Widget cancelButton = TextButton(
@@ -319,8 +437,10 @@ class _ProfilePageState extends State<ProfilePage> {
         onPressed: () async {
           AuthHelper.logout();
 
-          Navigator.pushAndRemoveUntil(context,
-              MaterialPageRoute(builder: (_) => const Home()), (route) => false);
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const Home()),
+              (route) => false);
         },
       );
 
@@ -454,20 +574,25 @@ class _ProfilePageState extends State<ProfilePage> {
                 Positioned(
                   child: Align(
                     alignment: Alignment.center,
-                    child: Container(
-                      width: 150, // Set your desired width
-                      height: 150, // Set your desired height
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: "$imageURL?tr=w-150,h-150,fo-auto",
-                          placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                          fit: BoxFit.fill,
+                    child: GestureDetector(
+                      onTap: () {
+                        navigateToViewImage([imageURL]);
+                      },
+                      child: Container(
+                        width: 150, // Set your desired width
+                        height: 150, // Set your desired height
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
+                        child: ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: "$imageURL?tr=w-150,h-150,fo-auto",
+                            placeholder: (context, url) =>
+                                CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
+                            fit: BoxFit.fill,
+                          ),
                         ),
                       ),
                     ),
@@ -546,7 +671,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: IconButton(
                       icon: const Icon(Icons.edit_note),
                       onPressed: () {
-                        countryselect();
+                        ListPicker(context);
                       },
                     ),
                   ),

@@ -155,14 +155,23 @@ class DBManager:
         DBManager.db["posts"].update_one({"_id": postID}, {"$set": {"deleted": True}})
 
     @staticmethod
-    def toggleRemovalOfPost(postID):
+    def toggleRemovalOfPost(postID, forceRemove):
         postID = ObjectId(postID)
         post = DBManager.db["posts"].find_one({"_id": postID})
         isRemoved = post.get("removed")
         removalToggle = not isRemoved
-        DBManager.db["posts"].update_one(
-            {"_id": postID}, {"$set": {"removed": removalToggle}}
+        if forceRemove == 'Remove':
+            DBManager.db["posts"].update_one(
+            {"_id": postID}, {"$set": {"removed": True}}
         )
+        elif forceRemove == 'Approve':
+            DBManager.db["posts"].update_one(
+            {"_id": postID}, {"$set": {"removed": False}}
+        )
+        else:
+            DBManager.db["posts"].update_one(
+                {"_id": postID}, {"$set": {"removed": removalToggle}}
+            )
 
     @staticmethod
     def getPosts(start, end, showRemoved, showDeleted, showReported, userID=None):
@@ -175,6 +184,11 @@ class DBManager:
             specialSearchParams["deleted"] = True
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
+        if showReported == "Only":
+            specialSearchParams["reports"] = {"$gt" : 0}
+        elif showReported == "Unreviewed":
+            specialSearchParams["unreviewedReport"] = True
+
         posts = (
             DBManager.db["posts"]
             .find(specialSearchParams)
@@ -213,6 +227,10 @@ class DBManager:
             specialSearchParams["deleted"] = True
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
+        if showReported == "Only":
+            specialSearchParams["reports"] = {"$gt" : 0}
+        elif showReported == "Unreviewed":
+            specialSearchParams["unreviewedReport"] = True
         posts = (
             DBManager.db["posts"]
             .find(specialSearchParams)
