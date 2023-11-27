@@ -12,6 +12,7 @@ import 'package:frontend/views/Comments.dart';
 import 'package:frontend/views/ConfirmReport.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ReportPage.dart';
+import 'package:frontend/views/ViewProfile.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 class ForumHome extends StatefulWidget {
@@ -209,6 +210,18 @@ class _ForumHomeState extends State<ForumHome> {
         builder: (BuildContext context) {
           return Scaffold(
             body: AdminView(postID: postID),
+          );
+        },
+      ),
+    );
+  }
+
+  void navigateToViewProfile(String postID, String posterID) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ViewProfile(posterID: posterID),
           );
         },
       ),
@@ -558,15 +571,20 @@ class _ForumHomeState extends State<ForumHome> {
             Positioned(
               left: 80,
               top: 14,
+              child: GestureDetector(
+                onTap: () {
+                navigateToViewProfile(postID, posterID);
+              },
               child: RichText(
                 text: TextSpan(
                   children: [
                     TextSpan(
-                        text: posterName,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontFamily: 'Inter',
-                        )),
+                      text: posterName,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
                     if (posterIsAdmin)
                       TextSpan(
                         text: ' [${Localize("Admin")}]',
@@ -574,7 +592,8 @@ class _ForumHomeState extends State<ForumHome> {
                           color: Color.fromRGBO(4, 57, 39, 100),
                         ),
                       ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

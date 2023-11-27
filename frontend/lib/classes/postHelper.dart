@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/routeHandler.dart';
@@ -159,6 +160,26 @@ class PostHelper {
       'postID': postID,
     };
     String endPoint = '/getPostByID';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.get(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static getUserByID(String userID) async {
+    final params = {
+      'userID': userID,
+    };
+    String endPoint = '/getUserByID';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.get(url,

@@ -1,8 +1,7 @@
-
-import 'package:flutter/material.dart';
-import 'package:frontend/views/CoreTemplate.dart';
-import 'package:frontend/classes/postHelper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:frontend/classes/postHelper.dart';
+import 'package:frontend/views/CoreTemplate.dart';
 
 class AdminView extends StatefulWidget {
   String postID;

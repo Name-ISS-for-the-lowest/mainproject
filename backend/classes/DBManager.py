@@ -227,6 +227,7 @@ class DBManager:
         user = DBManager.db["users"].find_one({"_id": ObjectId(post["userID"])})
         post["profilePicture"] = user["profilePicture"]
         post["username"] = user["username"]
+        post["userID"] = user["_id"]
         post["posterIsAdmin"] = user["admin"]
         post["email"] = user["email"]
         comboID = str(post["_id"]) + str(post["userID"])
