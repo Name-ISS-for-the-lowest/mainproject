@@ -5,22 +5,18 @@ import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/views/ConfirmPassword.dart';
 
 class PasswordSetUp extends StatefulWidget {
-  const PasswordSetUp({super.key});
+  final String email;
+  String password = "";
+  PasswordSetUp({super.key, required this.email});
 
   @override
   State<PasswordSetUp> createState() => _PasswordState();
 }
 
 class _PasswordState extends State<PasswordSetUp> {
-  bool validateEmail(String email) {
-    //general email regex
-    // final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
-    //csus email regex
-    final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@csus\.edu$');
-    return emailRegExp.hasMatch(email);
-  }
+  TextEditingController passwordController = TextEditingController();
 
-  void navigateToConfirmPassword() {
+  void navigateToConfirmPassword(String email, String password) {
     //navigate to confirm email page
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -34,12 +30,33 @@ class _PasswordState extends State<PasswordSetUp> {
                   iconTheme: const IconThemeData(color: Colors.white),
                 ),
               ),
-              const ConfirmPassword()
+              ConfirmPassword(
+                email: email,
+                password: password,
+              ),
             ]),
           );
         },
       ),
     );
+  }
+
+  bool validatePassword(String password) {
+    final passwordRegExp =
+        RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
+    bool validPassword = passwordRegExp.hasMatch(password);
+    if (!validPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(Localize(
+              "Password must be at least 8 characters long, have one uppercase letter, one lowercase letter, and one number")),
+        ),
+      );
+      //show error message
+      return false;
+    }
+    widget.password = password;
+    return true;
   }
 
   @override
@@ -150,7 +167,8 @@ class _PasswordState extends State<PasswordSetUp> {
                             SizedBox(
                               width: 340,
                               child: TextField(
-                                //controller: emailController,
+                                controller: passwordController,
+                                obscureText: true,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
@@ -169,30 +187,6 @@ class _PasswordState extends State<PasswordSetUp> {
                         const SizedBox(
                           height: 5,
                         ),
-                        /*
-                        Column(
-                          children: [
-                            SizedBox(
-                              width: 340,
-                              child: TextField(
-                                obscureText: true,
-                                controller: passwordController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  labelText: 'Password',
-                                  contentPadding: const EdgeInsets.all(18),
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.never,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        */
                       ],
                     ),
                   ],
@@ -220,7 +214,12 @@ class _PasswordState extends State<PasswordSetUp> {
                                     ),
                                   ),
                                   onPressed: () => {
-                                    navigateToConfirmPassword(),
+                                    if (validatePassword(
+                                        passwordController.text))
+                                      {
+                                        navigateToConfirmPassword(
+                                            widget.email, widget.password),
+                                      }
                                   },
                                   child: Text(
                                     Localize("Next"),

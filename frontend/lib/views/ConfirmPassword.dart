@@ -3,16 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/views/AddProfilePic.dart';
+import 'package:frontend/classes/authHelper.dart';
+import 'package:dio/dio.dart';
 
 class ConfirmPassword extends StatefulWidget {
-  const ConfirmPassword({super.key});
+  final String email;
+  final String password;
+  String confirmPassword = "";
+  ConfirmPassword({super.key, required this.email, required this.password});
 
   @override
   State<ConfirmPassword> createState() => _ConfirmPasswordState();
 }
 
 class _ConfirmPasswordState extends State<ConfirmPassword> {
-  void navigateToAddProfilePic() {
+  TextEditingController passwordController = TextEditingController();
+
+  void navigateToAddProfilePic(String email) {
     //navigate to AddProfilePic page
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -26,12 +33,39 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                   iconTheme: const IconThemeData(color: Colors.white),
                 ),
               ),
-              const AddToProfilePic()
+              AddToProfilePic(email: email)
             ]),
           );
         },
       ),
     );
+  }
+
+  bool validateConfirmPassword(String confirmPassword) {
+    if (confirmPassword != widget.password) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(Localize("Passwords do not match")),
+        ),
+      );
+      //show error message
+      return false;
+    }
+    widget.confirmPassword = confirmPassword;
+    return true;
+  }
+
+  Future<void> executeSignUp(String email, String password) async {
+    //need to do email validation to make sure email is not garbage
+    //also should have password validation minimum 8 characters, etc
+    Response response = await AuthHelper.signUp(email, password);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.data["message"] ?? "Error"),
+        ),
+      );
+    }
   }
 
   @override
@@ -113,7 +147,8 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                             SizedBox(
                               width: 340,
                               child: TextField(
-                                //controller: emailController,
+                                controller: passwordController,
+                                obscureText: true,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
@@ -132,30 +167,6 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                         const SizedBox(
                           height: 5,
                         ),
-                        /*
-                        Column(
-                          children: [
-                            SizedBox(
-                              width: 340,
-                              child: TextField(
-                                obscureText: true,
-                                controller: passwordController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  labelText: 'Password',
-                                  contentPadding: const EdgeInsets.all(18),
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.never,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        */
                       ],
                     ),
                   ],
@@ -182,7 +193,15 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                                       borderRadius: BorderRadius.circular(10.0),
                                     ),
                                   ),
-                                  onPressed: () => {navigateToAddProfilePic()},
+                                  onPressed: () async => {
+                                    if (validateConfirmPassword(
+                                        passwordController.text))
+                                      {
+                                        await executeSignUp(
+                                            widget.email, widget.password),
+                                        navigateToAddProfilePic(widget.email)
+                                      }
+                                  },
                                   child: Text(
                                     Localize("Next"),
                                     style: TextStyle(

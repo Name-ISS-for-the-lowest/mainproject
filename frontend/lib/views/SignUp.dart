@@ -16,7 +16,6 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
 
   //on mount
   @override
@@ -30,51 +29,19 @@ class _SignUpState extends State<SignUp> {
     // final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
     //csus email regex
     final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@csus\.edu$');
-    return emailRegExp.hasMatch(email);
-  }
-
-  bool validatePassword(String password) {
-    final passwordRegExp =
-        RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
-    return passwordRegExp.hasMatch(password);
-  }
-
-  void executeSignUp(String email, String password) async {
-    final validEmail = validateEmail(email);
-    //might remove this since we must match flow we have in figma
-    final validPassword = validatePassword(password);
-    if (!validEmail) {
-      //show error message
+    if (!emailRegExp.hasMatch(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(Localize('Invalid email, must be a CSUS email')),
         ),
       );
-      return;
+      return false;
     }
-    if (!validPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(Localize(
-              "Password must be at least 8 characters long, have one uppercase letter, one lowercase letter, and one number")),
-        ),
-      );
-      //show error message
-      return;
-    }
-    //need to do email validation to make sure email is not garbage
-    //also should have password validation minimum 8 characters, etc
-    Response response = await AuthHelper.signUp(email, password);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(response.data["message"] ?? "Error"),
-        ),
-      );
-    }
+    widget.email = email;
+    return true;
   }
 
-  void navigateToPassWordSetUp() {
+  void navigateToPassWordSetUp(String email) {
     //navigate to confirm email page
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -88,7 +55,7 @@ class _SignUpState extends State<SignUp> {
                   iconTheme: const IconThemeData(color: Colors.white),
                 ),
               ),
-              const PasswordSetUp()
+              PasswordSetUp(email: email)
             ]),
           );
         },
@@ -273,7 +240,11 @@ class _SignUpState extends State<SignUp> {
                                     ),
                                   ),
                                   onPressed: () => {
-                                    navigateToPassWordSetUp(),
+                                    if (validateEmail(emailController.text))
+                                      {
+                                        navigateToPassWordSetUp(
+                                            emailController.text),
+                                      }
                                   },
                                   child: Text(
                                     Localize("Next"),

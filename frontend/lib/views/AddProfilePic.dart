@@ -9,7 +9,8 @@ import 'dart:io';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class AddToProfilePic extends StatefulWidget {
-  const AddToProfilePic({super.key});
+  final String email;
+  const AddToProfilePic({super.key, required this.email});
 
   @override
   State<AddToProfilePic> createState() => _AddToProfilePicState();
@@ -17,6 +18,7 @@ class AddToProfilePic extends StatefulWidget {
 
 class _AddToProfilePicState extends State<AddToProfilePic> {
   bool imageSpecified = false;
+  File image = File('assets/Default_pfp.png');
   Widget imageWidget = Image.asset('assets/Default_pfp.png',
       width: 200, height: 200, fit: BoxFit.fill);
 
@@ -27,11 +29,20 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
         File getImage = File(pickedFile.path);
         setState(() {
           imageWidget = Image.file(getImage, fit: BoxFit.fill);
+          image = getImage;
           imageSpecified = true;
         });
       }
     } catch (e) {
       print("${Localize("Error picking image:")} $e");
+    }
+  }
+
+  Future<void> setProfilePic() async {
+    print("made it here$imageSpecified");
+    if (imageSpecified) {
+      //todo set the profile picture
+      await AuthHelper.setProfilePictureOnSignUp(widget.email, image);
     }
   }
 
@@ -210,8 +221,11 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                                                   BorderRadius.circular(10.0),
                                             ),
                                           ),
-                                          onPressed: () => {
+                                          onPressed: () {
                                             // enter logic to go to confirm password screen
+                                            //set the profile picture
+                                            print("am right here");
+                                            setProfilePic();
                                           },
                                           child: Text(
                                             Localize("Next"),

@@ -25,11 +25,10 @@ class Post:
     translations: {}
     posterIsAdmin: bool = False
     reports: int
-    imageURL : str
-    fileId : str
+    imageURL: str
+    fileId: str
     reportReasons: dict
     unreviewedReport: bool = False
-
 
     def __init__(self, content, user_id, attachment=None, parent_id=None):
         self.content = content
@@ -46,15 +45,21 @@ class Post:
         self.translations = {}
         self.edited = False
         self.contentHistory = []
-        self.reportReasons = {'hateSpeech' : 0, 'targetedHarassment': 0, 'illegalContent' : 0, 'inappropriateContent': 0, 'otherReason': 0}
+        self.reportReasons = {
+            "hateSpeech": 0,
+            "targetedHarassment": 0,
+            "illegalContent": 0,
+            "inappropriateContent": 0,
+            "otherReason": 0,
+        }
         self.deleted = False
         self.removed = False
         self.reports = 0
         self.unreviewedReport = False
         if attachment == None:
-            attachment = 'Empty'
+            attachment = "Empty"
         self.attachedImage = attachment
-        if attachment != None and attachment != 'Empty':
+        if attachment != None and attachment != "Empty":
             self.imageURL = attachment.url
             self.fileId = attachment.fileID
         else:
@@ -84,7 +89,6 @@ class Post:
             history += "]"
         return history
 
-
     @staticmethod
     def toJson(post):
         # turn all to string
@@ -96,7 +100,7 @@ class Post:
         post.removed = str(post.removed)
         post.reports = str(post.reports)
         post.posterIsAdmin = str(post.posterIsAdmin)
-        return json.dumps(post.__dict__)
+        return post.__dict__
 
     @staticmethod
     def listToJson(posts, targetLang=None):
