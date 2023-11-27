@@ -167,11 +167,11 @@ class DBManager:
         removalToggle = not isRemoved
         if forceRemove == 'Remove':
             DBManager.db["posts"].update_one(
-            {"_id": postID}, {"$set": {"removed": True}}
+            {"_id": postID}, {"$set": {"removed": True, "unreviewedReport" : False}}
         )
         elif forceRemove == 'Approve':
             DBManager.db["posts"].update_one(
-            {"_id": postID}, {"$set": {"removed": False}}
+            {"_id": postID}, {"$set": {"removed": False, "unreviewedReport" : False}}
         )
         else:
             DBManager.db["posts"].update_one(
