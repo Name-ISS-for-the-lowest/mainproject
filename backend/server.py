@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Response, UploadFile
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
 from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
 from JSONmodels.postid import postid
@@ -11,6 +11,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from classes.EventsManager import EventsManager
 from classes.ImageHelper import ImageHelper
 import json
+from fastapi.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
 import urllib.parse
 from models.Post import Post
 from models.Report import Report
@@ -18,9 +20,12 @@ from bson import ObjectId
 import migrate
 from classes.Translator import Translator
 import adminManager
+from datetime import datetime
 
+# templates = Jinja2Templates(directory="templates")
 
 app = FastAPI(title="ISS App")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 migrate.migrate()
 # When we actaully go live, I'd probably comment the adminManager out since we dont need to run it everytime server starts, only when changes to admin are made
 adminManager.setAdmins()
@@ -37,6 +42,7 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/logout"
             or request.url.path == "/openapi.json"
             or request.url.path == "/setProfilePictureOnSignUp"
+            or request.url.path == "/resetPassword",
         ):
             return await call_next(request)
         # check if the user has a cookie
@@ -427,3 +433,18 @@ def getEvents(request: Request, language: str = "en"):
     events = EventsManager.getEvents()
     jsonEvents = EventsManager.translateEvents(language, events)
     return JSONResponse(content=jsonEvents, status_code=200)
+
+
+@app.get("/resetPassword")
+def getResetPassword(token: str):
+    # user = DBManager.getUserByToken(token)
+    # if user is None:
+    #     return JSONResponse(content={"message": "invalid link"}, status_code=400)
+    # if createAt + 1800 < datetime.now():
+    #     return JSONResponse(content={"message": "link expired"}, status_code=400)
+    # else:
+    #     token = user["token"]
+    #     createAt = user["tokenCreatedAt"]
+    return HTMLResponse(
+        content=open("static/resetPassword/index.html", "r").read(), status_code=200
+    )

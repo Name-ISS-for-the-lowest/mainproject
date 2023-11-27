@@ -29,9 +29,8 @@ class DBManager:
             return None
         else:
             return User.fromDict(user)
-        
-   # def resetUserPassword(email, new_password):
 
+    # def resetUserPassword(email, new_password):
 
     @staticmethod
     def getUserByToken(token):

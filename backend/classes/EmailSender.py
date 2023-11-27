@@ -177,7 +177,7 @@ class EmailSender:
 
         return token
 
-    def sendResetPasswordEmail(userEmail: str, subject: str, token: str):
+    def sendResetPasswordEmail(userEmail: str):
         message = MIMEMultipart()
         message["From"] = EmailSender.fromEmail
         message["To"] = userEmail
@@ -476,3 +476,6 @@ class EmailSender:
             print("Error: unable to send email", e)
 
             #
+
+
+95630
