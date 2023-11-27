@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:frontend/classes/Data.dart';
 import 'package:frontend/classes/routeHandler.dart';
-import 'package:intl/intl.dart';
 
 //todo add persitent storage for session cookie
 
@@ -44,14 +43,13 @@ class AuthHelper {
 
 //need reset password function
   static Future<Response> resetPassword(String email) async {
-    final data = {'email': email};
-    String endPoint = '/reset';
+    final params = {'email': email};
+    String endPoint = '/resetPassword';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.post(
         url,
-        data: jsonEncode(data),
-        options: Options(contentType: Headers.jsonContentType),
+        queryParameters: params,
       );
       return response;
     } on DioException catch (e) {

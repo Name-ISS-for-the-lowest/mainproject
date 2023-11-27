@@ -1,12 +1,8 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 import 'package:frontend/views/ViewImage.dart';
 import 'package:frontend/classes/postHelper.dart';
-import 'package:frontend/classes/authHelper.dart';
-import 'package:html_unescape/html_unescape.dart';
-import 'package:http/http.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class AdminView extends StatefulWidget {
@@ -74,8 +70,8 @@ class _AdminViewState extends State<AdminView> {
     }
 
     if (post == null) {
-      return Scaffold(
-        backgroundColor: const Color(0xffece7d5),
+      return const Scaffold(
+        backgroundColor: Color(0xffece7d5),
         body: Center(child: Text("Loading Post...")),
       );
     }
@@ -147,7 +143,7 @@ class _AdminViewState extends State<AdminView> {
               color: const Color(0x5f000000),
             ),
           )),
-      body: Container(
+      body: SizedBox(
         width: 500,
         child: SingleChildScrollView(
           child: Column(
@@ -156,7 +152,7 @@ class _AdminViewState extends State<AdminView> {
               const SizedBox(
                 height: 20,
               ),
-              Text(
+              const Text(
                 "Posted By",
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
@@ -166,39 +162,39 @@ class _AdminViewState extends State<AdminView> {
               Container(
                 width: 200, // Set your desired width
                 height: 200, // Set your desired height
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                 ),
                 child: ClipOval(
                   child: CachedNetworkImage(
                     imageUrl: "$pfpURL?tr=w-200,h-200,fo-auto",
-                    placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    placeholder: (context, url) => const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => const Icon(Icons.error),
                     fit: BoxFit.fill,
                   ),
                 ),
               ),
-              Text(
+              const Text(
                 "Screen Name: ",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
                 posterName,
-                style: TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(
                 height: 15,
               ),
-              Text(
+              const Text(
                 "Email Address: ",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
                 posterEmail,
-                style: TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: 18),
               ),
-              Divider(),
-              Text(
+              const Divider(),
+              const Text(
                 "Image Attached",
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),

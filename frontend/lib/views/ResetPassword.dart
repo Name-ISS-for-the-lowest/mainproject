@@ -1,7 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
+import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/views/LogIn.dart';
 import 'package:lottie/lottie.dart';
 
 class ResetPassword extends StatefulWidget {
@@ -30,7 +30,7 @@ class _ResetPasswordState extends State<ResetPassword> {
     return emailRegExp.hasMatch(email);
   }
 
-  void executeRestsetPassWord(String email) async {
+  void executeResetPassWord(String email) async {
     final validEmail = validateEmail(email);
     if (!validEmail) {
       //show error message
@@ -39,10 +39,38 @@ class _ResetPasswordState extends State<ResetPassword> {
           content: Text(Localize('Invalid email, must be a CSUS email')),
         ),
       );
+
       return;
+    } else {
+      await AuthHelper.resetPassword(email);
+      navigateToLogin();
     }
   }
 
+  void navigateToLogin() {
+    //navigate to confirm email page
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            resizeToAvoidBottomInset: false,
+            body: Stack(children: [
+              SizedBox(
+                height: 100,
+                child: AppBar(
+                  backgroundColor: Colors.transparent,
+                  iconTheme: const IconThemeData(color: Colors.white),
+                ),
+              ),
+              const LogIn()
+            ]),
+          );
+        },
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.sizeOf(context).height;
 
@@ -175,7 +203,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                 ),
                 child: Text(Localize('Send Recovery Email')),
                 onPressed: () => {
-                  executeRestsetPassWord(emailController.text),
+                  executeResetPassWord(emailController.text),
                 },
               ),
             )

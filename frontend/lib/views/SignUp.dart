@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/Localize.dart';
-import 'package:dio/dio.dart';
 import 'package:frontend/views/PasswordSetup.dart';
 import 'package:lottie/lottie.dart';
 
@@ -184,8 +182,10 @@ class _SignUpState extends State<SignUp> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           labelText: Localize('Email'),
-                          filled: true,
+                          contentPadding: const EdgeInsets.all(18),
                           fillColor: Colors.white,
+                          filled: true,
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
                         ),
                       ),
                     ),

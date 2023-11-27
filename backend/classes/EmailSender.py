@@ -21,6 +21,7 @@ class EmailSender:
     fromEmail = "internationlstudentstation@gmail.com"
 
     # this returns a verification token to store in the db
+    
     @staticmethod
     def sendAuthenticationEmail(userEmail):
         # Set your email and password
@@ -177,14 +178,15 @@ class EmailSender:
 
         return token
 
-    def sendResetPasswordEmail(userEmail: str, subject: str, token: str):
+    def sendResetPasswordEmail(userEmail: str):
         message = MIMEMultipart()
         message["From"] = EmailSender.fromEmail
         message["To"] = userEmail
-        message["Subject"] = "ISS - Rest Email Verification"
+        message["Subject"] = "ISS - Reset Email Verification"
         token = secrets.token_urlsafe(32)
 
         body = f"""
+
   <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -476,3 +478,6 @@ class EmailSender:
             print("Error: unable to send email", e)
 
             #
+
+
+95630

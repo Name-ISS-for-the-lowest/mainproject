@@ -1,5 +1,7 @@
+from asyncio import create_task
+from datetime import datetime, timedelta
 from fastapi import FastAPI, Request, Response, UploadFile
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
 from classes.DBManager import DBManager
 from JSONmodels.credentials import credentials
 from JSONmodels.postid import postid
@@ -11,6 +13,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from classes.EventsManager import EventsManager
 from classes.ImageHelper import ImageHelper
 import json
+from fastapi.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
 import urllib.parse
 from models.Post import Post
 from models.Report import Report
@@ -18,9 +22,12 @@ from bson import ObjectId
 import migrate
 from classes.Translator import Translator
 import adminManager
+from datetime import datetime
 
+# templates = Jinja2Templates(directory="templates")
 
 app = FastAPI(title="ISS App")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 migrate.migrate()
 # When we actaully go live, I'd probably comment the adminManager out since we dont need to run it everytime server starts, only when changes to admin are made
 adminManager.setAdmins()
@@ -37,6 +44,7 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/logout"
             or request.url.path == "/openapi.json"
             or request.url.path == "/setProfilePictureOnSignUp"
+            or request.url.path == "/resetPassword",
         ):
             return await call_next(request)
         # check if the user has a cookie
@@ -271,7 +279,7 @@ def deletePost(postID: str, request: Request):
 
 
 @app.post("/toggleRemovalOfPost")
-def toggleRemovalOfPost(postID: str, forceRemove:str, request: Request):
+def toggleRemovalOfPost(postID: str, forceRemove: str, request: Request):
     DBManager.toggleRemovalOfPost(postID, forceRemove)
     return JSONResponse({"message": "Removal Status Updated"}, status_code=200)
 
@@ -427,3 +435,56 @@ def getEvents(request: Request, language: str = "en"):
     events = EventsManager.getEvents()
     jsonEvents = EventsManager.translateEvents(language, events)
     return JSONResponse(content=jsonEvents, status_code=200)
+
+
+@app.get("/resetPassword")
+def getResetPassword(token: str):
+    user = DBManager.getUserByToken(token)
+    userDic = user.__dict__
+    createAt = userDic["tokenCreatedAt"]
+    if user is None:
+        return JSONResponse(content={"message": "invalid link"}, status_code=400)
+    if timedelta(seconds=1800) < datetime.now() - createAt:
+        return JSONResponse(content={"message": "link expired"}, status_code=400)
+    else:
+        createAt = user.__dict__["tokenCreatedAt"]
+    return HTMLResponse(
+        content=open("static/resetPassword/index.html", "r").read(), status_code=200
+    )
+
+
+@app.patch("/resetPassword")
+def receivePassword(password: str, token: str):
+    user = DBManager.getUserByToken(token)
+    if user is None:
+        return JSONResponse(content={"message": "invalid link"}, status_code=400)
+    userDic = user.__dict__
+    createAt = userDic["tokenCreatedAt"]
+    if timedelta(seconds=1800) < datetime.now() - createAt:
+        return JSONResponse(content={"message": "link expired"}, status_code=400)
+
+    userDic.pop("tokenCreatedAt")
+    userDic.pop("token")
+    salt = PassHasher.generateSalt()
+    passwordHash = PassHasher.hashPassword(password, salt)
+    userDic["passwordHash"] = passwordHash
+    userDic["salt"] = salt
+    email = userDic["email"]
+    print(userDic)
+    DBManager.db["users"].replace_one({"email": email}, userDic)
+
+    return JSONResponse(content={"message": "Password reset successfully"})
+
+
+@app.post("/resetPassword")
+def resetPassword(email: str):
+    user = DBManager.getUserByEmail(email)
+    userDic = user.__dict__
+    if user is None:
+        return JSONResponse(content={"message": "invalid email"}, status_code=400)
+    token = EmailSender.sendResetPasswordEmail(email)
+    createdAt = datetime.now()
+    userDic["token"] = token
+    userDic["tokenCreatedAt"] = createdAt
+    DBManager.db["users"].update_one({"email": email}, {"$set": userDic})
+    return JSONResponse(content={"message": "email sent"}, status_code=200)

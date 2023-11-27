@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'dart:convert';
 import 'package:frontend/classes/authHelper.dart';
 
 import 'package:frontend/classes/Data.dart';

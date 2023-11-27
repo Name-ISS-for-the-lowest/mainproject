@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/views/AddProfilePic.dart';
@@ -152,8 +151,10 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         labelText: Localize('Confirm Password'),
-                        filled: true,
+                        contentPadding: const EdgeInsets.all(18),
                         fillColor: Colors.white,
+                        filled: true,
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
                       ),
                     ),
                   ),

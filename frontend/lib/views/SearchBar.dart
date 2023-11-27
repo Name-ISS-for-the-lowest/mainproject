@@ -78,8 +78,8 @@ class _SearchBarState extends State<SearchBarWidget> {
       },
       decoration: InputDecoration(
         hintText: Localize('Search'),
-        prefixIcon: Icon(Icons.search),
-        border: OutlineInputBorder(
+        prefixIcon: const Icon(Icons.search),
+        border: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black),
         ),
       ),

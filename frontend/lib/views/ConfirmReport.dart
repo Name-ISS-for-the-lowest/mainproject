@@ -62,7 +62,7 @@ class _ConfirmReportState extends State<ConfirmReport> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   "We have received your report, thank you for submitting it.",
                   style: TextStyle(
                     fontSize: 17,
@@ -70,14 +70,14 @@ class _ConfirmReportState extends State<ConfirmReport> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 20),
-                Text(
+                const SizedBox(height: 20),
+                const Text(
                   "User experience is what we value most at International Student Station and your input is very valuable to us.",
                   style: TextStyle(fontSize: 17),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 20),
-                Text(
+                const SizedBox(height: 20),
+                const Text(
                   "We will be reviewing your report soon, please click the button below or the close button on your top left to return to the app.",
                   style: TextStyle(fontSize: 17),
                   textAlign: TextAlign.center,
@@ -89,7 +89,7 @@ class _ConfirmReportState extends State<ConfirmReport> {
                   onTap: () {
                     navigateToPrimaryScreens();
                   },
-                  child: Text(
+                  child: const Text(
                     "Take me Back",
                     style: TextStyle(
                       color: Color(0xff007EF1),

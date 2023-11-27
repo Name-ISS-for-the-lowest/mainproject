@@ -2,4 +2,4 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/languagePicker/languages.dart';
 
-typedef Widget ItemBuilder(Language language);
+typedef ItemBuilder = Widget Function(Language language);

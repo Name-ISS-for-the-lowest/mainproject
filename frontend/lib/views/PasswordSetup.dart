@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
-import 'package:frontend/views/AddProfilePic.dart';
 import 'package:frontend/views/ConfirmPassword.dart';
 import 'package:lottie/lottie.dart';
 
@@ -80,7 +79,7 @@ class _PasswordState extends State<PasswordSetUp> {
         children: [
           //Background animation (increase top offset value to move anim down, decrease to move up)
           Positioned(
-              top: 200,
+              top: 110,
               child: SizedBox(
                 height: screenHeight,
                 child: LottieBuilder.asset(
@@ -131,20 +130,6 @@ class _PasswordState extends State<PasswordSetUp> {
                     height: 20,
                   ),
 
-                  SizedBox(
-                    width: 340,
-                    child: Text(
-                      Localize(
-                          'For security purposes, please make sure that your password contains a series of numbers, letters, and other special characters.'),
-                      style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Color.fromRGBO(230, 183, 17, 1)),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
                   //Spacer for Column elements
                   const SizedBox(
                     height: 20,
@@ -171,21 +156,21 @@ class _PasswordState extends State<PasswordSetUp> {
 
                   //Password Field Styling
                   SizedBox(
-                    width: 330,
-                    height: 55,
-                    child: TextField(
-                      controller: passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        labelText: Localize('Password'),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                    ),
-                  ),
+                      width: 330,
+                      height: 55,
+                      child: TextField(
+                          controller: passwordController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            labelText: Localize('Password'),
+                            contentPadding: const EdgeInsets.all(18),
+                            fillColor: Colors.white,
+                            filled: true,
+                            floatingLabelBehavior: FloatingLabelBehavior.never,
+                          ))),
 
                   //Spacer for Column elements
                   const SizedBox(
