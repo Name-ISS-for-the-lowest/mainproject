@@ -190,7 +190,7 @@ class DBManager:
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
         if showReported == "Only":
-            specialSearchParams["reports"] = {"gt" : 0}
+            specialSearchParams["reports"] = {"$gt" : 0}
         elif showReported == "Unreviewed":
             specialSearchParams["unreviewedReport"] = True
 
@@ -251,7 +251,7 @@ class DBManager:
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
         if showReported == "Only":
-            specialSearchParams["reports"] = {"gt" : 0}
+            specialSearchParams["reports"] = {"$gt" : 0}
         elif showReported == "Unreviewed":
             specialSearchParams["unreviewedReport"] = True
         posts = (
