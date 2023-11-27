@@ -228,18 +228,6 @@ class _ForumHomeState extends State<ForumHome> {
     );
   }
 
-  void navigateToViewImage(List<String> inputs) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return Scaffold(
-            body: ViewImage(imageUrls: inputs),
-          );
-        },
-      ),
-    );
-  }
-
   void navigateToConfirmPost() {
     Navigator.of(context).push(
       MaterialPageRoute(

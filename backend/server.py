@@ -279,7 +279,7 @@ def deletePost(postID: str, request: Request):
 
 
 @app.post("/toggleRemovalOfPost")
-def toggleRemovalOfPost(postID: str, forceRemove:str, request: Request):
+def toggleRemovalOfPost(postID: str, forceRemove: str, request: Request):
     DBManager.toggleRemovalOfPost(postID, forceRemove)
     return JSONResponse({"message": "Removal Status Updated"}, status_code=200)
 
