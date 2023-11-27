@@ -5,15 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/classes/keywordData.dart';
 import 'package:frontend/classes/postHelper.dart';
+import 'package:frontend/views/AdminView.dart';
 import 'package:frontend/views/Comments.dart';
+import 'package:frontend/views/ConfirmReport.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ReportPage.dart';
-import 'package:frontend/views/ConfirmReport.dart';
-import 'package:frontend/views/AdminView.dart';
-import 'package:frontend/classes/keywordData.dart';
 import 'package:html_unescape/html_unescape.dart';
-import 'package:http/http.dart';
 
 class ForumHome extends StatefulWidget {
   const ForumHome({super.key});
@@ -972,6 +971,58 @@ class _ForumHomeState extends State<ForumHome> {
                                         'Only')
                                     ? selectedText
                                     : unselectedText),
+                          ),
+                        ),
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          specialSearchArgs['showReported'] = 'Unreviewed';
+                          await loadUpdate();
+                        },
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: (specialSearchArgs['showReported'] == 'Unreviewed')
+                                ? selectedOption
+                                : unselectedOption,
+                          ),
+                          child: Text(
+                            Localize("Unreviewed"),
+                            style: TextStyle(
+                                color: (specialSearchArgs['showReported'] ==
+                                        'Unreviewed')
+                                    ? selectedText
+                                    : unselectedText),
+                          ),
+                        ),
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          specialSearchArgs['showReported'] = 'None';
+                          await loadUpdate();
+                        },
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: (specialSearchArgs['showReported'] == 'None')
+                                ? selectedOption
+                                : unselectedOption,
+                          ),
+                          child: Text(
+                            Localize("None"),
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showReported'] == 'None')
+                                        ? selectedText
+                                        : unselectedText),
                           ),
                         ),
                       ),
