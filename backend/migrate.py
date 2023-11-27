@@ -8,7 +8,7 @@ from bson import ObjectId
 from classes.DBManager import DBManager
 
 
-def insertUserList(users: [User]):
+def insertUserList(users: list[User]):
     for user in users:
         userJson = user.__dict__
         DBManager.db["users"].update_one(
@@ -16,7 +16,7 @@ def insertUserList(users: [User]):
         )
 
 
-def insertPostList(posts: [Post]):
+def insertPostList(posts: list[Post]):
     for post in posts:
         postJson = post.__dict__
         postJson["userID"] = ObjectId(postJson["userID"]["$oid"])

@@ -105,8 +105,9 @@ class PostHelper {
     }
   }
 
-  static Future<Response> toggleRemoval(String postID) async {
-    final params = {'postID': postID};
+  static Future<Response> toggleRemoval(String postID,
+      [String forceRemove = 'None']) async {
+    final params = {'postID': postID, 'forceRemove': forceRemove};
     String endPoint = '/toggleRemovalOfPost';
     final url = '$defaultHost$endPoint';
     try {
