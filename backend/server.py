@@ -458,6 +458,14 @@ def getResetPassword(token: str):
     else:
         token = user["token"]
         createAt = user["tokenCreatedAt"]
+    user = DBManager.getUserByToken(token)
+    if user is None:
+        return JSONResponse(content={"message": "invalid link"}, status_code=400)
+    if createAt + 1800 < datetime.now():
+        return JSONResponse(content={"message": "link expired"}, status_code=400)
+    else:
+        token = user["token"]
+        createAt = user["tokenCreatedAt"]
     return HTMLResponse(
         content=open("static/resetPassword/index.html", "r").read(), status_code=200
     )
@@ -480,3 +488,15 @@ def receivePassword(password: str, token: str):
     
     
     return JSONResponse(content={"message": "Password reset successfully"})
+@app.post("/resetPassword")
+def resetPassword(email: str):
+    user = DBManager.getUserByEmail(email)
+    userDic = user.__dict__
+    if user is None:
+        return JSONResponse(content={"message": "invalid email"}, status_code=400)
+    token = EmailSender.sendResetPasswordEmail(email)
+    createdAt = datetime.now()
+    user.token = token
+    user["tokenCreatedAt"] = createdAt
+    DBManager.db["users"].update_one({"email": email}, {"$set": user})
+    return JSONResponse(content={"message": "email sent"}, status_code=200)
