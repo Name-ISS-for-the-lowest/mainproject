@@ -59,13 +59,13 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
     //need to do email validation to make sure email is not garbage
     //also should have password validation minimum 8 characters, etc
     Response response = await AuthHelper.signUp(email, password);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(response.data["message"] ?? "Error"),
-        ),
-      );
-    }
+    // if (mounted) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //       content: Text(response.data["message"] ?? "Error"),
+    //     ),
+    //   );
+    // }
   }
 
   @override
@@ -145,7 +145,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                     width: 330,
                     height: 55,
                     child: TextField(
-                      //controller: passwordController,
+                      controller: passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
