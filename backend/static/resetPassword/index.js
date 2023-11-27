@@ -27,22 +27,16 @@ resetPasswordButton.addEventListener("click", (e) => {
     return;
   } else {
     //send a patch request to the server with the token and password as params
-    fetch(`/resetPassword/?token=${token}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ password: password }),
-    })
+    fetch(
+      `http://localhost:8000/resetPassword/?token=${token}&password=${password}`,
+      {
+        method: "PATCH",
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        if (data.status === "success") {
-          alert("Password reset successful");
-          window.location.href = "/success";
-        } else {
-          alert("Password reset failed");
-        }
+        alert(data.message);
       });
   }
 });
