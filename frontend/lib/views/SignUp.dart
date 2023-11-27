@@ -7,7 +7,7 @@ import 'package:lottie/lottie.dart';
 
 class SignUp extends StatefulWidget {
   String email = "";
-  const SignUp({super.key, required this.email});
+  SignUp({super.key, required this.email});
 
   @override
   State<SignUp> createState() => _SignUpState();

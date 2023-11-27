@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
@@ -47,9 +49,9 @@ class _LogInState extends State<LogIn> {
     var result = Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return const Scaffold(
+          return Scaffold(
             resizeToAvoidBottomInset: false,
-            body: SignUp(),
+            body: SignUp(email: emailController.text),
           );
         },
       ),

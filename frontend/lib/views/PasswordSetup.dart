@@ -174,7 +174,7 @@ class _PasswordState extends State<PasswordSetUp> {
                     width: 330,
                     height: 55,
                     child: TextField(
-                      //controller: passwordController,
+                      controller: passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
