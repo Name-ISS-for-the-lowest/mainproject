@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/eventHelper.dart';
 import 'package:frontend/views/SearchBar.dart';
@@ -58,7 +59,11 @@ class _EventsPageState extends State<EventsPage> {
                   )),
                   GestureDetector(
                     onTap: () {
-                      _launchURL(Uri.parse(event['url']!));
+                      String? eventId = event['id'];
+                      var language = AuthHelper.userInfoCache['language'];
+                      var url =
+                          "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$language";
+                      _launchURL(Uri.parse(url));
                     },
                     child: Container(
                       padding: const EdgeInsets.all(8.0),

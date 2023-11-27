@@ -164,11 +164,11 @@ class DBManager:
         removalToggle = not isRemoved
         if forceRemove == 'Remove':
             DBManager.db["posts"].update_one(
-            {"_id": postID}, {"$set": {"removed": True}}
+            {"_id": postID}, {"$set": {"removed": True, "unreviewedReport" : False}}
         )
         elif forceRemove == 'Approve':
             DBManager.db["posts"].update_one(
-            {"_id": postID}, {"$set": {"removed": False}}
+            {"_id": postID}, {"$set": {"removed": False, "unreviewedReport" : False}}
         )
         else:
             DBManager.db["posts"].update_one(
@@ -214,9 +214,24 @@ class DBManager:
         return returnPosts
 
     @staticmethod
-    def getPostByID(postID):
-        post = DBManager.db["posts"].find_one({"_id": postID})
-        return post
+    def getPostByID(postID: str):
+        objectID = ObjectId(postID)
+        post = DBManager.db["posts"].find_one({"_id": objectID})
+        user = DBManager.db["users"].find_one({"_id": ObjectId(post["userID"])})
+        post["profilePicture"] = user["profilePicture"]
+        post["username"] = user["username"]
+        post["userID"] = user["_id"]
+        post["posterIsAdmin"] = user["admin"]
+        post["email"] = user["email"]
+        comboID = str(post["_id"]) + str(post["userID"])
+        likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
+        reportedResult = DBManager.db["reports"].find_one({"comboID": comboID})
+        if likedResult is not None:
+            post["liked"] = True
+        if reportedResult is not None:
+            post["reportedByUser"] = True
+        returnPost = Post.fromDict(post)
+        return returnPost
 
     @staticmethod
     def searchPosts(start, end, showRemoved, showDeleted, showReported, search, userID):
@@ -230,6 +245,7 @@ class DBManager:
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
         if showReported == "Only":
+            #print(specialSearchParams["reports"])
             specialSearchParams["reports"] = {"$gt" : 0}
         elif showReported == "Unreviewed":
             specialSearchParams["unreviewedReport"] = True
@@ -291,8 +307,11 @@ class DBManager:
             print(result.modified_count)
 
             # add the reports to the reports collection
-            DBManager.db["reports"].insert_one({"PostID": postID, "comboID": comboID, "Reason": 'harassment'})
-            print("Reported")
+            DBManager.db["reports"].insert_one(
+                {"PostID": postID, "comboID": comboID, "hateSpeech": specialDict['hateSpeech'],
+                'illegalContent': specialDict['illegalContent'], 'targetedHarassment' : specialDict['targetedHarassment'],
+                'inappropriateContent': specialDict['inappropriateContent'], 'otherReason': specialDict['otherReason']}
+            )
             return {"message": "Post reported"}
         else:
             return {"message": "Post already reported"}

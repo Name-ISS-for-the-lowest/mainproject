@@ -12,6 +12,7 @@ import 'package:frontend/views/Comments.dart';
 import 'package:frontend/views/ConfirmReport.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ReportPage.dart';
+import 'package:frontend/views/ViewProfile.dart';
 import 'package:frontend/views/ViewImage.dart';
 import 'package:html_unescape/html_unescape.dart';
 
@@ -154,6 +155,7 @@ class _ForumHomeState extends State<ForumHome> {
     }
 
     return '$returnedNumber$suffix';
+    return '$returnedNumber$suffix';
   }
 
   Future<void> translatePost(String originalText, int index) async {
@@ -210,6 +212,18 @@ class _ForumHomeState extends State<ForumHome> {
         builder: (BuildContext context) {
           return Scaffold(
             body: AdminView(postID: postID),
+          );
+        },
+      ),
+    );
+  }
+
+  void navigateToViewProfile(String postID, String posterID) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ViewProfile(posterID: posterID),
           );
         },
       ),
@@ -568,10 +582,8 @@ class _ForumHomeState extends State<ForumHome> {
                 child: ClipOval(
                   child: CachedNetworkImage(
                     imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
-                    placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
+                    placeholder: (context, url) => CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
                     fit: BoxFit.fill,
                   ),
                 ),
@@ -580,23 +592,28 @@ class _ForumHomeState extends State<ForumHome> {
             Positioned(
               left: 80,
               top: 14,
-              child: RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                        text: posterName,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontFamily: 'Inter',
-                        )),
-                    if (posterIsAdmin)
+              child: GestureDetector(
+                onTap: () {
+                  navigateToViewProfile(postID, posterID);
+                },
+                child: RichText(
+                  text: TextSpan(
+                    children: [
                       TextSpan(
-                        text: ' [${Localize("Admin")}]',
-                        style: const TextStyle(
-                          color: Color.fromRGBO(4, 57, 39, 100),
+                          text: posterName,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Inter',
+                          )),
+                      if (posterIsAdmin)
+                        TextSpan(
+                          text: ' [${Localize("Admin")}]',
+                          style: const TextStyle(
+                            color: Color.fromRGBO(4, 57, 39, 100),
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -644,21 +661,15 @@ class _ForumHomeState extends State<ForumHome> {
               bottom: 80,
               right: 10,
               child: (attachmentURL != 'Empty')
-                  ? GestureDetector(
-                      onTap: () {
-                        navigateToViewImage([attachmentURL]);
-                      },
-                      child: Container(
-                        height: 340,
-                        width: 340,
-                        color: Colors.black,
-                        child: CachedNetworkImage(
-                          imageUrl: "$attachmentURL?tr=w-340,h-340,fo-auto",
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
-                        ),
+                  ? Container(
+                      height: 340,
+                      width: 340,
+                      color: Colors.black,
+                      child: CachedNetworkImage(
+                        imageUrl: "$attachmentURL?tr=w-340,h-340,fo-auto",
+                        placeholder: (context, url) =>
+                            CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
                       ),
                     )
                   : const SizedBox(),
@@ -755,8 +766,7 @@ class _ForumHomeState extends State<ForumHome> {
                                       ? Colors.deepOrange
                                       : Colors.black,
                                 )),
-                            Text(reportNumber,
-                                style: const TextStyle(fontSize: 11))
+                            Text(reportNumber, style: TextStyle(fontSize: 11))
                           ],
                         )
                       : const SizedBox(),
@@ -1003,14 +1013,14 @@ class _ForumHomeState extends State<ForumHome> {
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       GestureDetector(
                         onTap: () async {
                           specialSearchArgs['showReported'] = 'Unreviewed';
                           await loadUpdate();
                         },
                         child: Container(
-                          padding: EdgeInsets.only(
+                          padding: const EdgeInsets.only(
                               top: 8, bottom: 8, left: 16, right: 16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
@@ -1030,7 +1040,7 @@ class _ForumHomeState extends State<ForumHome> {
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                     ],
                   ),
                 )

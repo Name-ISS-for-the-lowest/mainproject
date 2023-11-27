@@ -1,6 +1,11 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
+import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/selectorHelper.dart';
 // import 'package:language_picker/language_picker.dart';
@@ -291,10 +296,8 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Text(Localize("Continue")),
         onPressed: () async {
           AuthHelper.logout();
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => const Home()),
-              (route) => false);
+          Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (_) => Home()), (route) => false);
         },
       );
 
@@ -463,10 +466,8 @@ class _ProfilePageState extends State<ProfilePage> {
         onPressed: () async {
           AuthHelper.logout();
 
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => const Home()),
-              (route) => false);
+          Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (_) => Home()), (route) => false);
         },
       );
 
@@ -600,25 +601,20 @@ class _ProfilePageState extends State<ProfilePage> {
                 Positioned(
                   child: Align(
                     alignment: Alignment.center,
-                    child: GestureDetector(
-                      onTap: () {
-                        navigateToViewImage([imageURL]);
-                      },
-                      child: Container(
-                        width: 150, // Set your desired width
-                        height: 150, // Set your desired height
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: ClipOval(
-                          child: CachedNetworkImage(
-                            imageUrl: "$imageURL?tr=w-150,h-150,fo-auto",
-                            placeholder: (context, url) =>
-                                CircularProgressIndicator(),
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.error),
-                            fit: BoxFit.fill,
-                          ),
+                    child: Container(
+                      width: 150, // Set your desired width
+                      height: 150, // Set your desired height
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: "$imageURL?tr=w-150,h-150,fo-auto",
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                          fit: BoxFit.fill,
                         ),
                       ),
                     ),
