@@ -19,20 +19,21 @@ class Comments extends StatefulWidget {
 }
 
 class _CommentsState extends State<Comments> {
-  var post;
+  var post = {};
   bool init = true;
   final Map<String, String> currentlyTranslated = {};
   Map postData = {};
+  bool fetched = false;
 
-  void load() async {
+  Future load() async {
     var dataCall = await PostHelper.getPostByID(widget.postID);
     print("printing data call...");
     print(dataCall);
     if (mounted) {
       setState(() {
-        post = dataCall;
+        fetched = true;
+        post = jsonDecode(dataCall);
         print("printing...");
-
         print(post);
         init = false;
         //postData = jsonDecode(dataCall) as Map<String, dynamic>;
@@ -113,7 +114,10 @@ class _CommentsState extends State<Comments> {
   }
 
   Widget _buildPost() {
-    //String imageURL = post["profilePicture"]["url"];
+    if (!fetched) {
+      return const Text("Loading");
+    }
+    String imageURL = post["profilePicture"]["url"];
     String posterName = post["username"];
     String postContent = post["content"];
     String postID = post["_id"];
@@ -557,6 +561,7 @@ class _CommentsState extends State<Comments> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.postID);
     if (init) {
       firstload();
       init = false;
@@ -566,7 +571,7 @@ class _CommentsState extends State<Comments> {
       userIsAdmin = true;
     }
     return Scaffold(
-        /*appBar: AppBar(
+        appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -605,7 +610,7 @@ class _CommentsState extends State<Comments> {
                 _buildPost()
           )
         ]
-      ),*/
-        );
+      ),
+    );
   }
 }

@@ -19,8 +19,8 @@ class Post:
     edited: bool
     deleted: bool
     removed: bool
-    contentHistory: []
-    translations: {}
+    contentHistory: list
+    translations: dict
     posterIsAdmin: bool
     reports: int
     imageURL : str
