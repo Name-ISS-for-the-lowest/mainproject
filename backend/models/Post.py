@@ -92,7 +92,6 @@ class Post:
         post._id = str(post._id)
         post.userID = str(post.userID)
         post.edited = str(post.edited)
-        post.contentHistory = Post.contentHistoryToString(post)
         post.deleted = str(post.deleted)
         post.removed = str(post.removed)
         post.reports = str(post.reports)
