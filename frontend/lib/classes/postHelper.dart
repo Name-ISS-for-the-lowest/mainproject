@@ -6,15 +6,15 @@ import 'package:frontend/classes/routeHandler.dart';
 
 class PostHelper {
   static String defaultHost = RouteHandler.defaultHost;
-  static Map<String, String> cachedTranslations = Map();
+  static Map<String, String> cachedTranslations = {};
 
   static Future<Response> createPost(
       String userID, String postBody, File? Photo) async {
-    var params;
+    Map<String, dynamic> params;
     String endPoint;
     String? imageURL;
     String? fileID;
-    var url;
+    String url;
     if (Photo != null) {
       var formData = FormData.fromMap({
         'photo': await MultipartFile.fromFile(Photo.path,
@@ -125,13 +125,11 @@ class PostHelper {
 
   static getPosts(int start, int end,
       [Map<String, String>? specialSearchOptions]) async {
-    if (specialSearchOptions == null) {
-      specialSearchOptions = {
+    specialSearchOptions ??= {
         'showReported': 'All',
         'showRemoved': 'None',
         'showDeleted': 'None'
       };
-    }
     final params = {
       'start': start,
       'end': end,
@@ -177,13 +175,11 @@ class PostHelper {
 
   static searchPosts(int start, int end, String search, String userID,
       [Map<String, String>? specialSearchOptions]) async {
-    if (specialSearchOptions == null) {
-      specialSearchOptions = {
+    specialSearchOptions ??= {
         'showReported': 'All',
         'showRemoved': 'None',
         'showDeleted': 'None'
       };
-    }
     final data = {
       'start': start,
       'end': end,
@@ -200,7 +196,7 @@ class PostHelper {
           data: jsonEncode(data),
           options: Options(contentType: Headers.jsonContentType));
       return response.data;
-    } on DioException catch (e) {
+    } on DioException {
       return Response(
         requestOptions: RequestOptions(path: url),
         data: {'message': 'post machine broke lil bro'},

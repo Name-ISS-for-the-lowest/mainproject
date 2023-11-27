@@ -1,13 +1,9 @@
-import 'dart:convert';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/SignupComplete.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:lottie/lottie.dart';
 
 class AddToProfilePic extends StatefulWidget {
@@ -97,6 +93,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
     );
   }
 
+  @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.sizeOf(context).height;
 
@@ -229,7 +226,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                               child: Align(
                                 alignment: Alignment.bottomCenter,
                                 child: IconButton(
-                                    icon: Icon(Icons.camera_alt),
+                                    icon: const Icon(Icons.camera_alt),
                                     iconSize: 50,
                                     onPressed: () async {
                                       _showImagePickerDialog(context);
@@ -271,7 +268,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                                           },
                                           child: Text(
                                             Localize("Next"),
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w700,
                                               color: Color.fromARGB(

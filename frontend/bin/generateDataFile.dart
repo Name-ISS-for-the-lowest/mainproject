@@ -155,7 +155,7 @@ String generateDartFileContent(
   String dartFileContent = 'class Data {\n';
 
   // Add each map as a static variable in the Data class
-  JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+  JsonEncoder encoder = const JsonEncoder.withIndent('  ');
 
   String jsonLocalizations = encoder.convert(localizations);
   String jsonLanguageNames = encoder.convert(languageNames);
@@ -173,11 +173,9 @@ String generateDartFileContent(
 
 String _formatMap(Map<String, dynamic> map) {
   // Format the map with double quotes around keys and string values
-  String formattedMap = '{' +
-      map.entries
+  String formattedMap = '{${map.entries
           .map((entry) => '"${entry.key}": ${_formatValue(entry.value)}')
-          .join(', ') +
-      '}';
+          .join(', ')}}';
   return formattedMap;
 }
 

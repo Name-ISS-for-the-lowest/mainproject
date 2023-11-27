@@ -1,11 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:frontend/classes/routeHandler.dart';
-import 'package:html_unescape/html_unescape.dart';
-import 'package:html/parser.dart' show parse;
 
 import 'package:frontend/classes/keywordData.dart';
 import 'package:frontend/classes/authHelper.dart';
-import 'package:frontend/classes/localize.dart';
 
 class EventHelper {
   static final events = <Map<String, dynamic>>[];
@@ -99,7 +96,7 @@ class EventHelper {
     } on DioException catch (e) {
       print(e);
       // Handle the error, you might want to throw an exception or return a default response
-      throw e;
+      rethrow;
     }
   }
 
@@ -121,9 +118,7 @@ class EventHelper {
         eventDescription.contains(userLanguage)) {
       return true;
     }
-    if (userKeywords == null) {
-      userKeywords = [];
-    }
+    userKeywords ??= [];
     for (String keyword in userKeywords) {
       if (eventTitle.contains(keyword.toLowerCase()) ||
           eventDescription.contains(keyword.toLowerCase())) {

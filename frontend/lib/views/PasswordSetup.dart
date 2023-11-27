@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
-import 'package:frontend/views/AddProfilePic.dart';
 import 'package:frontend/views/ConfirmPassword.dart';
 import 'package:lottie/lottie.dart';
 
