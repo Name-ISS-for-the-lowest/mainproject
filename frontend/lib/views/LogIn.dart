@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/ResetPassword.dart';
 import 'package:frontend/views/SignUp.dart';
 import 'package:frontend/views/CoreTemplate.dart';
+import 'package:lottie/lottie.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
@@ -46,9 +47,9 @@ class _LogInState extends State<LogIn> {
     var result = Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return Scaffold(
-            //I kept the email in the text field
-            body: SignUp(email: emailController.text),
+          return const Scaffold(
+            resizeToAvoidBottomInset: false,
+            body: SignUp(),
           );
         },
       ),
@@ -83,212 +84,207 @@ class _LogInState extends State<LogIn> {
   }
 
   void navigateToPrimaryScreens() {
-    Navigator.pushAndRemoveUntil(context,
-        MaterialPageRoute(builder: (_) => CoreTemplate()), (route) => false);
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const CoreTemplate()),
+        (route) => false);
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.sizeOf(context).height;
+
     return Scaffold(
-      body: SingleChildScrollView(
-        physics: const NeverScrollableScrollPhysics(),
-        child: Stack(
+        backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
+        resizeToAvoidBottomInset: false,
+        body: Stack(
+          alignment: Alignment.center,
           children: [
-            Column(
-              children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.60,
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.40,
-                  child: SvgPicture.asset(
-                    'assets/BackGround.svg',
-                    fit: BoxFit.fitWidth,
+            //Background animation (increase top offset value to move anim down, decrease to move up)
+            Positioned(
+                top: 200,
+                child: SizedBox(
+                  height: screenHeight,
+                  child: LottieBuilder.asset(
+                    'assets/BackgroundWave.json',
+                    fit: BoxFit.fill,
                   ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                //spacer for top
-                const SizedBox(
-                  height: 120,
-                ),
-                //Log in title
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      Localize("Log In"),
-                      style: TextStyle(
-                        fontSize: 50,
-                        fontWeight: FontWeight.w700,
-                        color: Color.fromRGBO(230, 183, 17, 1),
+                )),
+
+            //Returning User Form begins Here--------------------------
+            Positioned(
+                top: 100,
+                child: Column(
+                  children: [
+                    //This part is just text and formatting
+                    SizedBox(
+                        width: 240,
+                        height: 100,
+                        child: FittedBox(
+                          child: DefaultTextStyle(
+                            style: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.bold,
+                                fontSize: 50,
+                                color: Color.fromRGBO(230, 183, 17, 1)),
+                            textAlign: TextAlign.center,
+                            child: AnimatedTextKit(
+                                repeatForever: true,
+                                animatedTexts: [
+                                  RotateAnimatedText(
+                                      transitionHeight: 100,
+                                      Localizer.localize('Welcome Back', 'en')),
+                                  RotateAnimatedText(
+                                      transitionHeight: 100,
+                                      Localizer.localize('Welcome Back', 'es')),
+                                  RotateAnimatedText(
+                                      transitionHeight: 100,
+                                      Localizer.localize('Welcome Back', 'fr')),
+                                  RotateAnimatedText(
+                                      transitionHeight: 100,
+                                      Localizer.localize('Welcome Back', 'zh')),
+                                ]),
+                          ),
+                        )),
+
+                    //Spacer for Column elements
+                    const SizedBox(
+                      height: 45,
+                    ),
+
+                    //Email Field Styling
+                    SizedBox(
+                      width: 330,
+                      height: 55,
+                      child: TextField(
+                        controller: emailController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          labelText: Localize('Email'),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                //Input fields
-                Column(
-                  children: [
+
+                    //Spacer for Column elements
                     const SizedBox(
-                      height: 50,
+                      height: 21,
                     ),
-                    Column(
-                      children: [
-                        Column(
-                          children: [
-                            SizedBox(
-                              width: 340,
-                              child: TextField(
-                                controller: emailController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  labelText: Localize('Email'),
-                                  contentPadding: const EdgeInsets.all(18),
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.never,
-                                ),
-                              ),
-                            ),
-                          ],
+
+                    //Password Field Styling
+                    SizedBox(
+                      width: 330,
+                      height: 55,
+                      child: TextField(
+                        controller: passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          labelText: Localize('Password'),
+                          filled: true,
+                          fillColor: Colors.white,
                         ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Column(
-                          children: [
-                            SizedBox(
-                              width: 340,
-                              child: TextField(
-                                obscureText: true,
-                                controller: passwordController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  labelText: Localize('Password'),
-                                  contentPadding: const EdgeInsets.all(18),
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.never,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Column(
-                      children: [
-                        const SizedBox(
-                          height: 50,
-                        ),
-                        Column(
-                          children: [
-                            Center(
-                              child: SizedBox(
-                                width: 340,
-                                height: 50,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    elevation: 10,
-                                    backgroundColor:
-                                        const Color.fromRGBO(230, 183, 17, 1),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                  ),
-                                  onPressed: () => {
-                                    executeLogin(context, emailController.text,
-                                        passwordController.text),
-                                  },
-                                  child: Text(
-                                    Localize("Login"),
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color.fromARGB(255, 53, 53, 53),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Column(
-                          children: [
-                            Center(
-                              child: SizedBox(
-                                width: 340,
-                                height: 50,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    elevation: 10,
-                                    backgroundColor:
-                                        const Color.fromRGBO(221, 151, 26, 1),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                  ),
-                                  onPressed: () => {
-                                    navigateToSignUp(),
-                                  },
-                                  child: Text(
-                                    Localize("Sign Up"),
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color.fromARGB(255, 53, 53, 53),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+
+                    //Spacer for Column elements
                     const SizedBox(
-                      height: 10,
+                      height: 11,
                     ),
+
+                    //Reset Password Link Styling
+                    SizedBox(
+                      width: 330,
+                      child: GestureDetector(
+                        onTap: () {
+                          navigateToResetPassword();
+                        },
+                        child: Text(
+                          Localize('Forgot Password?'),
+                          style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.white),
+                          textAlign: TextAlign.end,
+                        ),
+                      ),
+                    ),
+
+                    //Spacer for Column elements
+                    const SizedBox(
+                      height: 12,
+                    ),
+
+                    //Log In Button Styling
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                      ),
-                      onPressed: () => {
-                        navigateToResetPassword(),
-                      },
-                      child: Text(
-                        Localize("Forgot Password?"),
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: Color.fromRGBO(230, 183, 17, 1),
+                        fixedSize: const Size(330, 50),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0)),
+                        backgroundColor: const Color.fromRGBO(230, 183, 17, 1),
+                        foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
+                        textStyle: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
                       ),
+                      child: Text(Localize('Log In')),
+                      onPressed: () => {
+                        executeLogin(context, emailController.text,
+                            passwordController.text)
+                      },
                     ),
                   ],
-                ),
-              ],
+                )),
+
+            //New User Forms Begin here -------------------------------
+            Positioned(
+              bottom: 42,
+              child: Column(
+                children: [
+                  //This part is just text and formatting
+                  Text(
+                    Localize('Don\'t have an account?'),
+                    style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color.fromRGBO(230, 183, 17, 1)),
+                  ),
+
+                  //Spacer
+                  const SizedBox(
+                    height: 9,
+                  ),
+
+                  //Sign Up button Formatting
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: const Size(330, 50),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0)),
+                      backgroundColor: const Color.fromRGBO(221, 151, 26, 1),
+                      foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
+                      textStyle: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    child: Text(Localize('Sign Up')),
+                    onPressed: () => {navigateToSignUp()},
+                  ),
+                ],
+              ),
             ),
           ],
-        ),
-      ),
-    );
+        ));
   }
 }

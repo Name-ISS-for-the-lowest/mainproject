@@ -31,6 +31,7 @@ class EmailSender:
         token = secrets.token_urlsafe(32)
 
         body = f"""
+        
 <html lang="en">
   <head>
     <meta charset="utf-8" />
