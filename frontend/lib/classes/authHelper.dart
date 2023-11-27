@@ -45,7 +45,7 @@ class AuthHelper {
 //need reset password function
   static Future<Response> resetPassword(String email) async {
     final data = {'email': email};
-    String endPoint = '/reset';
+    String endPoint = '/resetPassword';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.post(

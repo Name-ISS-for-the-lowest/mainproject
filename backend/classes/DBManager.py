@@ -2,7 +2,6 @@ import pymongo
 import json
 from models.User import User
 from models.Post import Post
-from models.Picture import Picture
 import bson
 from bson import ObjectId, binary, BSON
 import base64
@@ -30,7 +29,6 @@ class DBManager:
         else:
             return User.fromDict(user)
         
-   # def resetUserPassword(email, new_password):
 
 
     @staticmethod
@@ -74,17 +72,17 @@ class DBManager:
             profilePicture["url"] != profilePictureURL
             or profilePicture["fileId"] != profilePictureFileID
         ):
-            profilePictureHistory = user.get("profilePictureHistory")
+            profilePictureHistory = user.get('profilePictureHistory')
             profilePictureHistory.append(oldProfilePicture)
             profilePicture["url"] = profilePictureURL
             profilePicture["fileId"] = profilePictureFileID
             newDict["profilePicture"] = profilePicture
-            newDict["profilePictureHistory"] = profilePictureHistory
+            newDict['profilePictureHistory'] = profilePictureHistory
         oldUsername = user.get("username")
         if oldUsername != username:
-            usernameHistory = user.get("usernameHistory")
+            usernameHistory = user.get('usernameHistory')
             usernameHistory.append(oldUsername)
-            newDict["usernameHistory"] = usernameHistory
+            newDict['usernameHistory'] = usernameHistory
         DBManager.db["users"].update_one({"_id": id}, {"$set": newDict})
 
     @staticmethod
@@ -123,11 +121,8 @@ class DBManager:
         DBManager.db["session_cookies"].delete_one({"session_id": cookie["session_id"]})
 
     @staticmethod
-    def addPost(userID, content, imageURL, imageFileID):
+    def addPost(userID, content):
         newPost = Post(content, userID)
-        if imageURL != "False":
-            Attachment = Picture(imageURL, imageFileID)
-            newPost.attachedImage = Attachment.__dict__
         user = DBManager.getUserById(userID)
         DBManager.db["posts"].insert_one(newPost.__dict__)
 
@@ -194,36 +189,18 @@ class DBManager:
             post.profilePicture = user.get("profilePicture")
             post.username = user.get("username")
             post.posterIsAdmin = user.get("admin")
-            post.email = user.get("email")
             comboID = str(post._id) + str(userID)
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
-            reportedResult = DBManager.db["reports"].find_one({"comboID": comboID})
             if likedResult is not None:
                 post.liked = True
-            if reportedResult is not None:
-                post.reportedByUser = True
 
             returnPosts.append(post)
         return returnPosts
 
     @staticmethod
-    def getPostByID(postID: str):
-        objectID = ObjectId(postID)
-        post = DBManager.db["posts"].find_one({"_id": objectID})
-        user = DBManager.db["users"].find_one({"_id": ObjectId(post["userID"])})
-        post["profilePicture"] = user["profilePicture"]
-        post["username"] = user["username"]
-        post["posterIsAdmin"] = user["admin"]
-        post["email"] = user["email"]
-        comboID = str(post["_id"]) + str(post["userID"])
-        likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
-        reportedResult = DBManager.db["reports"].find_one({"comboID": comboID})
-        if likedResult is not None:
-            post["liked"] = True
-        if reportedResult is not None:
-            post["reportedByUser"] = True
-        returnPost = Post.fromDict(post)
-        return returnPost
+    def getPostByID(postID):
+        post = DBManager.db["posts"].find_one({"_id": postID})
+        return post
 
     @staticmethod
     def searchPosts(start, end, showRemoved, showDeleted, showReported, search, userID):
@@ -280,40 +257,21 @@ class DBManager:
             # remove the like from the likes collection
             DBManager.db["likes"].delete_one({"comboID": comboID})
             return {"message": "Post unliked"}
-
+        
     @staticmethod
-    def reportPost(postID, userID, specialDict):
+    def reportPost(postID, userID):
         # check if the user has already liked the post
         comboID = str(postID) + str(userID)
         postID = ObjectId(postID)
         reportResult = DBManager.db["reports"].find_one({"comboID": comboID})
-        postResult = DBManager.db["posts"].find_one({"_id": postID})
-        reasonDict = postResult.get("reportReasons")
         if reportResult is None:
-            postDict = {"reports": 1}
-            reasons = [
-                "hateSpeech",
-                "illegalContent",
-                "targetedHarassment",
-                "inappropriateContent",
-                "otherReason",
-            ]
-            for reason in reasons:
-                if specialDict[reason]:
-                    reasonDict[reason] += 1
             result = DBManager.db["posts"].update_one(
                 {"_id": postID}, {"$inc": {"reports": 1}}
-            )
-            result2 = DBManager.db["posts"].update_one(
-                {"_id": postID},
-                {"$set": {"reportReasons": reasonDict, "unreviewedReport": True}},
             )
             print(result.modified_count)
 
             # add the reports to the reports collection
-            DBManager.db["reports"].insert_one(
-                {"PostID": postID, "comboID": comboID, "Reason": "harassment"}
-            )
+            DBManager.db["reports"].insert_one({"PostID": postID, "comboID": comboID, "Reason": 'harassment'})
             print("Reported")
             return {"message": "Post reported"}
         else:
@@ -355,13 +313,13 @@ class DBManager:
             postJson["userID"] = ObjectId(postJson["userID"]["$oid"])
             DBManager.db["posts"].insert_one(postJson)
 
-    # @staticmethod
-    # def getEvents(language: str):
-    #     # I first, fetch all events from the database, trimming all events older than today
-    #     # I check if the event has been translated to the user's language, if not, I translate them
-    #     # I then return the events
-    #     events = DBManager.db["events"].find()
-    #     returnEvents = []
-    #     for elem in events:
-    #         returnEvents.append(elem)
-    #     return returnEvents
+    @staticmethod
+    def getEvents(language: str):
+        # I first, fetch all events from the database, trimming all events older than today
+        # I check if the event has been translated to the user's language, if not, I translate them
+        # I then return the events
+        events = DBManager.db["events"].find()
+        returnEvents = []
+        for elem in events:
+            returnEvents.append(elem)
+        return returnEvents

@@ -1,3 +1,5 @@
+from asyncio import create_task
+from datetime import datetime
 from fastapi import FastAPI, Request, Response, UploadFile
 from fastapi.responses import JSONResponse, HTMLResponse
 from classes.DBManager import DBManager
@@ -37,6 +39,7 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/logout"
             or request.url.path == "/openapi.json"
             or request.url.path == "/setProfilePictureOnSignUp"
+            or request.url.path == "/resetPassword"
         ):
             return await call_next(request)
         # check if the user has a cookie
@@ -427,3 +430,43 @@ def getEvents(request: Request, language: str = "en"):
     events = EventsManager.getEvents()
     jsonEvents = EventsManager.translateEvents(language, events)
     return JSONResponse(content=jsonEvents, status_code=200)
+
+@app.post("/resetPassword")
+def resetPassword(email: str):
+    token = EmailSender.sendResetPasswordEmail(email)
+    now = datetime.now()
+    user = DBManager.getUserByEmail(email)
+    if user is None:
+        return JSONResponse(
+            content={"message": "Hopefully email is found"}, status_code=400
+        )
+    user['token'] = token
+    user['tokenCreatedAt'] = now
+
+    DBManager.db["users"].update_one({"email": email}, {"$set": user})
+    return JSONResponse ("Message sent")
+
+
+@app.patch("/resetPassword")
+def receivePassword(password: str, token: str):
+    user = DBManager.getUserByToken(token)
+    createAt = user['tokenExpiresAt']
+    expires = createAt + 1800 < datetime.now()
+    if createAt + 1800 < datetime.now():
+        return JSONResponse(content={"message": "link expired"}, status_code=400)
+    
+    user['tokenCreatedAt'].clear()
+    salt = PassHasher.generateSalt()
+    passwordHash = PassHasher.hashPassword(password, salt)
+    user['passwordHash'] = passwordHash
+    user['salt'] = salt
+    DBManager.db["users"].update_one({"token": token}, {"$set": user})
+    
+    
+    return JSONResponse(content={"message": "Password reset successfully"})
+    
+
+
+
+    
+    
