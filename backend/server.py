@@ -36,6 +36,7 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/docs"
             or request.url.path == "/logout"
             or request.url.path == "/openapi.json"
+            or request.url.path == "/setProfilePictureOnSignUp"
         ):
             return await call_next(request)
         # check if the user has a cookie
@@ -221,6 +222,30 @@ async def uploadPhoto(photo: UploadFile, name: str, type: str):
         jsonImage = json.dumps(image.__dict__, ensure_ascii=False)
 
         return JSONResponse(content=image.__dict__, status_code=200)
+    except Exception as e:
+        print(e)
+        return JSONResponse({"message": "Unable to upload photo"}), 400
+
+
+@app.post("/setProfilePictureOnSignUp")
+async def setProfilePictureOnSignUp(photo: UploadFile, email: str, request: Request):
+    try:
+        # first get user by email
+        user = DBManager.getUserByEmail(email)
+        print("user: ", user.__dict__)
+        # check user is not activated
+        if user["accountActivated"] == True:
+            return JSONResponse({"message": "User already activated"}), 400
+        else:
+            # upload image
+            image = await ImageHelper.uploadImage(photo, "default", "profilePictures")
+            print("made it here", image.__dict__)
+            user.__setattr__("profilePicture", image.__dict__)
+
+            # user["profilePicture"] = image.__dict__
+            print("user: ", user)
+            # update user
+            DBManager.db["users"].update_one({"email": email}, {"$set": user.__dict__})
     except Exception as e:
         print(e)
         return JSONResponse({"message": "Unable to upload photo"}), 400

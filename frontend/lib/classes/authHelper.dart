@@ -92,6 +92,7 @@ class AuthHelper {
   }
 
   static Future<bool> isLoggedIn() async {
+    return false;
     var sessionCookie = await readCookie('session_cookie');
     if (sessionCookie == null) return false;
 
@@ -218,6 +219,33 @@ class AuthHelper {
     var params = {
       'name': name,
       'type': 'profilePictures',
+    };
+
+    try {
+      final response = await RouteHandler.dio.post(url,
+          data: formData,
+          queryParameters: params,
+          options: Options(contentType: Headers.multipartFormDataContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static setProfilePictureOnSignUp(String email, File photo) async {
+    //this endpoint can change a profile picture, but email, only if account is unverified
+    String endPoint = '/setProfilePictureOnSignUp';
+    var url = '$defaultHost$endPoint';
+
+    var formData = FormData.fromMap({
+      'photo': await MultipartFile.fromFile(photo.path),
+    });
+    var params = {
+      'email': email,
     };
 
     try {

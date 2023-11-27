@@ -30,7 +30,6 @@ class Post:
     reportReasons: dict
     unreviewedReport: bool = False
 
-
     def __init__(self, content, user_id, attachment=None, parent_id=None):
         self.content = content
         self.userID = user_id
@@ -46,7 +45,13 @@ class Post:
         self.translations = {}
         self.edited = False
         self.contentHistory = []
-        self.reportReasons = {'hateSpeech' : 0, 'targetedHarassment': 0, 'illegalContent' : 0, 'inappropriateContent': 0, 'otherReason': 0}
+        self.reportReasons = {
+            "hateSpeech": 0,
+            "targetedHarassment": 0,
+            "illegalContent": 0,
+            "inappropriateContent": 0,
+            "otherReason": 0,
+        }
         self.deleted = False
         self.removed = False
         self.reports = 0

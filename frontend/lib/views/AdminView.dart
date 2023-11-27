@@ -41,11 +41,8 @@ class _AdminViewState extends State<AdminView> {
     var dataCall = await PostHelper.getPostByID(widget.postID);
     if (mounted) {
       setState(() {
-        post = jsonDecode(dataCall);
-        print('POST PRINT HERE');
-        print(post);
+        post = dataCall;
         firstLoad = false;
-        //postData = jsonDecode(dataCall) as Map<String, dynamic>;
       });
     }
   }

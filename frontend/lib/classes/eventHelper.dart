@@ -11,9 +11,11 @@ class EventHelper {
   static final events = <Map<String, dynamic>>[];
   static bool mounted = true;
   static bool fetched = false;
+  static bool fetching = false;
+  static Function setState = () {};
   static String previousLanguage = "en";
 
-  static Future fetchEvents(Function setState) async {
+  static Future fetchEvents() async {
     if (events.isNotEmpty) {
       var language = AuthHelper.userInfoCache['language'];
       if (language == previousLanguage) {
@@ -39,6 +41,10 @@ class EventHelper {
     };
 
     try {
+      if (fetching) {
+        return;
+      }
+      EventHelper.fetching = true;
       String defaultHost = RouteHandler.defaultHost;
       var language = AuthHelper.userInfoCache['language'];
       EventHelper.previousLanguage = language;
@@ -58,7 +64,7 @@ class EventHelper {
 
       //Okay so how are the events being set as recommended?
       if (mounted) {
-        setState(() {
+        EventHelper.setState(() {
           for (var event in results) {
             if (isEventRecommended(event)) {
               events.add({
@@ -88,6 +94,7 @@ class EventHelper {
         });
       }
       fetched = true;
+      fetching = false;
       return response;
     } on DioException catch (e) {
       print(e);

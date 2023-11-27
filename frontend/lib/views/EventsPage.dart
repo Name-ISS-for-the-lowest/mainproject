@@ -21,7 +21,8 @@ class _EventsPageState extends State<EventsPage> {
   void initState() {
     super.initState();
     EventHelper.mounted = true;
-    EventHelper.fetchEvents(setState);
+    EventHelper.setState = setState;
+    EventHelper.fetchEvents();
   }
 
   @override
