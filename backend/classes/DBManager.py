@@ -200,18 +200,19 @@ class DBManager:
         return returnPosts
 
     @staticmethod
-    def getPostByID(postID):
-        postID = ObjectId(postID)
-        post = DBManager.db["posts"].find_one({"_id": postID})
-        user = DBManager.db["users"].find_one({"_id": ObjectId(post.get("userID"))})
-        post['profilePicture'] = user.get("profilePicture")
-        post['profilePicture'] = user.get("username")
-        post['profilePicture'] = user.get("admin")
-        comboID = str(post.get("_id")) + str(post.get("userID"))
+    def getPostByID(postID: str):
+        objectID = ObjectId(postID)
+        post = DBManager.db["posts"].find_one({"_id": objectID})
+        user = DBManager.db["users"].find_one({"_id": ObjectId(post["userID"])})
+        post["profilePicture"] = user["profilePicture"]
+        post["username"] = user["username"]
+        post["posterIsAdmin"] = user["admin"]
+        comboID = str(post["_id"]) + str(post["userID"])
         likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
         if likedResult is not None:
-            post.liked = True
-        return post
+            post["liked"] = True
+        returnPost = Post.fromDict(post)
+        return returnPost
 
     @staticmethod
     def searchPosts(start, end, showRemoved, showDeleted, showReported, search, userID):
@@ -300,7 +301,7 @@ class DBManager:
         else:
             return {"message": "Post not found"}
 
-    def insertUserList(users: [User]):
+    def insertUserList(users: list[User]):
         for user in users:
             userJson = user.__dict__
             DBManager.db["users"].insert_one(userJson)
@@ -318,7 +319,7 @@ class DBManager:
         print("Admin privilleges assigned successfully!")
 
     @staticmethod
-    def insertPostList(posts: [Post]):
+    def insertPostList(posts: list[Post]):
         for post in posts:
             postJson = post.__dict__
             postJson["userID"] = ObjectId(postJson["userID"]["$oid"])
