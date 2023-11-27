@@ -33,7 +33,7 @@ class _ReportPageState extends State<ReportPage> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return Scaffold(
+          return const Scaffold(
             body: CoreTemplate(),
           );
         },
@@ -45,7 +45,7 @@ class _ReportPageState extends State<ReportPage> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return Scaffold(
+          return const Scaffold(
             body: ConfirmReport(),
           );
         },
@@ -202,11 +202,11 @@ class _ReportPageState extends State<ReportPage> {
   Widget buildMenu(String option) {
     String argOption = textToArg[option]!;
     bool? selected = reasonsSelected[argOption];
-    Color unselectedOption = Color(0xffF2F0F4);
-    Color selectedOption = Color(0xffC9C9C9);
-    Color unselected = Color(0xaa000000);
+    Color unselectedOption = const Color(0xffF2F0F4);
+    Color selectedOption = const Color(0xffC9C9C9);
+    Color unselected = const Color(0xaa000000);
     return Container(
-      padding: EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 16),
+      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.0),
         border: Border.all(color: Colors.black, width: 1.0),

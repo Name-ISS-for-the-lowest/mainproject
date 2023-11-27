@@ -1,18 +1,18 @@
-import 'dart:convert';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/views/AccountAlreadyExists.dart';
 import 'package:frontend/views/SignupComplete.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:lottie/lottie.dart';
+import 'package:dio/dio.dart';
 
 class AddToProfilePic extends StatefulWidget {
   final String email;
-  const AddToProfilePic({super.key, required this.email});
+  final String password;
+  const AddToProfilePic(
+      {super.key, required this.email, required this.password});
 
   @override
   State<AddToProfilePic> createState() => _AddToProfilePicState();
@@ -23,6 +23,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
   File image = File('assets/Default_pfp.png');
   Widget imageWidget = Image.asset('assets/Default_pfp.png',
       width: 200, height: 200, fit: BoxFit.fill);
+  bool isLoading = false;
 
   Future<void> pickImage(ImageSource source) async {
     try {
@@ -41,7 +42,6 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
   }
 
   Future<void> setProfilePic() async {
-    print("made it here$imageSpecified");
     if (imageSpecified) {
       //todo set the profile picture
       await AuthHelper.setProfilePictureOnSignUp(widget.email, image);
@@ -97,6 +97,47 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
     );
   }
 
+  void navigateToAccountAlreadyExists() {
+    //navigate back to login
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: Stack(children: [
+              SizedBox(
+                height: 100,
+                child: AppBar(
+                  backgroundColor: Colors.transparent,
+                  iconTheme: const IconThemeData(color: Colors.white),
+                ),
+              ),
+              const AccountAlreadyExists()
+            ]),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<bool> executeSignUp(String email, String password) async {
+    Response response = await AuthHelper.signUp(email, password);
+    print(response.data["message"]);
+    if (response.data["message"] == "Account with this email, already exists") {
+      //navigate to account already exists page
+      navigateToAccountAlreadyExists();
+      return false;
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.data["message"] ?? "Error"),
+        ),
+      );
+    }
+    return true;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.sizeOf(context).height;
 
@@ -229,7 +270,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                               child: Align(
                                 alignment: Alignment.bottomCenter,
                                 child: IconButton(
-                                    icon: Icon(Icons.camera_alt),
+                                    icon: const Icon(Icons.camera_alt),
                                     iconSize: 50,
                                     onPressed: () async {
                                       _showImagePickerDialog(context);
@@ -262,17 +303,33 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                                                   BorderRadius.circular(10.0),
                                             ),
                                           ),
-                                          onPressed: () {
-                                            // enter logic to go to confirm password screen
-                                            //set the profile picture
-                                            print("am right here");
-                                            setProfilePic();
+                                          onPressed: () async {
+                                            //show loading overlay
+                                            setState(() {
+                                              isLoading = true;
+                                            });
+                                            bool result = await executeSignUp(
+                                                widget.email, widget.password);
+                                            if (result) {
+                                              await setProfilePic();
+                                              setState(() {
+                                                isLoading = false;
+                                              });
+                                              navigateToFinishSignUp();
+                                            } else {
+                                              setState(() {
+                                                isLoading = false;
+                                              });
+                                              navigateToAccountAlreadyExists();
+                                            }
+
+                                            //remove loading overlay
                                           },
                                           child: Text(
                                             Localize("Next"),
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontSize: 16,
-                                              fontWeight: FontWeight.w700,
+                                              fontWeight: FontWeight.w800,
                                               color: Color.fromARGB(
                                                   255, 53, 53, 53),
                                             ),
@@ -293,38 +350,19 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                     ),
                   ],
                 ),
-
-                Positioned(
-                  bottom: 42,
-                  child: Column(children: [
-                    SizedBox(
-                        height:
-                            100), // Add spacing between the profile picture and the next button
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        fixedSize: const Size(330, 50),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0)),
-                        backgroundColor: const Color.fromRGBO(221, 151, 26, 1),
-                        foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
-                        textStyle: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      child: Text(Localize('Next')),
-                      onPressed: () => {
-                        navigateToFinishSignUp(),
-                      },
-                    ),
-                  ]
-                      //Next Button Styling
-                      ),
-                ),
               ],
             )),
           ),
+
+          if (isLoading)
+            Container(
+              width: screenHeight,
+              height: screenHeight,
+              color: Color.fromARGB(0, 245, 245, 245).withOpacity(0.3),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
         ],
       ),
     );

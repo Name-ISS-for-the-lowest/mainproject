@@ -1,9 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
-import 'package:frontend/classes/authHelper.dart';
-import 'package:dio/dio.dart';
 import 'package:frontend/views/LogIn.dart';
 import 'package:lottie/lottie.dart';
 
@@ -76,9 +72,9 @@ class _SignupCompleteState extends State<SignupComplete> {
                   children: [
                     //This part is just text and formatting
                     SizedBox(
-                      width: 280,
+                      width: 350,
                       child: Text(
-                        Localize('All Done!'),
+                        Localize('Verify your email'),
                         style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
@@ -97,7 +93,7 @@ class _SignupCompleteState extends State<SignupComplete> {
                       width: 300,
                       child: Text(
                         Localize(
-                            'Congratulations, you’ve completed your ISS sign up process!'),
+                            'You should receive an email shortly with a link to confirm your email address. Please click the link to complete your registration.'),
                         style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,

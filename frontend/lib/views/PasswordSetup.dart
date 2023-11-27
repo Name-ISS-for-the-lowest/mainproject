@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
-import 'package:frontend/views/AddProfilePic.dart';
-import 'package:frontend/views/ConfirmPassword.dart';
 import 'package:lottie/lottie.dart';
+import 'package:frontend/views/AddProfilePic.dart';
 
 class PasswordSetUp extends StatefulWidget {
   final String email;
@@ -15,8 +14,9 @@ class PasswordSetUp extends StatefulWidget {
 
 class _PasswordState extends State<PasswordSetUp> {
   TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
 
-  void navigateToConfirmPassword(String email, String password) {
+  void navigateToAddProfilePic(String email, String password) {
     //navigate to AddProfilePic page
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -30,10 +30,7 @@ class _PasswordState extends State<PasswordSetUp> {
                   iconTheme: const IconThemeData(color: Colors.white),
                 ),
               ),
-              ConfirmPassword(
-                email: email,
-                password: password,
-              ),
+              AddToProfilePic(email: email, password: password)
             ]),
           );
         },
@@ -55,6 +52,15 @@ class _PasswordState extends State<PasswordSetUp> {
       //show error message
       return false;
     }
+    //make sure passwords match
+    if (password != confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(Localize("Passwords do not match")),
+        ),
+      );
+      return false;
+    }
     widget.password = password;
     return true;
   }
@@ -65,7 +71,7 @@ class _PasswordState extends State<PasswordSetUp> {
 
     return Scaffold(
       backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true, // Extend content behind the AppBar
       appBar: AppBar(
         backgroundColor:
@@ -131,39 +137,6 @@ class _PasswordState extends State<PasswordSetUp> {
                     height: 20,
                   ),
 
-                  SizedBox(
-                    width: 340,
-                    child: Text(
-                      Localize(
-                          'For security purposes, please make sure that your password contains a series of numbers, letters, and other special characters.'),
-                      style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Color.fromRGBO(230, 183, 17, 1)),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-                  //Spacer for Column elements
-                  const SizedBox(
-                    height: 20,
-                  ),
-
-                  SizedBox(
-                    width: 300,
-                    child: Text(
-                      Localize(
-                          'DON\'T share your password with other users or third-parties. It should only be known by the owner of the account'),
-                      style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Color.fromRGBO(255, 255, 255, 1)),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
                   //Spacer for Column elements
                   const SizedBox(
                     height: 20,
@@ -181,8 +154,10 @@ class _PasswordState extends State<PasswordSetUp> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         labelText: Localize('Password'),
-                        filled: true,
+                        contentPadding: const EdgeInsets.all(18),
                         fillColor: Colors.white,
+                        filled: true,
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
                       ),
                     ),
                   ),
@@ -190,6 +165,24 @@ class _PasswordState extends State<PasswordSetUp> {
                   //Spacer for Column elements
                   const SizedBox(
                     height: 20,
+                  ),
+                  SizedBox(
+                    width: 330,
+                    height: 55,
+                    child: TextField(
+                      controller: confirmPasswordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        labelText: Localize('Confirm Password'),
+                        contentPadding: const EdgeInsets.all(18),
+                        fillColor: Colors.white,
+                        filled: true,
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
+                      ),
+                    ),
                   ),
                 ],
               )),
@@ -213,7 +206,7 @@ class _PasswordState extends State<PasswordSetUp> {
               child: Text(Localize('Next')),
               onPressed: () {
                 if (validatePassword(passwordController.text)) {
-                  navigateToConfirmPassword(widget.email, widget.password);
+                  navigateToAddProfilePic(widget.email, widget.password);
                 }
               },
             ),

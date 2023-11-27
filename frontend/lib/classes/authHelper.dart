@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:frontend/classes/Data.dart';
 import 'package:frontend/classes/routeHandler.dart';
-import 'package:intl/intl.dart';
 
 //todo add persitent storage for session cookie
 
@@ -184,6 +183,7 @@ class AuthHelper {
       AuthHelper.userInfoCache['profilePicture.fileId'] =
           userInfo['profilePicture.fileId'];
       userInfoCache['admin'] = userInfo['admin'];
+      print(userInfoCache);
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),

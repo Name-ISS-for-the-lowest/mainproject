@@ -1,11 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:frontend/classes/routeHandler.dart';
-import 'package:html_unescape/html_unescape.dart';
-import 'package:html/parser.dart' show parse;
-
 import 'package:frontend/classes/keywordData.dart';
 import 'package:frontend/classes/authHelper.dart';
-import 'package:frontend/classes/localize.dart';
 
 class EventHelper {
   static final events = <Map<String, dynamic>>[];
@@ -25,20 +21,6 @@ class EventHelper {
         events.clear();
       }
     }
-    final monthsOfYear = {
-      1: 'JAN',
-      2: 'FEB',
-      3: 'MAR',
-      4: 'APR',
-      5: 'MAY',
-      6: 'JUN',
-      7: 'JUL',
-      8: 'AUG',
-      9: 'SEP',
-      10: 'OCT',
-      11: 'NOV',
-      12: 'DEC',
-    };
 
     try {
       if (fetching) {
@@ -48,7 +30,6 @@ class EventHelper {
       String defaultHost = RouteHandler.defaultHost;
       var language = AuthHelper.userInfoCache['language'];
       EventHelper.previousLanguage = language;
-      print("language is $language");
       String endPoint = '/getEvents';
       final url = '$defaultHost$endPoint';
       var params = {
@@ -57,7 +38,6 @@ class EventHelper {
       final response = await RouteHandler.dio.get(url,
           queryParameters: params,
           options: Options(responseType: ResponseType.json));
-      print(response);
       var results = response.data;
 
       final eventsSecondary = <Map<String, String>>[];
@@ -97,14 +77,14 @@ class EventHelper {
       fetching = false;
       return response;
     } on DioException catch (e) {
+      //sc
       print(e);
       // Handle the error, you might want to throw an exception or return a default response
-      throw e;
+      rethrow;
     }
   }
 
   static bool isEventRecommended(var event) {
-    var language = AuthHelper.userInfoCache['language'];
     String eventTitle = event['title']["en"];
     String eventDescription = event['description']["en"];
     String userNationality = AuthHelper.userInfoCache['nationality'];
@@ -121,9 +101,7 @@ class EventHelper {
         eventDescription.contains(userLanguage)) {
       return true;
     }
-    if (userKeywords == null) {
-      userKeywords = [];
-    }
+    userKeywords ??= [];
     for (String keyword in userKeywords) {
       if (eventTitle.contains(keyword.toLowerCase()) ||
           eventDescription.contains(keyword.toLowerCase())) {

@@ -87,18 +87,18 @@ class _ResourceCenterState extends State<ResourceCenter> {
               _IconBuilder(
                   Localize("Housing"),
                   "assets/ResourceCenter/icon-homehome.svg",
-                  "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/housing.html?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp"),
+                  "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/housing.html?_x_tr_sl=auto&_x_tr_tl=$userLang&_x_tr_hl=en&_x_tr_pto=wapp"),
               const Spacer(),
               _IconBuilder(
                 Localize("F1/J1 Status"),
                 "assets/ResourceCenter/icon-visavisa.svg",
-                "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/maintaining-status.html?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
+                "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/maintaining-status.html?_x_tr_sl=auto&_x_tr_tl=$userLang&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
               const Spacer(),
               _IconBuilder(
                 Localize("F1/J1 Jobs"),
                 "assets/ResourceCenter/icon-jobjob.svg",
-                "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/employment.html?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
+                "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/employment.html?_x_tr_sl=auto&_x_tr_tl=$userLang&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
               const Spacer(),
             ],
@@ -111,19 +111,19 @@ class _ResourceCenterState extends State<ResourceCenter> {
               _IconBuilder(
                 Localize("Research Scholar"),
                 "assets/ResourceCenter/icon-research.svg",
-                "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/international-visiting-research-scholars.html?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
+                "https://www-csus-edu.translate.goog/international-programs-global-engagement/international-student-scholar-services/international-visiting-research-scholars.html?_x_tr_sl=auto&_x_tr_tl=$userLang&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
               const Spacer(),
               _IconBuilder(
                 Localize("Multicultural Center"),
                 "assets/ResourceCenter/icon-globeoutline.svg",
-                "https://www-csus-edu.translate.goog/student-affairs/centers-programs/multi-cultural-center/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
+                "https://www-csus-edu.translate.goog/student-affairs/centers-programs/multi-cultural-center/?_x_tr_sl=auto&_x_tr_tl=$userLang&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
               const Spacer(),
               _IconBuilder(
                 Localize("Serna Center"),
                 "assets/ResourceCenter/icon-americas.svg",
-                "https://www-csus-edu.translate.goog/student-affairs/centers-programs/serna-center/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
+                "https://www-csus-edu.translate.goog/student-affairs/centers-programs/serna-center/?_x_tr_sl=auto&_x_tr_tl=$userLang&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
               const Spacer(),
             ],
@@ -142,7 +142,7 @@ class _ResourceCenterState extends State<ResourceCenter> {
               _IconBuilder(
                 Localize("Health and Counseling"),
                 "assets/ResourceCenter/icon-heart.svg",
-                "https://www-csus-edu.translate.goog/student-life/health-counseling/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
+                "https://www-csus-edu.translate.goog/student-life/health-counseling/?_x_tr_sl=auto&_x_tr_tl=$userLang&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
               const Spacer(),
               _IconBuilder(

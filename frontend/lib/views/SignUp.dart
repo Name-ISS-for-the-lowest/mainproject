@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/Localize.dart';
-import 'package:dio/dio.dart';
 import 'package:frontend/views/PasswordSetup.dart';
 import 'package:lottie/lottie.dart';
 
@@ -31,6 +29,15 @@ class _SignUpState extends State<SignUp> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(Localize('Invalid email, must be a CSUS email')),
+        ),
+      );
+      return false;
+    }
+    //make sure it is shorter than 50 characters
+    if (email.length > 50) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(Localize('Email must be less than 50 characters')),
         ),
       );
       return false;
@@ -68,7 +75,7 @@ class _SignUpState extends State<SignUp> {
 
     return Scaffold(
         backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
-        resizeToAvoidBottomInset: false,
+        // resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: true, // Extend content behind the AppBar
         appBar: AppBar(
           backgroundColor:
@@ -154,23 +161,7 @@ class _SignUpState extends State<SignUp> {
                       height: 20,
                     ),
 
-                    SizedBox(
-                      width: 300,
-                      child: Text(
-                        Localize('“Example@csus.edu”'),
-                        style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Color.fromRGBO(255, 255, 255, 1)),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-
                     //Spacer for Column elements
-                    const SizedBox(
-                      height: 20,
-                    ),
 
                     //Email Field Styling
 
@@ -184,8 +175,10 @@ class _SignUpState extends State<SignUp> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           labelText: Localize('Email'),
-                          filled: true,
+                          contentPadding: const EdgeInsets.all(18),
                           fillColor: Colors.white,
+                          filled: true,
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
                         ),
                       ),
                     ),

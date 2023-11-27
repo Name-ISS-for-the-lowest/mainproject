@@ -92,6 +92,13 @@ def login(creds: credentials, request: Request, response: Response):
         )
     else:
         if user["accountActivated"] == False:
+            passwordHash = user["passwordHash"]
+            salt = user["salt"]
+            correctPass = PassHasher.checkPassword(password, passwordHash, salt)
+            if correctPass:
+                return JSONResponse(
+                    content={"message": "Please verify your email"}, status_code=400
+                )
             return JSONResponse(
                 content={"message": "Data does not match our records"}, status_code=400
             )
@@ -101,7 +108,6 @@ def login(creds: credentials, request: Request, response: Response):
             salt = user["salt"]
             # print(type(salt))
             # print(user.__dict__)
-            print(PassHasher.checkPassword(password, passwordHash, salt))
             if PassHasher.checkPassword(password, passwordHash, salt):
                 # check if the user has a cookie
                 if "session_cookie" in request.cookies:
@@ -173,6 +179,16 @@ def signUp(creds: credentials):
     # check if the user already exists
     user = DBManager.getUserByEmail(email)
     if user is not None:
+        # check if password is correct
+        passwordHash = user["passwordHash"]
+        salt = user["salt"]
+        correctPass = PassHasher.checkPassword(password, passwordHash, salt)
+        if correctPass:
+            return JSONResponse(
+                content={"message": "Account with this email, already exists"},
+                status_code=400,
+            )
+
         return JSONResponse(
             content={"message": "Unable to create account"}, status_code=400
         )
@@ -271,7 +287,7 @@ def deletePost(postID: str, request: Request):
 
 
 @app.post("/toggleRemovalOfPost")
-def toggleRemovalOfPost(postID: str, forceRemove:str, request: Request):
+def toggleRemovalOfPost(postID: str, forceRemove: str, request: Request):
     DBManager.toggleRemovalOfPost(postID, forceRemove)
     return JSONResponse({"message": "Removal Status Updated"}, status_code=200)
 

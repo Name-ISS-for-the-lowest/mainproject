@@ -15,6 +15,7 @@ class Language {
   factory Language.fromIsoCode(String isoCode) =>
       Languages.defaultLanguages.firstWhere((l) => l.isoCode == isoCode);
 
+  @override
   bool operator ==(o) =>
       o is Language && name == o.name && isoCode == o.isoCode;
 

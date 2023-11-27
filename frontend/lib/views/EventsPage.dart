@@ -4,8 +4,6 @@ import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/eventHelper.dart';
 import 'package:frontend/views/SearchBar.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:memoized/memoized.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:frontend/classes/Localize.dart';
 
 class EventsPage extends StatefulWidget {
@@ -63,7 +61,7 @@ class _EventsPageState extends State<EventsPage> {
                       _launchURL(Uri.parse(event['url']!));
                     },
                     child: Container(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: const Icon(
                         Icons.arrow_forward,
                       ),
@@ -196,7 +194,7 @@ class _EventsPageState extends State<EventsPage> {
                                   children: [
                                     Text(
                                       Localize("Recommended for you!"),
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w400,
                                           color: Colors.red),

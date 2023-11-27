@@ -1,44 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
+import 'package:frontend/views/LogIn.dart';
 import 'package:lottie/lottie.dart';
 
-class ResetPassword extends StatefulWidget {
-  final String email = "";
-  const ResetPassword({super.key});
+class AccountAlreadyExists extends StatefulWidget {
+  const AccountAlreadyExists({super.key});
+
+//varibles
 
   @override
-  State<ResetPassword> createState() => _ResetPasswordState();
+  State<AccountAlreadyExists> createState() => _AccountAlreadyExistsState();
 }
 
-class _ResetPasswordState extends State<ResetPassword> {
-  TextEditingController emailController = TextEditingController();
-
-  //on mount
-  @override
-  void initState() {
-    super.initState();
-    emailController.text = widget.email;
-  }
-
-  bool validateEmail(String email) {
-    //general email regex
-    // final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
-    //csus email regex
-    final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@csus\.edu$');
-    return emailRegExp.hasMatch(email);
-  }
-
-  void executeRestsetPassWord(String email) async {
-    final validEmail = validateEmail(email);
-    if (!validEmail) {
-      //show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(Localize('Invalid email, must be a CSUS email')),
-        ),
-      );
-      return;
-    }
+class _AccountAlreadyExistsState extends State<AccountAlreadyExists> {
+  void navigateBacktoLogIn() {
+    //navigate back to login
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: Stack(children: [
+              SizedBox(
+                height: 100,
+                child: AppBar(
+                  backgroundColor: Colors.transparent,
+                  iconTheme: const IconThemeData(color: Colors.white),
+                ),
+              ),
+              const LogIn()
+            ]),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -78,9 +72,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                   children: [
                     //This part is just text and formatting
                     SizedBox(
-                      width: 280,
+                      width: 350,
                       child: Text(
-                        Localize('Reset Password'),
+                        Localize('Account Already Exists'),
                         style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
@@ -98,7 +92,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     SizedBox(
                       width: 300,
                       child: Text(
-                        Localize('Forgot Password?'),
+                        Localize('Please login or reset password to continue.'),
                         style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
@@ -117,41 +111,13 @@ class _ResetPasswordState extends State<ResetPassword> {
                       width: 300,
                       child: Text(
                         Localize(
-                            "Just enter your account's email and a recovery link will be sent right to you!"),
+                            'We hope you enjoy your time with us. Press the button below at any time to return to the login page and begin browsing.'),
                         style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                             color: Color.fromRGBO(230, 183, 17, 1)),
                         textAlign: TextAlign.center,
-                      ),
-                    ),
-
-                    //Spacer for Column elements
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    //Spacer for Column elements
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    //Email Field Styling
-
-                    SizedBox(
-                      width: 330,
-                      height: 55,
-                      child: TextField(
-                        controller: emailController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          labelText: Localize('Email'),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
                       ),
                     ),
                   ],
@@ -172,9 +138,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                     fontSize: 16,
                   ),
                 ),
-                child: Text(Localize('Send Recovery Email')),
+                child: Text(Localize('Return to Login')),
                 onPressed: () => {
-                  executeRestsetPassWord(emailController.text),
+                  navigateBacktoLogIn(),
                 },
               ),
             )
