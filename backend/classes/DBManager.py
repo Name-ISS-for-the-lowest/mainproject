@@ -87,6 +87,13 @@ class DBManager:
         DBManager.db["users"].update_one({"_id": id}, {"$set": newDict})
 
     @staticmethod
+    def banUser(adminID: str, bannedID: str, banMessage: str):
+        adminID = ObjectId(adminID)
+        bannedID = ObjectId(bannedID)
+        newDict = {'banned' : True, 'bannedBy': adminID, 'banMessage': banMessage}
+        DBManager.db["users"].update_one({"_id": bannedID}, {"$set": newDict})
+
+    @staticmethod
     def activateAccount(token):
         DBManager.db["users"].update_one(
             {"token": token}, {"$set": {"accountActivated": True}}
@@ -206,10 +213,14 @@ class DBManager:
             post.profilePicture = user.get("profilePicture")
             post.username = user.get("username")
             post.posterIsAdmin = user.get("admin")
+            post.posterIsBanned = user.get("banned")
             comboID = str(post._id) + str(userID)
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
             if likedResult is not None:
                 post.liked = True
+            reportResult = DBManager.db['reports'].find_one({"comboID": comboID})
+            if reportResult is not None:
+                post.reportedByUser = True
 
             returnPosts.append(post)
         return returnPosts
@@ -224,6 +235,7 @@ class DBManager:
         post["userID"] = user["_id"]
         post["posterIsAdmin"] = user["admin"]
         post["email"] = user["email"]
+        post['posterIsBanned'] = user.get("banned")
         comboID = str(post["_id"]) + str(post["userID"])
         likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
         reportedResult = DBManager.db["reports"].find_one({"comboID": comboID})

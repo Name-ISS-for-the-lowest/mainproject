@@ -75,9 +75,20 @@ class _ProfilePageState extends State<ProfilePage> {
 
     String imageURL = AuthHelper.userInfoCache['profilePicture.url'];
     String displayName = AuthHelper.userInfoCache['username'];
-    String nationality = Localize(AuthHelper.userInfoCache['nationality']);
+    String englishNationality = AuthHelper.userInfoCache['nationality'];
+    String nationality = Localize(englishNationality);
+    String? emoji_check = SelectorHelper.countryEmojiMap[englishNationality];
+    String emoji = '';
+    if (emoji_check != null) {
+      emoji = emoji_check + ' ';
+    }
+    String? localizedLanguage =
+        SelectorHelper.reverseLangMap[AuthHelper.userInfoCache['language']];
     String language =
         AuthHelper.languageNames[AuthHelper.userInfoCache['language']];
+    if (localizedLanguage != null) {
+      language = localizedLanguage;
+    }
     String emailAddress = AuthHelper.userInfoCache['email'];
     Language selectedDialogLanguage = Languages.english;
 
@@ -472,7 +483,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         Localize('Nationality'),
                         textAlign: TextAlign.left,
                       ),
-                      subtitle: Text(nationality),
+                      subtitle: Text(emoji + nationality),
                     ),
                   ),
                 ),

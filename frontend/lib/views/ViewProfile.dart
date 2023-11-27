@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/postHelper.dart';
+import 'package:frontend/classes/selectorHelper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
-
+import 'package:frontend/views/ViewImage.dart';
 
 class ViewProfile extends StatefulWidget {
   String posterID;
@@ -28,6 +29,18 @@ class _ViewProfileState extends State<ViewProfile> {
         builder: (BuildContext context) {
           return const Scaffold(
             body: CoreTemplate(),
+          );
+        },
+      ),
+    );
+  }
+
+  void navigateToViewImage(List<String> inputs) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ViewImage(imageUrls: inputs),
           );
         },
       ),
@@ -67,6 +80,16 @@ class _ViewProfileState extends State<ViewProfile> {
     String pfpURL = user["profilePicture.url"];
     String posterNationality = Localize(user["nationality"]);
     String posterLanguage = AuthHelper.languageNames[user["language"]];
+    String englishNationality = user['nationality'];
+    String? emoji_check = SelectorHelper.countryEmojiMap[englishNationality];
+    String emoji = '';
+    if (emoji_check != null) {
+      emoji = emoji_check + ' ';
+    }
+    String? localizedLanguage = SelectorHelper.reverseLangMap[user['language']];
+    if (localizedLanguage != null) {
+      posterLanguage = localizedLanguage;
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xffece7d5),
@@ -98,12 +121,16 @@ class _ViewProfileState extends State<ViewProfile> {
               color: const Color(0x5f000000),
             ),
           )),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20.0),
-          child: ListView(
-            children: [
-              Align(
-                alignment: Alignment.center,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20.0),
+        child: ListView(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: GestureDetector(
+                onTap: () {
+                  navigateToViewImage([pfpURL]);
+                },
                 child: Container(
                   width: 150,
                   height: 150,
@@ -113,53 +140,56 @@ class _ViewProfileState extends State<ViewProfile> {
                   child: ClipOval(
                     child: CachedNetworkImage(
                       imageUrl: "$pfpURL?tr=w-150,h-150,fo-auto",
-                      placeholder: (context, url) => const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                      placeholder: (context, url) =>
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
                       fit: BoxFit.fill,
                     ),
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.center,
-                child: ListTile(
-                  title: Text(
-                    posterName,
-                    textAlign: TextAlign.center,
-                    textScaleFactor: 2,
-                  ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: ListTile(
+                title: Text(
+                  posterName,
+                  textAlign: TextAlign.center,
+                  textScaleFactor: 2,
                 ),
               ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: ListTile(
-                  leading: const Icon(Icons.flag),
-                  title: Text(
-                    Localize('Nationality'),
-                    textAlign: TextAlign.left,
-                  ),
-                  subtitle: Text(posterNationality),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ListTile(
+                leading: const Icon(Icons.flag),
+                title: Text(
+                  Localize('Nationality'),
+                  textAlign: TextAlign.left,
                 ),
+                subtitle: Text(emoji + posterNationality),
               ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: ListTile(
-                  leading: const Icon(Icons.chat_rounded),
-                  title: Text(
-                    Localize('Language'),
-                    textAlign: TextAlign.left,
-                  ),
-                  subtitle: Text(posterLanguage),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ListTile(
+                leading: const Icon(Icons.chat_rounded),
+                title: Text(
+                  Localize('Language'),
+                  textAlign: TextAlign.left,
                 ),
+                subtitle: Text(posterLanguage),
               ),
-              ListTile(
-                leading: const Icon(Icons.mail),
-                title: Text(Localize('Email Address')),
-                subtitle: Text(posterEmail),
-              ),
-            ],
-          ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.mail),
+              title: Text(Localize('Email Address')),
+              subtitle: Text(posterEmail),
+            ),
+          ],
         ),
-      );
-    }
+      ),
+    );
+  }
 }

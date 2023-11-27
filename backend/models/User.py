@@ -33,6 +33,9 @@ class User:
         self.admin = False
         self.usernameHistory = []
         self.profilePictureHistory = []
+        self.banned = False
+        self.bannedBy = 'None'
+        self.banMessage = 'None'
 
     @staticmethod
     def fromDict(dict):

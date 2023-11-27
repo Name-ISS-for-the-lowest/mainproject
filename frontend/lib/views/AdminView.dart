@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 import 'package:frontend/views/ViewImage.dart';
 import 'package:frontend/classes/postHelper.dart';
+import 'package:frontend/classes/authHelper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 
 class AdminView extends StatefulWidget {
@@ -65,6 +65,47 @@ class _AdminViewState extends State<AdminView> {
     }
   }
 
+  Future<void> banDialog(BuildContext context, String userID) async {
+    TextEditingController _textController = TextEditingController();
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Would you like to ban this user?'),
+          content: TextField(
+            controller: _textController,
+            decoration: InputDecoration(hintText: 'Ban Reasoning'),
+            maxLines: null,
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Close the alert dialog
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await AuthHelper.banUser(AuthHelper.userInfoCache['_id'],
+                    userID, _textController.text);
+                Navigator.of(context).pop();
+                setState(() {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("User has been Banned."),
+                  ));
+                  firstLoad = true;
+                });
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (firstLoad) {
@@ -83,11 +124,18 @@ class _AdminViewState extends State<AdminView> {
     String reports = post['reports'];
     String posterName = post['username'];
     String posterEmail = post['email'];
-    String adminCheck = post['posterIsAdmin'];
+    String? adminCheck = post['posterIsAdmin'];
+    bool? bannedCheck = post['posterIsBanned'];
     String pfpURL = post['profilePicture']['url'];
     bool posterIsAdmin = false;
+    bool userBanned = false;
     if (adminCheck == 'True') {
       posterIsAdmin = true;
+    }
+    if (bannedCheck != null) {
+      if (bannedCheck) {
+        userBanned = bannedCheck!;
+      }
     }
     String currentlyViewedContent = contentHistory[contentIndex];
 
@@ -197,6 +245,13 @@ class _AdminViewState extends State<AdminView> {
                 posterEmail,
                 style: const TextStyle(fontSize: 18),
               ),
+              (userBanned)
+                  ? Text("[USER HAS BEEN BANNED]",
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red))
+                  : const SizedBox(),
               const Divider(),
               const Text(
                 "Image Attached",
@@ -499,6 +554,15 @@ class _AdminViewState extends State<AdminView> {
                 height: 30,
               ),
               GestureDetector(
+                onTap: () async {
+                  if (posterIsAdmin) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text("You cannot ban an admin account!"),
+                    ));
+                  } else {
+                    await banDialog(context, userID);
+                  }
+                },
                 child: Container(
                   padding: const EdgeInsets.only(
                       top: 8, bottom: 8, left: 16, right: 16),

@@ -24,6 +24,7 @@ class Post:
     contentHistory: []
     translations: {}
     posterIsAdmin: bool = False
+    posterIsBanned: bool = False
     reports: int
     imageURL: str
     fileId: str
@@ -39,6 +40,7 @@ class Post:
         self.liked = False
         self.reportedByUser = False
         self.posterIsAdmin = False
+        self.posterIsBanned = False
         # if parent is none then post is not a reply
         # otherwise the post is a reply to parent
         self.parent_id = parent_id
