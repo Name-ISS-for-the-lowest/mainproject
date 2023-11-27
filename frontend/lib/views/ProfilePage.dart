@@ -323,10 +323,12 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     void ListPicker(BuildContext context) {
-      List trueItems = SelectorHelper.countryList;
+      Map<String, String> trueItems = {};
       List items = [];
       SelectorHelper.countryList.forEach((element) {
-        items.add(Localize(element));
+        String localizedElem = Localize(element);
+        items.add(localizedElem);
+        trueItems[localizedElem] = element;
       });
       List filteredItems = List.from(items);
       showDialog(
@@ -358,10 +360,43 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 content: Container(
                   width: double.maxFinite,
-                  height: 300,
+                  height: 500,
                   child: ListView.builder(
                     itemCount: filteredItems.length,
                     itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () async {
+                          AuthHelper.userInfoCache['nationality'] =
+                              trueItems[filteredItems[index]];
+                          await updateUser();
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          //dont ask me why but this color argument is necessary
+                          color: Colors.transparent,
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 280,
+                                    child: Text(
+                                      SelectorHelper.countryEmojiMap[trueItems[
+                                              filteredItems[index]]]! +
+                                          '  ' +
+                                          filteredItems[index],
+                                      style: TextStyle(fontSize: 20),
+                                      softWrap: true,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Divider(),
+                            ],
+                          ),
+                        ),
+                      );
+
                       return ListTile(
                         title: Text(filteredItems[index]),
                         onTap: () async {
