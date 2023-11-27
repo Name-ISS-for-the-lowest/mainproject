@@ -13,7 +13,7 @@ class _ConfirmReportState extends State<ConfirmReport> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return const Scaffold(
+          return Scaffold(
             body: CoreTemplate(),
           );
         },

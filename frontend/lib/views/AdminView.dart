@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/views/CoreTemplate.dart';
+import 'package:frontend/views/ViewImage.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -28,8 +29,20 @@ class _AdminViewState extends State<AdminView> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return const Scaffold(
+          return Scaffold(
             body: CoreTemplate(),
+          );
+        },
+      ),
+    );
+  }
+
+  void navigateToViewImage(List<String> inputs) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ViewImage(imageUrls: inputs),
           );
         },
       ),
@@ -195,11 +208,16 @@ class _AdminViewState extends State<AdminView> {
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     )
-                  : CachedNetworkImage(
-                      imageUrl: "$attachmentURL?tr=w-400,h-auto",
-                      placeholder: (context, url) =>
-                          CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
+                  : GestureDetector(
+                      onTap: () {
+                        navigateToViewImage([attachmentURL]);
+                      },
+                      child: CachedNetworkImage(
+                        imageUrl: "$attachmentURL?tr=w-400,h-auto",
+                        placeholder: (context, url) =>
+                            CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
+                      ),
                     ),
               Divider(),
               Text(

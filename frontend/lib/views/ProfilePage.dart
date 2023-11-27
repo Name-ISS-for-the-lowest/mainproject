@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/postHelper.dart';
+import 'package:frontend/classes/selectorHelper.dart';
 // import 'package:language_picker/language_picker.dart';
 // import 'package:language_picker/languages.dart';
 import '../languagePicker/languages.dart';
@@ -15,6 +16,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:frontend/home.dart';
+import 'package:frontend/views/ViewImage.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -51,6 +53,18 @@ class _ProfilePageState extends State<ProfilePage> {
   void submit() async {
     Navigator.of(context).pop(controller.text);
     await updateUser();
+  }
+
+  void navigateToViewImage(List<String> inputs) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ViewImage(imageUrls: inputs),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -308,6 +322,73 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
+    void ListPicker(BuildContext context) {
+      List trueItems = SelectorHelper.countryList;
+      List items = [];
+      SelectorHelper.countryList.forEach((element) {
+        items.add(Localize(element));
+      });
+      List filteredItems = List.from(items);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return AlertDialog(
+                title: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        onChanged: (query) {
+                          setState(() {
+                            filteredItems = items
+                                .where((item) => item
+                                    .toLowerCase()
+                                    .contains(query.toLowerCase()))
+                                .toList();
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Search',
+                          hintText: 'Enter your search query',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                content: Container(
+                  width: double.maxFinite,
+                  height: 300,
+                  child: ListView.builder(
+                    itemCount: filteredItems.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(filteredItems[index]),
+                        onTap: () async {
+                          AuthHelper.userInfoCache['nationality'] =
+                              trueItems[index];
+                          await updateUser();
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    },
+                  ),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    child: Text('Cancel'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+    }
+
     //LOGOUT BUTTON
     showLogoutAlertDialog(BuildContext context) {
       Widget cancelButton = TextButton(
@@ -457,20 +538,25 @@ class _ProfilePageState extends State<ProfilePage> {
                 Positioned(
                   child: Align(
                     alignment: Alignment.center,
-                    child: Container(
-                      width: 150, // Set your desired width
-                      height: 150, // Set your desired height
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: "$imageURL?tr=w-150,h-150,fo-auto",
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
-                          fit: BoxFit.fill,
+                    child: GestureDetector(
+                      onTap: () {
+                        navigateToViewImage([imageURL]);
+                      },
+                      child: Container(
+                        width: 150, // Set your desired width
+                        height: 150, // Set your desired height
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
+                        child: ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: "$imageURL?tr=w-150,h-150,fo-auto",
+                            placeholder: (context, url) =>
+                                CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
+                            fit: BoxFit.fill,
+                          ),
                         ),
                       ),
                     ),
@@ -549,7 +635,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: IconButton(
                       icon: Icon(Icons.edit_note),
                       onPressed: () {
-                        countryselect();
+                        ListPicker(context);
                       },
                     ),
                   ),

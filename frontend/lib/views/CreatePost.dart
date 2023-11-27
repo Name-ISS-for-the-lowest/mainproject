@@ -22,19 +22,22 @@ class CreatePost extends StatefulWidget {
 
 class _CreatePostState extends State<CreatePost> {
   void navigateToPrimaryScreens() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return const Scaffold(
-            body: CoreTemplate(),
-          );
-        },
-      ),
-    );
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (BuildContext context) {
+            return Scaffold(
+              body: CoreTemplate(),
+            );
+          },
+        ),
+      );
+    }
   }
 
   File? imageAttachment;
   String currentPostBody = "";
+  bool isSubmitting = false;
 
   Future pickImage() async {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -184,8 +187,13 @@ class _CreatePostState extends State<CreatePost> {
                       var response =
                           await PostHelper.editPost(postID, currentPostBody);
                     } else {
-                      var response = await PostHelper.createPost(
-                          userID, currentPostBody, imageAttachment);
+                      if (isSubmitting == false) {
+                        setState(() {
+                          isSubmitting = true;
+                        });
+                        var response = await PostHelper.createPost(
+                            userID, currentPostBody, imageAttachment);
+                      }
                     }
 
                     navigateToPrimaryScreens();
