@@ -1001,6 +1001,32 @@ class _ForumHomeState extends State<ForumHome> {
                         ),
                       ),
                       Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          specialSearchArgs['showReported'] = 'None';
+                          await loadUpdate();
+                        },
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: (specialSearchArgs['showReported'] == 'None')
+                                ? selectedOption
+                                : unselectedOption,
+                          ),
+                          child: Text(
+                            Localize("None"),
+                            style: TextStyle(
+                                color:
+                                    (specialSearchArgs['showReported'] == 'None')
+                                        ? selectedText
+                                        : unselectedText),
+                          ),
+                        ),
+                      ),
+                      Spacer(),
                     ],
                   ),
                 )

@@ -177,6 +177,14 @@ class DBManager:
             specialSearchParams["deleted"] = True
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
+        if showReported == "Only":
+            specialSearchParams["reportedByUser"] = True
+        elif showReported == "Unreviewed":
+            specialSearchParams["unreviewedReport"] = True
+        elif showReported == "None":
+            specialSearchParams["reportedByUser"] = False
+            specialSearchParams["unreviewedReport"] = False
+
         posts = (
             DBManager.db["posts"]
             .find(specialSearchParams)
@@ -230,6 +238,13 @@ class DBManager:
             specialSearchParams["deleted"] = True
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
+        if showReported == "Only":
+            specialSearchParams["reportedByUser"] = True
+        elif showReported == "Unreviewed":
+            specialSearchParams["unreviewedReport"] = True
+        elif showReported == "None":
+            specialSearchParams["reportedByUser"] = False
+            specialSearchParams["unreviewedReport"] = False
         posts = (
             DBManager.db["posts"]
             .find(specialSearchParams)
@@ -293,7 +308,7 @@ class DBManager:
                 {"_id": postID}, {"$inc": {"reports": 1}}
             )
             result2 = DBManager.db["posts"].update_one(
-                {"_id": postID}, {"$set": {'reportReasons' : reasonDict, 'unreviewedReport' : True}}
+                {"_id": postID}, {"$set": {'reportReasons' : reasonDict, 'unreviewedReport' : True, 'reportedByUser' : True}}
             )
             print(result.modified_count)
 
