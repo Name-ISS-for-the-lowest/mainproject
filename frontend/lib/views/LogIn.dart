@@ -129,7 +129,7 @@ class _LogInState extends State<LogIn> {
                                 color: Color.fromRGBO(230, 183, 17, 1)),
                             textAlign: TextAlign.center,
                             child: AnimatedTextKit(
-                                isRepeatingAnimation: true,
+                                repeatForever: true,
                                 animatedTexts: [
                                   RotateAnimatedText(
                                       transitionHeight: 100,
