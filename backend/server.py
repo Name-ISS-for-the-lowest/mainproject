@@ -18,9 +18,14 @@ from bson import ObjectId
 import migrate
 from classes.Translator import Translator
 import adminManager
+from datetime import datetime, timedelta
+from fastapi.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
+import re
 
 
 app = FastAPI(title="ISS App")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 migrate.migrate()
 # When we actaully go live, I'd probably comment the adminManager out since we dont need to run it everytime server starts, only when changes to admin are made
 adminManager.setAdmins()
@@ -29,6 +34,9 @@ adminManager.setAdmins()
 class CookiesMiddleWare(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # pattern = r"^/.*$"
+        # any endpoint that is /static/ will not be checked for cookies
+        pattern = r"^/static/.*$"
+        match = re.match(pattern, request.url.path)
         if (
             request.url.path == "/login"
             or request.url.path == "/signup"
@@ -37,6 +45,8 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/logout"
             or request.url.path == "/openapi.json"
             or request.url.path == "/setProfilePictureOnSignUp"
+            or request.url.path == "/resetPassword"
+            or match
         ):
             return await call_next(request)
         # check if the user has a cookie
@@ -443,3 +453,50 @@ def getEvents(request: Request, language: str = "en"):
     events = EventsManager.getEvents()
     jsonEvents = EventsManager.translateEvents(language, events)
     return JSONResponse(content=jsonEvents, status_code=200)
+
+
+@app.get("/resetPassword")
+def getResetPassword(token: str):
+    user = DBManager.getUserByToken(token)
+    if user is None:
+        return JSONResponse(content={"message": "invalid link"}, status_code=400)
+    if timedelta(minutes=30) + user["tokenCreatedAt"] < datetime.now():
+        return JSONResponse(content={"message": "link expired"}, status_code=400)
+    else:
+        token = user["token"]
+    return HTMLResponse(
+        content=open("static/resetPassword/index.html", "r").read(), status_code=200
+    )
+
+
+@app.patch("/resetPassword")
+def receivePassword(password: str, token: str):
+    user = DBManager.getUserByToken(token)
+    userDic = user.__dict__
+    createAt = user["tokenCreatedAt"]
+    if timedelta(minutes=30) + createAt < datetime.now():
+        return JSONResponse(content={"message": "link expired"}, status_code=400)
+
+    userDic.pop("tokenCreatedAt")
+    salt = PassHasher.generateSalt()
+    passwordHash = PassHasher.hashPassword(password, salt)
+    userDic["passwordHash"] = passwordHash
+    userDic["salt"] = salt
+    userDic.pop("token")
+    DBManager.db["users"].replace_one({"token": token}, userDic)
+
+    return JSONResponse(content={"message": "Password reset successfully"})
+
+
+@app.post("/resetPassword")
+def resetPassword(email: str):
+    user = DBManager.getUserByEmail(email)
+    userDic = user.__dict__
+    if user is None:
+        return JSONResponse(content={"message": "invalid email"}, status_code=400)
+    token = EmailSender.sendResetPasswordEmail(email)
+    createdAt = datetime.now()
+    userDic["token"] = token
+    userDic["tokenCreatedAt"] = createdAt
+    DBManager.db["users"].replace_one({"email": email}, userDic)
+    return JSONResponse(content={"message": "email sent"}, status_code=200)

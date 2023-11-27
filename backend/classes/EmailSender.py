@@ -177,7 +177,7 @@ class EmailSender:
 
         return token
 
-    def sendResetPasswordEmail(userEmail: str, subject: str, token: str):
+    def sendResetPasswordEmail(userEmail: str):
         message = MIMEMultipart()
         message["From"] = EmailSender.fromEmail
         message["To"] = userEmail
@@ -194,7 +194,7 @@ class EmailSender:
   <body>
     <div class="main-container">
       <h1 class="main-header">
-        Reset Email!
+        Reset Password!
       </h1>
       <p class="mb-6">
        We received a request for you to reset your password. If you did not make this request, you can safely ignore this email.

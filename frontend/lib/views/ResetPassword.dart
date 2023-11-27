@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
+import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/views/LogIn.dart';
 import 'package:lottie/lottie.dart';
 
 class ResetPassword extends StatefulWidget {
@@ -20,6 +22,28 @@ class _ResetPasswordState extends State<ResetPassword> {
     emailController.text = widget.email;
   }
 
+  void navigateBacktoLogIn() {
+    //navigate back to login
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: Stack(children: [
+              SizedBox(
+                height: 100,
+                child: AppBar(
+                  backgroundColor: Colors.transparent,
+                  iconTheme: const IconThemeData(color: Colors.white),
+                ),
+              ),
+              const LogIn()
+            ]),
+          );
+        },
+      ),
+    );
+  }
+
   bool validateEmail(String email) {
     //general email regex
     // final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
@@ -28,8 +52,9 @@ class _ResetPasswordState extends State<ResetPassword> {
     return emailRegExp.hasMatch(email);
   }
 
-  void executeRestsetPassWord(String email) async {
+  Future<void> executeRestsetPassWord(String email) async {
     final validEmail = validateEmail(email);
+
     if (!validEmail) {
       //show error message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -38,6 +63,13 @@ class _ResetPasswordState extends State<ResetPassword> {
         ),
       );
       return;
+    } else {
+      await AuthHelper.resetPassword(email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(Localize('Email sent')),
+        ),
+      );
     }
   }
 
@@ -149,8 +181,10 @@ class _ResetPasswordState extends State<ResetPassword> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           labelText: Localize('Email'),
-                          filled: true,
+                          contentPadding: const EdgeInsets.all(18),
                           fillColor: Colors.white,
+                          filled: true,
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
                         ),
                       ),
                     ),
@@ -173,8 +207,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                   ),
                 ),
                 child: Text(Localize('Send Recovery Email')),
-                onPressed: () => {
-                  executeRestsetPassWord(emailController.text),
+                onPressed: () async {
+                  await executeRestsetPassWord(emailController.text);
+                  navigateBacktoLogIn();
                 },
               ),
             )
