@@ -21,7 +21,8 @@ class _EventsPageState extends State<EventsPage> {
   void initState() {
     super.initState();
     EventHelper.mounted = true;
-    EventHelper.fetchEvents(setState);
+    EventHelper.setState = setState;
+    EventHelper.fetchEvents();
   }
 
   @override
@@ -36,7 +37,7 @@ class _EventsPageState extends State<EventsPage> {
     }
   }
 
-  void showExpandedInformation(Map<String, String> event) {
+  void showExpandedInformation(Map<String, dynamic> event) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
@@ -104,9 +105,6 @@ class _EventsPageState extends State<EventsPage> {
       itemBuilder: (context, index) {
         //if at bottom of list show loading indicator
         if (index == EventHelper.events.length) {
-          if (EventHelper.fetched == true) {
-            return null;
-          }
           return const Center(
             child: CircularProgressIndicator(),
           );
@@ -120,13 +118,13 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  Widget _buildEvent(Map<String, String> event) {
+  Widget _buildEvent(Map<String, dynamic> event) {
     return GestureDetector(
       onTap: () {
         String? eventId = event['id'];
-        String userLanguage = AuthHelper.userInfoCache['language'];
+        var language = AuthHelper.userInfoCache['language'];
         var url =
-            "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$userLanguage";
+            "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$language";
         _launchURL(Uri.parse(url));
       },
       onLongPress: () {

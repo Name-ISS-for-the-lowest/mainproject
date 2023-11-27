@@ -9,36 +9,62 @@ class Post:
     content: str
     userID: str
     username: str
+    email: str
     profilePicture = Picture()
+    attachedImage = Picture()
     date: datetime.datetime
     likes: int
     reports: int
     imagelinks: list
     liked: bool = False
+    reportedByUser: bool = False
     edited: bool
     deleted: bool
     removed: bool
     contentHistory: []
     translations: {}
-    posterIsAdmin: bool
+    posterIsAdmin: bool = False
     reports: int
+    imageURL: str
+    fileId: str
+    reportReasons: dict
+    unreviewedReport: bool = False
 
-    def __init__(self, content, user_id, parent_id=None):
+    def __init__(self, content, user_id, attachment=None, parent_id=None):
         self.content = content
         self.userID = user_id
         self.date = datetime.datetime.now()
         self.likes = 0
         self.reports = 0
         self.liked = False
+        self.reportedByUser = False
+        self.posterIsAdmin = False
         # if parent is none then post is not a reply
         # otherwise the post is a reply to parent
         self.parent_id = parent_id
         self.translations = {}
         self.edited = False
         self.contentHistory = []
+        self.reportReasons = {
+            "hateSpeech": 0,
+            "targetedHarassment": 0,
+            "illegalContent": 0,
+            "inappropriateContent": 0,
+            "otherReason": 0,
+        }
         self.deleted = False
         self.removed = False
         self.reports = 0
+        self.unreviewedReport = False
+        if attachment == None:
+            attachment = "Empty"
+        self.attachedImage = attachment
+        if attachment != None and attachment != "Empty":
+            self.imageURL = attachment.url
+            self.fileId = attachment.fileID
+        else:
+            self.imageURL = None
+            self.fileId = None
 
     @staticmethod
     def fromDict(dict):
@@ -73,9 +99,9 @@ class Post:
         post.contentHistory = Post.contentHistoryToString(post)
         post.deleted = str(post.deleted)
         post.removed = str(post.removed)
-        post.posterIsAdmin = str(post.posterIsAdmin)
         post.reports = str(post.reports)
-        return json.dumps(post.__dict__)
+        post.posterIsAdmin = str(post.posterIsAdmin)
+        return post.__dict__
 
     @staticmethod
     def listToJson(posts, targetLang=None):
@@ -87,8 +113,8 @@ class Post:
             post.edited = str(post.edited)
             post.deleted = str(post.deleted)
             post.removed = str(post.removed)
-            post.posterIsAdmin = str(post.posterIsAdmin)
             post.reports = str(post.reports)
+            post.posterIsAdmin = str(post.posterIsAdmin)
             if targetLang in post.translations:
                 post.translations = str(post.translations[targetLang])
             else:

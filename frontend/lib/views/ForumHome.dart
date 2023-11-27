@@ -6,10 +6,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/postHelper.dart';
+import 'package:frontend/views/Comments.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ReportPage.dart';
+import 'package:frontend/views/ConfirmReport.dart';
+import 'package:frontend/views/AdminView.dart';
 import 'package:frontend/classes/keywordData.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'package:http/http.dart';
 
 class ForumHome extends StatefulWidget {
   const ForumHome({super.key});
@@ -200,6 +204,30 @@ class _ForumHomeState extends State<ForumHome> {
     );
   }
 
+  void navigateToAdminView(String postID) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: AdminView(postID: postID),
+          );
+        },
+      ),
+    );
+  }
+
+  void navigateToConfirmPost() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ConfirmReport(),
+          );
+        },
+      ),
+    );
+  }
+
   void deletePost(String postID) {
     loadDelete(postID);
   }
@@ -270,6 +298,10 @@ class _ForumHomeState extends State<ForumHome> {
 
   Widget _buildPost(int index) {
     String imageURL = postData[index]["profilePicture"]['url'];
+    String attachmentURL = 'Empty';
+    if (postData[index]['attachedImage'] != 'Empty') {
+      attachmentURL = postData[index]['attachedImage']['url'];
+    }
     String posterName = postData[index]["username"];
     String postContent = postData[index]["content"];
     String postID = postData[index]["_id"];
@@ -286,6 +318,8 @@ class _ForumHomeState extends State<ForumHome> {
     }
     bool isEdited = false;
     var liked = postData[index]['liked'];
+    var reportedByUser = postData[index]['reportedByUser'];
+    var unreviewedReport = postData[index]['unreviewedReport'];
     if (postData[index]['edited'] == 'True') {
       isEdited = true;
     }
@@ -353,7 +387,11 @@ class _ForumHomeState extends State<ForumHome> {
         } else if (result == 'deletePost') {
           deletePost(postID);
         } else if (result == 'reportPost') {
-          navigateToReportPost(postID);
+          if (reportedByUser) {
+            navigateToConfirmPost();
+          } else {
+            navigateToReportPost(postID);
+          }
         }
       },
       itemBuilder: (BuildContext context) {
@@ -490,6 +528,9 @@ class _ForumHomeState extends State<ForumHome> {
 
     double calculatedHeight = (postContent.length / 25 * 14) + 50;
     if (postTooLong) calculatedHeight += 35;
+    if (attachmentURL != 'Empty') {
+      calculatedHeight += 450;
+    }
 
     return Padding(
       padding: const EdgeInsets.all(6.0),
@@ -579,6 +620,23 @@ class _ForumHomeState extends State<ForumHome> {
               child: postBodyContainer,
             ),
             Positioned(
+              bottom: 80,
+              right: 10,
+              child: (attachmentURL != 'Empty')
+                  ? Container(
+                      height: 400,
+                      width: 340,
+                      color: Colors.black,
+                      child: CachedNetworkImage(
+                        imageUrl: "$attachmentURL?tr=w-340,h-auto",
+                        placeholder: (context, url) =>
+                            CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
+                      ),
+                    )
+                  : SizedBox(),
+            ),
+            Positioned(
               bottom: 20,
               left: 50,
               child: Row(
@@ -637,8 +695,13 @@ class _ForumHomeState extends State<ForumHome> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Comment Tapped")));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      Comments(postID: postID)));
+                          /*ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Comment Tapped")));*/
                         },
                         child: SvgPicture.asset(
                           "assets/PostUI/icon-comment.svg",
@@ -655,14 +718,15 @@ class _ForumHomeState extends State<ForumHome> {
                           children: [
                             GestureDetector(
                                 onTap: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Flag Tapped")));
+                                  navigateToAdminView(postID);
                                 },
                                 child: SvgPicture.asset(
                                   "assets/PostUI/icon-flag.svg",
                                   height: 20,
                                   width: 20,
-                                  color: Colors.deepOrange,
+                                  color: (unreviewedReport)
+                                      ? Colors.deepOrange
+                                      : Colors.black,
                                 )),
                             Text(reportNumber, style: TextStyle(fontSize: 11))
                           ],

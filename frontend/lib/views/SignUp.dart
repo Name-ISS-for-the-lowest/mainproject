@@ -6,7 +6,8 @@ import 'package:frontend/views/PasswordSetup.dart';
 import 'package:lottie/lottie.dart';
 
 class SignUp extends StatefulWidget {
-  const SignUp({super.key});
+  String email = "";
+  SignUp({super.key, required this.email});
 
   @override
   State<SignUp> createState() => _SignUpState();
@@ -14,7 +15,6 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
 
   //on mount
   @override
@@ -27,50 +27,19 @@ class _SignUpState extends State<SignUp> {
     // final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
     //csus email regex
     final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@csus\.edu$');
-    return emailRegExp.hasMatch(email);
-  }
-
-  bool validatePassword(String password) {
-    final passwordRegExp =
-        RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
-    return passwordRegExp.hasMatch(password);
-  }
-
-  void executeSignUp(String email, String password) async {
-    final validEmail = validateEmail(email);
-    //might remove this since we must match flow we have in figma
-    final validPassword = validatePassword(password);
-    if (!validEmail) {
-      //show error message
+    if (!emailRegExp.hasMatch(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(Localize('Invalid email, must be a CSUS email')),
         ),
       );
-      return;
+      return false;
     }
-    if (!validPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(Localize("Password must be at least 8 characters long, have one uppercase letter, one lowercase letter, and one number")),
-        ),
-      );
-      //show error message
-      return;
-    }
-    //need to do email validation to make sure email is not garbage
-    //also should have password validation minimum 8 characters, etc
-    Response response = await AuthHelper.signUp(email, password);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(response.data["message"] ?? "Error"),
-        ),
-      );
-    }
+    widget.email = email;
+    return true;
   }
 
-  void navigateToPassWordSetUp() {
+  void navigateToPassWordSetUp(String email) {
     //navigate to confirm email page
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -85,7 +54,7 @@ class _SignUpState extends State<SignUp> {
                   iconTheme: const IconThemeData(color: Colors.white),
                 ),
               ),
-              const PasswordSetUp()
+              PasswordSetUp(email: email)
             ]),
           );
         },
@@ -95,117 +64,109 @@ class _SignUpState extends State<SignUp> {
 
   @override
   Widget build(BuildContext context) {
- 
     final screenHeight = MediaQuery.sizeOf(context).height;
-    
+
     return Scaffold(
-      
-      backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
-      resizeToAvoidBottomInset: false,
-      extendBodyBehindAppBar: true, // Extend content behind the AppBar
-      appBar: AppBar(
-        backgroundColor:
-            Colors.transparent, // Set the background color to transparent
-        elevation: 0, // Remove the shadow
-        iconTheme:
-            const IconThemeData(color: Colors.white), // Set the back arrow color
-      ),
+        backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
+        resizeToAvoidBottomInset: false,
+        extendBodyBehindAppBar: true, // Extend content behind the AppBar
+        appBar: AppBar(
+          backgroundColor:
+              Colors.transparent, // Set the background color to transparent
+          elevation: 0, // Remove the shadow
+          iconTheme: const IconThemeData(
+              color: Colors.white), // Set the back arrow color
+        ),
+        body: Stack(
+          alignment: Alignment.center,
+          children: [
+            //Background animation (increase top offset value to move anim down, decrease to move up)
+            Positioned(
+                top: 200,
+                child: SizedBox(
+                  height: screenHeight,
+                  child: LottieBuilder.asset(
+                    'assets/BackgroundWave.json',
+                    fit: BoxFit.fill,
+                  ),
+                )),
 
-      body: Stack(
-
-        alignment: Alignment.center,
-        children: [
-
-          //Background animation (increase top offset value to move anim down, decrease to move up)
-          Positioned(
-            top: 200,
-            child: SizedBox(
-            height: screenHeight,
-            child: LottieBuilder.asset('assets/BackgroundWave.json',
-              fit: BoxFit.fill,),
-          )),
-            
-          //Returning User Form begins Here--------------------------
-          Positioned(
-            top: 100,
-            child: SingleChildScrollView(
-              child: Column(
-            
-                  children: [  
-                    
+            //Returning User Form begins Here--------------------------
+            Positioned(
+                top: 100,
+                child: SingleChildScrollView(
+                    child: Column(
+                  children: [
                     //This part is just text and formatting
                     SizedBox(
                       width: 280,
-                      child : Text(
-                          Localize('Welcome to the I.S.S!'),
-                          style: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 45,
-                                color: Color.fromRGBO(255, 255, 255, 1)
-                              ),
-                          textAlign: TextAlign.center,
-                        ),
+                      child: Text(
+                        Localize('Welcome to the I.S.S!'),
+                        style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 45,
+                            color: Color.fromRGBO(255, 255, 255, 1)),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
 
                     //Spacer for Column elements
                     const SizedBox(
-                        height: 25,
+                      height: 25,
                     ),
 
                     SizedBox(
                       width: 300,
-                      child : Text(
-                          Localize('Before we begin, please enter a valid Sacramento State email.'),
-                          style: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Color.fromRGBO(230, 183, 17, 1)
-                              ),
-                          textAlign: TextAlign.center,
-                        ),
+                      child: Text(
+                        Localize(
+                            'Before we begin, please enter a valid Sacramento State email.'),
+                        style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Color.fromRGBO(230, 183, 17, 1)),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
 
                     //Spacer for Column elements
                     const SizedBox(
-                        height: 20,
+                      height: 20,
                     ),
 
                     SizedBox(
                       width: 300,
-                      child : Text(
-                          Localize('These can be identified by the “@csus.edu” handle near the end like this:'),
-                          style: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Color.fromRGBO(230, 183, 17, 1)
-                              ),
-                          textAlign: TextAlign.center,
-                        ),
+                      child: Text(
+                        Localize(
+                            'These can be identified by the “@csus.edu” handle near the end like this:'),
+                        style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Color.fromRGBO(230, 183, 17, 1)),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
 
                     //Spacer for Column elements
                     const SizedBox(
-                        height: 20,
+                      height: 20,
                     ),
 
                     SizedBox(
                       width: 300,
-                      child : Text(
-                          Localize('“Example@csus.edu”'),
-                          style: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Color.fromRGBO(255, 255, 255, 1)
-                              ),
-                          textAlign: TextAlign.center,
-                        ),
+                      child: Text(
+                        Localize('“Example@csus.edu”'),
+                        style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Color.fromRGBO(255, 255, 255, 1)),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    
-                    
+
                     //Spacer for Column elements
                     const SizedBox(
                       height: 20,
@@ -214,51 +175,49 @@ class _SignUpState extends State<SignUp> {
                     //Email Field Styling
 
                     SizedBox(
-                        width: 330,
-                        height: 55,
-                        child: TextField(
-                          controller: emailController,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            labelText: Localize('Email'),
-                            filled: true,
-                            fillColor: Colors.white,
+                      width: 330,
+                      height: 55,
+                      child: TextField(
+                        controller: emailController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
                           ),
+                          labelText: Localize('Email'),
+                          filled: true,
+                          fillColor: Colors.white,
                         ),
-                      ), 
-                ],
-              )
-            )
-          ),
+                      ),
+                    ),
+                  ],
+                ))),
 
-          Positioned(
-            bottom: 42,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
+            Positioned(
+              bottom: 42,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
                   fixedSize: const Size(330, 50),
-                      shape: RoundedRectangleBorder( 
-                          borderRadius: BorderRadius.circular(5.0)),
-                      backgroundColor: const Color.fromRGBO(230, 183, 17, 1),
-                      foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
-                      textStyle: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16, 
-                        ), 
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5.0)),
+                  backgroundColor: const Color.fromRGBO(230, 183, 17, 1),
+                  foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
+                  textStyle: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
-
-                  child: Text(Localize('Next')),
-                    onPressed: () => {
-                      navigateToPassWordSetUp(),
-                  },
-          ),)
-          //Next Button Styling
-          
-        ],
-        )
-      );
+                ),
+                child: Text(Localize('Next')),
+                onPressed: () => {
+                  if (validateEmail(emailController.text))
+                    {
+                      navigateToPassWordSetUp(emailController.text),
+                    }
+                },
+              ),
+            )
+            //Next Button Styling
+          ],
+        ));
   }
-
 }

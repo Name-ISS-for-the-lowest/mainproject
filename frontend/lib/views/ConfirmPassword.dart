@@ -2,17 +2,24 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/views/AddProfilePic.dart';
+import 'package:frontend/classes/authHelper.dart';
+import 'package:dio/dio.dart';
 import 'package:lottie/lottie.dart';
 
 class ConfirmPassword extends StatefulWidget {
-  const ConfirmPassword({super.key});
+  final String email;
+  final String password;
+  String confirmPassword = "";
+  ConfirmPassword({super.key, required this.email, required this.password});
 
   @override
   State<ConfirmPassword> createState() => _ConfirmPasswordState();
 }
 
 class _ConfirmPasswordState extends State<ConfirmPassword> {
-  void navigateToAddProfilePic() {
+  TextEditingController passwordController = TextEditingController();
+
+  void navigateToAddProfilePic(String email) {
     //navigate to AddProfilePic page
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -26,12 +33,39 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                   iconTheme: const IconThemeData(color: Colors.white),
                 ),
               ),
-              const AddToProfilePic()
+              AddToProfilePic(email: email)
             ]),
           );
         },
       ),
     );
+  }
+
+  bool validateConfirmPassword(String confirmPassword) {
+    if (confirmPassword != widget.password) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(Localize("Passwords do not match")),
+        ),
+      );
+      //show error message
+      return false;
+    }
+    widget.confirmPassword = confirmPassword;
+    return true;
+  }
+
+  Future<void> executeSignUp(String email, String password) async {
+    //need to do email validation to make sure email is not garbage
+    //also should have password validation minimum 8 characters, etc
+    Response response = await AuthHelper.signUp(email, password);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.data["message"] ?? "Error"),
+        ),
+      );
+    }
   }
 
   @override
@@ -148,7 +182,13 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                 ),
               ),
               child: Text(Localize('Next')),
-              onPressed: () => {navigateToAddProfilePic()},
+              onPressed: () async => {
+                if (validateConfirmPassword(passwordController.text))
+                  {
+                    await executeSignUp(widget.email, widget.password),
+                    navigateToAddProfilePic(widget.email)
+                  }
+              },
             ),
           ),
         ],

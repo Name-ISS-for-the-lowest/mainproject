@@ -1,4 +1,7 @@
 from classes.EventsManager import EventsManager
+import json
 
 
-EventsManager.getEvents()
+result = EventsManager.getEvents()
+prettyJson = EventsManager.translateEvents("es", result)
+print(prettyJson)

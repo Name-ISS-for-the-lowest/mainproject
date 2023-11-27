@@ -47,9 +47,9 @@ class _LogInState extends State<LogIn> {
     var result = Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return const Scaffold(
+          return Scaffold(
             resizeToAvoidBottomInset: false,
-            body: SignUp(),
+            body: SignUp(email: emailController.text),
           );
         },
       ),

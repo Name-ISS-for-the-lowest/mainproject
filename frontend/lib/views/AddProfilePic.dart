@@ -11,7 +11,8 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:lottie/lottie.dart';
 
 class AddToProfilePic extends StatefulWidget {
-  const AddToProfilePic({super.key});
+  final String email;
+  const AddToProfilePic({super.key, required this.email});
 
   @override
   State<AddToProfilePic> createState() => _AddToProfilePicState();
@@ -19,6 +20,7 @@ class AddToProfilePic extends StatefulWidget {
 
 class _AddToProfilePicState extends State<AddToProfilePic> {
   bool imageSpecified = false;
+  File image = File('assets/Default_pfp.png');
   Widget imageWidget = Image.asset('assets/Default_pfp.png',
       width: 200, height: 200, fit: BoxFit.fill);
 
@@ -29,11 +31,20 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
         File getImage = File(pickedFile.path);
         setState(() {
           imageWidget = Image.file(getImage, fit: BoxFit.fill);
+          image = getImage;
           imageSpecified = true;
         });
       }
     } catch (e) {
       print("${Localize("Error picking image:")} $e");
+    }
+  }
+
+  Future<void> setProfilePic() async {
+    print("made it here$imageSpecified");
+    if (imageSpecified) {
+      //todo set the profile picture
+      await AuthHelper.setProfilePictureOnSignUp(widget.email, image);
     }
   }
 
@@ -224,6 +235,57 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                                       _showImagePickerDialog(context);
                                     }),
                               ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            Column(
+                              children: [
+                                const SizedBox(
+                                  height: 100,
+                                ),
+                                Column(
+                                  children: [
+                                    Center(
+                                      child: SizedBox(
+                                        width: 340,
+                                        height: 50,
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            elevation: 10,
+                                            backgroundColor:
+                                                const Color.fromRGBO(
+                                                    230, 183, 17, 1),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            // enter logic to go to confirm password screen
+                                            //set the profile picture
+                                            print("am right here");
+                                            setProfilePic();
+                                          },
+                                          child: Text(
+                                            Localize("Next"),
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700,
+                                              color: Color.fromARGB(
+                                                  255, 53, 53, 53),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                              ],
                             ),
                           ],
                         ),
