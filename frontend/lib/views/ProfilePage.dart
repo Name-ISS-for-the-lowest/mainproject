@@ -322,14 +322,28 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
-    void ListPicker(BuildContext context) {
+    void ListPicker(BuildContext context, [bool languagesPicked = false]) {
+      List listChoice = SelectorHelper.countryList;
+
+      if (languagesPicked) {
+        listChoice = SelectorHelper.langNames;
+      }
+
       Map<String, String> trueItems = {};
       List items = [];
-      SelectorHelper.countryList.forEach((element) {
-        String localizedElem = Localize(element);
-        items.add(localizedElem);
-        trueItems[localizedElem] = element;
-      });
+      if (languagesPicked) {
+        listChoice.forEach((element) {
+          items.add(element);
+          trueItems[element] = SelectorHelper.langMap[element]!;
+        });
+      } else {
+        listChoice.forEach((element) {
+          String localizedElem = Localize(element);
+          items.add(localizedElem);
+          trueItems[localizedElem] = element;
+        });
+      }
+
       List filteredItems = List.from(items);
       showDialog(
         context: context,
@@ -344,9 +358,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         onChanged: (query) {
                           setState(() {
                             filteredItems = items
-                                .where((item) => item
-                                    .toLowerCase()
-                                    .contains(query.toLowerCase()))
+                                .where((item) =>
+                                    item
+                                        .toLowerCase()
+                                        .contains(query.toLowerCase()) ||
+                                    trueItems[item]!
+                                        .toLowerCase()
+                                        .contains(query.toLowerCase()))
                                 .toList();
                           });
                         },
@@ -366,8 +384,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () async {
-                          AuthHelper.userInfoCache['nationality'] =
-                              trueItems[filteredItems[index]];
+                          if (languagesPicked) {
+                            AuthHelper.userInfoCache['language'] =
+                                trueItems[filteredItems[index]];
+                          } else {
+                            AuthHelper.userInfoCache['nationality'] =
+                                trueItems[filteredItems[index]];
+                          }
                           await updateUser();
                           Navigator.of(context).pop();
                         },
@@ -381,10 +404,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                   Container(
                                     width: 280,
                                     child: Text(
-                                      SelectorHelper.countryEmojiMap[trueItems[
-                                              filteredItems[index]]]! +
-                                          '  ' +
-                                          filteredItems[index],
+                                      (languagesPicked)
+                                          ? filteredItems[index]
+                                          : SelectorHelper.countryEmojiMap[
+                                                  trueItems[
+                                                      filteredItems[index]]]! +
+                                              '  ' +
+                                              filteredItems[index],
                                       style: TextStyle(fontSize: 20),
                                       softWrap: true,
                                     ),
@@ -700,7 +726,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: IconButton(
                       icon: Icon(Icons.edit_note),
                       onPressed: () {
-                        _openLanguagePickerDialog();
+                        ListPicker(context, true);
                       },
                     ),
                   ),
