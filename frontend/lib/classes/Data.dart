@@ -48714,6 +48714,7 @@ class Data {
     "jv": "Dec",
     "zh-CN": "十二月"
   },
+<<<<<<< HEAD
   "Deactivate Account": {
     "af": "Deaktivate rekening",
     "sq": "Çaktivizoni llogarinë",
@@ -49266,6 +49267,8 @@ class Data {
     "jv": "Tumindak iki ora bisa dibatalake saka app.",
     "zh-CN": "该操作无法从应用程序中解散。"
   },
+=======
+>>>>>>> origin/gabriel
   "Åland Islands": {
     "af": "Åland -eilande",
     "sq": "Ishujt e Fshës",
@@ -49313,7 +49316,11 @@ class Data {
     "ha": "Åland Tsibiri",
     "haw": "Ålandlelontaia",
     "iw": "איי איינד",
+<<<<<<< HEAD
     "hi": "Åland द्वीप समूह",
+=======
+    "hi": "Åland आइलैंड्स",
+>>>>>>> origin/gabriel
     "hmn": "Barsland Islands",
     "hu": "Åland szigetek",
     "is": "Åland eyjar",
@@ -49322,13 +49329,21 @@ class Data {
     "id": "Pulau Åland",
     "ga": "Oileáin Åland",
     "it": "Isole Åland",
+<<<<<<< HEAD
     "ja": "Åland諸島",
+=======
+    "ja": "Åland島",
+>>>>>>> origin/gabriel
     "jw": "Pulo Åland",
     "kn": "Walls ದ್ವೀಪಗಳು",
     "kk": "Аландығы аралдар",
     "km": "កោះålandកោះ",
     "rw": "Ibirwa bya å",
+<<<<<<< HEAD
     "gom": "åland islands 1000 .",
+=======
+    "gom": "åland islands",
+>>>>>>> origin/gabriel
     "ko": "Åland 제도",
     "kri": "Åland ayland dɛn .",
     "ku": "Islandslandsland",
@@ -49374,7 +49389,11 @@ class Data {
     "sd": "Å لينڊ جزائر",
     "si": "Åland දූපත්",
     "sk": "Ostrovy Åland",
+<<<<<<< HEAD
     "sl": "Otoki Åland",
+=======
+    "sl": "Åland otoki",
+>>>>>>> origin/gabriel
     "so": "Jasiiradaha Åalland",
     "es": "Åland Islas",
     "su": "Kapuloan Erland",
@@ -49384,13 +49403,21 @@ class Data {
     "ta": "Åland தீவு",
     "tt": "Åленд утраулары",
     "te": "ఓలాండ్ ద్వీపాలు",
+<<<<<<< HEAD
     "th": "เกาะÅland",
+=======
+    "th": "หมู่เกาะ",
+>>>>>>> origin/gabriel
     "ti": "ደሴታት ኦላንድ",
     "ts": "Åland Swihlala .",
     "tr": "Åland Adaları",
     "tk": "Åann adalary",
     "ak": "Åland Nsupɔw so .",
+<<<<<<< HEAD
     "uk": "Åland острівці",
+=======
+    "uk": "Острови",
+>>>>>>> origin/gabriel
     "ur": "ایلینڈ جزیرے",
     "ug": "AåLand Alance",
     "uz": "Illand orollar",
@@ -49403,6 +49430,7 @@ class Data {
     "he": "איי איינד",
     "jv": "Pulo Åland",
     "zh-CN": "Åland岛"
+<<<<<<< HEAD
   },
   "Côte d'Ivoire": {
     "af": "Côte d'IVOIRE",
@@ -49955,6 +49983,8 @@ class Data {
     "he": "חבר תמונה",
     "jv": "Masang gambar",
     "zh-CN": "连接图像"
+=======
+>>>>>>> origin/gabriel
   }
 };
   static Map<String, dynamic> languageNames = {

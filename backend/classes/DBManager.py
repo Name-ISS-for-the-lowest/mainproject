@@ -352,13 +352,13 @@ class DBManager:
             postJson["userID"] = ObjectId(postJson["userID"]["$oid"])
             DBManager.db["posts"].insert_one(postJson)
 
-    @staticmethod
-    def getEvents(language: str):
-        # I first, fetch all events from the database, trimming all events older than today
-        # I check if the event has been translated to the user's language, if not, I translate them
-        # I then return the events
-        events = DBManager.db["events"].find()
-        returnEvents = []
-        for elem in events:
-            returnEvents.append(elem)
-        return returnEvents
+    # @staticmethod
+    # def getEvents(language: str):
+    #     # I first, fetch all events from the database, trimming all events older than today
+    #     # I check if the event has been translated to the user's language, if not, I translate them
+    #     # I then return the events
+    #     events = DBManager.db["events"].find()
+    #     returnEvents = []
+    #     for elem in events:
+    #         returnEvents.append(elem)
+    #     return returnEvents

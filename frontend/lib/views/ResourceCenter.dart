@@ -148,7 +148,7 @@ class _ResourceCenterState extends State<ResourceCenter> {
               _IconBuilder(
                 Localize("Basic Needs"),
                 "assets/ResourceCenter/icon-basic.svg",
-                "https://www-csus-edu.translate.goog/student-life/health-counseling/?_x_tr_sl=auto&_x_tr_tl=${userLang}&_x_tr_hl=en&_x_tr_pto=wapp",
+                "https://www-csus-edu.translate.goog/student-life/health-counseling/?_x_tr_sl=auto&_x_tr_tl=$userLang&_x_tr_hl=en&_x_tr_pto=wapp",
               ),
               const Spacer(),
             ],

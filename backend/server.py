@@ -8,6 +8,7 @@ from JSONmodels.userinfo import userinfo
 from classes.PasswordHasher import PassHasher
 from classes.EmailSender import EmailSender
 from starlette.middleware.base import BaseHTTPMiddleware
+from classes.EventsManager import EventsManager
 from classes.ImageHelper import ImageHelper
 import json
 import urllib.parse
@@ -381,10 +382,12 @@ def searchPosts(data: postsearch):
 
 # get events
 @app.get("/getEvents")
-def getEvents(request: Request):
+def getEvents(request: Request, language: str = "en"):
     # need to get the user language
-    id = IdFromCookie(request.cookies["session_cookie"])
-    user = DBManager.getUserById(id)
-    language = user.language
-    events = DBManager.getEvents(language)
-    return events
+    # id = IdFromCookie(request.cookies["session_cookie"])
+    # user = DBManager.getUserById(id)
+    # language = user.language
+    print("languge is ->", language)
+    events = EventsManager.getEvents()
+    jsonEvents = EventsManager.translateEvents(language, events)
+    return JSONResponse(content=jsonEvents, status_code=200)
