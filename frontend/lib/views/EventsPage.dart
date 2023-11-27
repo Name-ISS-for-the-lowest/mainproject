@@ -58,7 +58,11 @@ class _EventsPageState extends State<EventsPage> {
                   )),
                   GestureDetector(
                     onTap: () {
-                      _launchURL(Uri.parse(event['url']!));
+                      String? eventId = event['id'];
+                      var language = AuthHelper.userInfoCache['language'];
+                      var url =
+                        "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$language";
+                      _launchURL(Uri.parse(url));
                     },
                     child: Container(
                       padding: const EdgeInsets.all(8.0),
