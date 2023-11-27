@@ -121,9 +121,11 @@ class DBManager:
         DBManager.db["session_cookies"].delete_one({"session_id": cookie["session_id"]})
 
     @staticmethod
-    def addPost(userID, content):
+    def addPost(userID, content, imageURL, imageFileID):
         newPost = Post(content, userID)
-        user = DBManager.getUserById(userID)
+        if imageURL != "False":
+            Attachment = Picture(imageURL, imageFileID)
+            newPost.attachedImage = Attachment.__dict__
         DBManager.db["posts"].insert_one(newPost.__dict__)
 
     @staticmethod
