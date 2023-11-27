@@ -262,11 +262,12 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                                                   BorderRadius.circular(10.0),
                                             ),
                                           ),
-                                          onPressed: () {
+                                          onPressed: () async {
                                             // enter logic to go to confirm password screen
                                             //set the profile picture
                                             print("am right here");
-                                            setProfilePic();
+                                            await setProfilePic();
+                                            navigateToFinishSignUp();
                                           },
                                           child: Text(
                                             Localize("Next"),
@@ -292,35 +293,6 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                       ],
                     ),
                   ],
-                ),
-
-                Positioned(
-                  bottom: 42,
-                  child: Column(children: [
-                    SizedBox(
-                        height:
-                            100), // Add spacing between the profile picture and the next button
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        fixedSize: const Size(330, 50),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0)),
-                        backgroundColor: const Color.fromRGBO(221, 151, 26, 1),
-                        foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
-                        textStyle: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      child: Text(Localize('Next')),
-                      onPressed: () => {
-                        navigateToFinishSignUp(),
-                      },
-                    ),
-                  ]
-                      //Next Button Styling
-                      ),
                 ),
               ],
             )),

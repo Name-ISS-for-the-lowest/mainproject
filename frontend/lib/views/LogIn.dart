@@ -165,8 +165,10 @@ class _LogInState extends State<LogIn> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           labelText: Localize('Email'),
-                          filled: true,
+                          contentPadding: const EdgeInsets.all(18),
                           fillColor: Colors.white,
+                          filled: true,
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
                         ),
                       ),
                     ),
@@ -188,8 +190,10 @@ class _LogInState extends State<LogIn> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           labelText: Localize('Password'),
-                          filled: true,
+                          contentPadding: const EdgeInsets.all(18),
                           fillColor: Colors.white,
+                          filled: true,
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
                         ),
                       ),
                     ),
@@ -260,12 +264,10 @@ class _LogInState extends State<LogIn> {
                         fontSize: 16,
                         color: Color.fromRGBO(230, 183, 17, 1)),
                   ),
-
                   //Spacer
                   const SizedBox(
                     height: 9,
                   ),
-
                   //Sign Up button Formatting
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
