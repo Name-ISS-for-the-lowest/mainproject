@@ -1,17 +1,19 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
+import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/postHelper.dart';
+import 'package:frontend/home.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../languagePicker/language_picker.dart';
 // import 'package:language_picker/language_picker.dart';
 // import 'package:language_picker/languages.dart';
 import '../languagePicker/languages.dart';
-import '../languagePicker/language_picker.dart';
-import 'package:frontend/classes/authHelper.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'dart:async';
-import 'package:frontend/home.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

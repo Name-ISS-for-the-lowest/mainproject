@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
+import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
+
 
 class ViewProfile extends StatefulWidget {
   String posterID;
@@ -63,15 +65,14 @@ class _ViewProfileState extends State<ViewProfile> {
     String posterName = user["username"];
     String posterEmail = user["email"];
     String pfpURL = user["profilePicture.url"];
-    String posterNationality = user["nationality"];
-    String posterLanguage = user["language"];
+    String posterNationality = Localize(user["nationality"]);
+    String posterLanguage = AuthHelper.languageNames[user["language"]];
 
     return Scaffold(
       backgroundColor: const Color(0xffece7d5),
       appBar: AppBar(
           centerTitle: true,
           backgroundColor: Colors.transparent,
-          elevation: 0,
           iconTheme: const IconThemeData(color: Colors.black),
           leading: GestureDetector(
             child: const Icon(
@@ -97,93 +98,68 @@ class _ViewProfileState extends State<ViewProfile> {
               color: const Color(0x5f000000),
             ),
           )),
-        body: ListView(
-          children: [
-            Stack(
-              children: <Widget>[
-                Positioned(
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Container(
-                      width: 150, // Set your desired width
-                      height: 150, // Set your desired height
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: "$pfpURL?tr=w-150,h-150,fo-auto",
-                          placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                          fit: BoxFit.fill,
-                        ),
-                      ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20.0),
+          child: ListView(
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: 150,
+                  height: 150,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: "$pfpURL?tr=w-150,h-150,fo-auto",
+                      placeholder: (context, url) => const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                      fit: BoxFit.fill,
                     ),
                   ),
                 ),
-              ],
-            ),
-            Stack(
-              children: <Widget>[
-                Positioned(
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: ListTile(
-                      title: Text(
-                        posterName,
-                        textAlign: TextAlign.center,
-                        textScaleFactor: 2,
-                      ),
-                    ),
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: ListTile(
+                  title: Text(
+                    posterName,
+                    textAlign: TextAlign.center,
+                    textScaleFactor: 2,
                   ),
                 ),
-              ],
-            ),
-            Stack(
-              children: <Widget>[
-                Positioned(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: ListTile(
-                      leading: const Icon(Icons.flag),
-                      title: Text(
-                        Localize('Nationality'),
-                        textAlign: TextAlign.left,
-                      ),
-                      subtitle: Text(posterNationality),
-                    ),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: ListTile(
+                  leading: const Icon(Icons.flag),
+                  title: Text(
+                    Localize('Nationality'),
+                    textAlign: TextAlign.left,
                   ),
+                  subtitle: Text(posterNationality),
                 ),
-              ],
-            ),
-            Stack(
-              children: <Widget>[
-                Positioned(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: ListTile(
-                      leading: const Icon(Icons.chat_rounded),
-                      title: Text(
-                        Localize('Language'),
-                        textAlign: TextAlign.left,
-                      ),
-                      subtitle: Text(posterLanguage),
-                    ),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: ListTile(
+                  leading: const Icon(Icons.chat_rounded),
+                  title: Text(
+                    Localize('Language'),
+                    textAlign: TextAlign.left,
                   ),
+                  subtitle: Text(posterLanguage),
                 ),
-              ],
-            ),
-            Container(
-              child: ListTile(
+              ),
+              ListTile(
                 leading: const Icon(Icons.mail),
                 title: Text(Localize('Email Address')),
                 subtitle: Text(posterEmail),
               ),
-            ),
-          ],
-        )
+            ],
+          ),
+        ),
       );
-  }
+    }
 }
