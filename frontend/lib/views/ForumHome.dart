@@ -384,6 +384,36 @@ class _ForumHomeState extends State<ForumHome> {
     loadUpdate();
   }
 
+  Future<void> removalAlertDialog(
+      BuildContext context, String postID, bool removed) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text((removed)
+              ? 'Do you wish to approve this post?'
+              : 'Do you wish to remove this post?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await loadRemovalToggle(postID);
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildPost(int index) {
     String imageURL = postData[index]["profilePicture"]['url'];
     String attachmentURL = 'Empty';
@@ -897,7 +927,8 @@ class _ForumHomeState extends State<ForumHome> {
                                     ? const SizedBox()
                                     : GestureDetector(
                                         onTap: () async {
-                                          await loadRemovalToggle(postID);
+                                          await removalAlertDialog(
+                                              context, postID, removed);
                                         },
                                         child: (removed)
                                             ? SvgPicture.asset(
