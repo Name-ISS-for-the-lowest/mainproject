@@ -610,7 +610,7 @@ class _ForumHomeState extends State<ForumHome> {
       ),
     );
 
-    double calculatedHeight = (postContent.length / 25 * 23) + 50;
+    double calculatedHeight = (postContent.length / 25 * 23) + 60;
     if (postTooLong) calculatedHeight += 35;
     if (attachmentURL != 'Empty') {
       calculatedHeight += 410;
@@ -655,27 +655,18 @@ class _ForumHomeState extends State<ForumHome> {
                   navigateToViewProfile(postID, posterID);
                   loadUpdate();
                 },
-                child: RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                          text: posterName,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'Inter',
-                            fontSize: 16,
-                          )),
-                      if (posterIsAdmin)
-                        TextSpan(
-                          text: ' [${Localize("Admin")}]',
-                          style: const TextStyle(
-                            color: Color.fromRGBO(4, 57, 39, 100),
-                            fontSize: 16,
-                          ),
-                        ),
-                    ],
+                child: Row(children: [
+                  Text(
+                    posterName,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'Inter',
+                      fontSize: 20,
+                    ),
                   ),
-                ),
+                  Icon(Icons.shield_sharp,
+                      color: Color.fromRGBO(4, 57, 39, 100))
+                ]),
               ),
             ),
             Positioned(
@@ -837,31 +828,6 @@ class _ForumHomeState extends State<ForumHome> {
                                 style: const TextStyle(fontSize: 14))
                           ],
                         )
-                      : const SizedBox(),
-                  (userIsAdmin)
-                      ? (deleted)
-                          ? const SizedBox()
-                          : const SizedBox(width: 10)
-                      : const SizedBox(),
-                  (userIsAdmin)
-                      ? (deleted)
-                          ? const SizedBox()
-                          : GestureDetector(
-                              onTap: () async {
-                                await loadRemovalToggle(postID);
-                              },
-                              child: (removed)
-                                  ? SvgPicture.asset(
-                                      "assets/PostUI/icon-approve.svg",
-                                      height: 30,
-                                      width: 30,
-                                      color: Colors.green,
-                                    )
-                                  : SvgPicture.asset(
-                                      "assets/PostUI/icon-remove.svg",
-                                      height: 24,
-                                      color: Colors.red,
-                                    ))
                       : const SizedBox(),
                 ],
               ),
