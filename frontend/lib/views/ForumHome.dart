@@ -444,6 +444,7 @@ class _ForumHomeState extends State<ForumHome> {
                     style: const TextStyle(
                       color: Colors.black,
                       fontFamily: 'Inter',
+                      fontSize: 18,
                     )),
                 if (isEdited)
                   TextSpan(
@@ -609,7 +610,7 @@ class _ForumHomeState extends State<ForumHome> {
       ),
     );
 
-    double calculatedHeight = (postContent.length / 25 * 14) + 50;
+    double calculatedHeight = (postContent.length / 25 * 23) + 50;
     if (postTooLong) calculatedHeight += 35;
     if (attachmentURL != 'Empty') {
       calculatedHeight += 410;
@@ -618,7 +619,7 @@ class _ForumHomeState extends State<ForumHome> {
     return Padding(
       padding: const EdgeInsets.all(6.0),
       child: SizedBox(
-        height: calculatedHeight + 100,
+        height: calculatedHeight + 110,
         child: Stack(
           children: [
             Positioned(
@@ -662,12 +663,14 @@ class _ForumHomeState extends State<ForumHome> {
                           style: const TextStyle(
                             color: Colors.black,
                             fontFamily: 'Inter',
+                            fontSize: 16,
                           )),
                       if (posterIsAdmin)
                         TextSpan(
                           text: ' [${Localize("Admin")}]',
                           style: const TextStyle(
                             color: Color.fromRGBO(4, 57, 39, 100),
+                            fontSize: 16,
                           ),
                         ),
                     ],
@@ -770,29 +773,29 @@ class _ForumHomeState extends State<ForumHome> {
                                     child: SvgPicture.asset(
                                       'assets/PostUI/icon-heartFilled.svg',
                                       color: Colors.red,
-                                      height: 20,
-                                      width: 20,
+                                      height: 30,
+                                      width: 30,
                                     ),
                                   ),
                                   SvgPicture.asset(
                                     'assets/PostUI/icon-heart.svg',
                                     color: Colors.black,
-                                    height: 20,
-                                    width: 20,
+                                    height: 30,
+                                    width: 30,
                                   )
                                 ],
                               )
                             : SvgPicture.asset(
                                 'assets/PostUI/icon-heart.svg',
                                 color: Colors.black,
-                                height: 20,
-                                width: 20,
+                                height: 30,
+                                width: 30,
                               ),
                       ),
-                      Text(formattedLikes, style: const TextStyle(fontSize: 11))
+                      Text(formattedLikes, style: const TextStyle(fontSize: 14))
                     ],
                   ),
-                  const SizedBox(width: 5),
+                  const SizedBox(width: 10),
                   Column(
                     children: [
                       GestureDetector(
@@ -807,14 +810,14 @@ class _ForumHomeState extends State<ForumHome> {
                         },
                         child: SvgPicture.asset(
                           "assets/PostUI/icon-comment.svg",
-                          height: 20,
-                          width: 20,
+                          height: 30,
+                          width: 30,
                         ),
                       ),
-                      Text(commentNumber, style: const TextStyle(fontSize: 11))
+                      Text(commentNumber, style: const TextStyle(fontSize: 14))
                     ],
                   ),
-                  (userIsAdmin) ? const SizedBox(width: 5) : const SizedBox(),
+                  (userIsAdmin) ? const SizedBox(width: 10) : const SizedBox(),
                   (userIsAdmin)
                       ? Column(
                           children: [
@@ -824,21 +827,21 @@ class _ForumHomeState extends State<ForumHome> {
                                 },
                                 child: SvgPicture.asset(
                                   "assets/PostUI/icon-flag.svg",
-                                  height: 20,
-                                  width: 20,
+                                  height: 30,
+                                  width: 30,
                                   color: (unreviewedReport)
                                       ? Colors.deepOrange
                                       : Colors.black,
                                 )),
                             Text(reportNumber,
-                                style: const TextStyle(fontSize: 11))
+                                style: const TextStyle(fontSize: 14))
                           ],
                         )
                       : const SizedBox(),
                   (userIsAdmin)
                       ? (deleted)
                           ? const SizedBox()
-                          : const SizedBox(width: 5)
+                          : const SizedBox(width: 10)
                       : const SizedBox(),
                   (userIsAdmin)
                       ? (deleted)
@@ -850,14 +853,13 @@ class _ForumHomeState extends State<ForumHome> {
                               child: (removed)
                                   ? SvgPicture.asset(
                                       "assets/PostUI/icon-approve.svg",
-                                      height: 20,
-                                      width: 20,
+                                      height: 30,
+                                      width: 30,
                                       color: Colors.green,
                                     )
                                   : SvgPicture.asset(
                                       "assets/PostUI/icon-remove.svg",
-                                      height: 18,
-                                      width: 18,
+                                      height: 24,
                                       color: Colors.red,
                                     ))
                       : const SizedBox(),
@@ -866,7 +868,7 @@ class _ForumHomeState extends State<ForumHome> {
             ),
             Positioned(
               bottom: 33,
-              left: 280,
+              right: 20,
               child: GestureDetector(
                 onTap: () async {
                   await translatePost(postContent, index);
@@ -891,12 +893,13 @@ class _ForumHomeState extends State<ForumHome> {
                       : Localize("Translate"),
                   style: const TextStyle(
                     color: Color(0xff0094FF),
+                    fontSize: 18,
                   ),
                 ),
               ),
             ),
             Positioned(
-              bottom: 60,
+              bottom: 70,
               left: 55,
               child: postTooLong
                   ? Container(
