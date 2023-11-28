@@ -431,11 +431,9 @@ class DBManager:
 
     @staticmethod
     def addTranslationToPost(translatedText, userLang, postID):
-
-        post = DBManager.db['posts'].find_one({"_id": ObjectId(postID)})
-        translations = post['translations']
+        post = DBManager.db["posts"].find_one({"_id": ObjectId(postID)})
+        translations = post["translations"]
         translations[userLang] = translatedText
-
 
         result = DBManager.db["posts"].update_one(
             {"_id": ObjectId(postID)},
