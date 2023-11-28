@@ -22,9 +22,9 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   Future<void> updateUser() async {
     await AuthHelper.updateUser();
-    if (mounted) {
-      setState(() {});
-    }
+    print("made it here bitch");
+    print(AuthHelper.userInfoCache['language']);
+    setState(() {});
   }
 
   late TextEditingController controller;
@@ -184,16 +184,21 @@ class _ProfilePageState extends State<ProfilePage> {
                     itemCount: filteredItems.length,
                     itemBuilder: (context, index) {
                       return GestureDetector(
-                        onTap: () async {
-                          if (languagesPicked) {
-                            AuthHelper.userInfoCache['language'] =
-                                trueItems[filteredItems[index]];
-                            PostHelper.cachedTranslations = {};
-                          } else {
-                            AuthHelper.userInfoCache['nationality'] =
-                                trueItems[filteredItems[index]];
-                          }
-                          updateUser();
+                        onTap: () {
+                          setState(() {
+                            if (languagesPicked) {
+                              AuthHelper.userInfoCache['language'] =
+                                  trueItems[filteredItems[index]];
+                              PostHelper.cachedTranslations = {};
+                            } else {
+                              AuthHelper.userInfoCache['nationality'] =
+                                  trueItems[filteredItems[index]];
+                            }
+                            // sleep(const Duration(milliseconds: 2000));
+                            updateUser();
+                          });
+
+                          print(AuthHelper.userInfoCache['language']);
                           setState(() {});
                           Navigator.of(context).pop();
                         },
