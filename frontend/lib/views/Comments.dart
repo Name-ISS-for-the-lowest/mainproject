@@ -296,7 +296,7 @@ class _CommentsState extends State<Comments> {
     );
   }
 
-  Future<void> translatePost(String originalText) async {
+  Future<void> translatePost(String originalText, var post) async {
     //first I check if cachedTranslations contains the original text as a key
     if (PostHelper.cachedTranslations.containsKey(originalText)) {
       return;
@@ -697,7 +697,11 @@ class _CommentsState extends State<Comments> {
                             children: [
                               GestureDetector(
                                 onTap: () async {
-                                  await translatePost(postContent);
+                                  var postTarget = post;
+                                  if (postPassed == null) {
+                                    var postTarget = commentData[index];
+                                  }
+                                  await translatePost(postContent, postTarget);
                                   if (dataSource[index]['translations'] == '') {
                                     await PostHelper.storeTranslation(
                                         PostHelper
