@@ -88,6 +88,67 @@ class PostHelper {
     }
   }
 
+  static Future<Response> createComment(
+    String userID, String postBody, String postID, File? Photo) async {
+    Map<String, dynamic> params;
+    String endPoint;
+    String? imageURL;
+    String? fileID;
+    String url;
+    if (Photo != null) {
+      var formData = FormData.fromMap({
+        'photo': await MultipartFile.fromFile(Photo.path,
+            filename: AuthHelper.userInfoCache['username'] + '_postAttachment'),
+      });
+      params = {
+        'name': AuthHelper.userInfoCache['username'],
+        'type': 'postAttachments'
+      };
+      endPoint = '/uploadPhoto';
+      url = '$defaultHost$endPoint';
+      try {
+        final response = await RouteHandler.dio.post(url,
+            data: formData,
+            queryParameters: params,
+            options:
+                Options(contentType: Headers.multipartFormDataContentType));
+        imageURL = response.data['url'];
+        fileID = response.data['fileId'];
+      } on DioException catch (e) {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': e},
+          statusCode: 500,
+        );
+      }
+    }
+    endPoint = '/createComment';
+    url = '$defaultHost$endPoint';
+    params = {
+      'postBody': postBody,
+      'imageURL': 'False',
+      'imageFileID': 'False',
+      'parentID': postID
+    };
+    if (imageURL != null) {
+      params['imageURL'] = imageURL;
+      params['imageFileID'] = fileID;
+    }
+
+    try {
+      final response = await RouteHandler.dio.post(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
   static Future<Response> deletePost(String postID) async {
     final params = {'postID': postID};
     String endPoint = '/deletePost';
@@ -140,6 +201,26 @@ class PostHelper {
       'showDeleted': specialSearchOptions['showDeleted'],
     };
     String endPoint = '/getPosts';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.get(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static getComments(String parentID) async {
+    final params = {
+      'parentID': parentID,
+    };
+    String endPoint = '/getComments';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.get(url,

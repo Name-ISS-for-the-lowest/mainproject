@@ -290,6 +290,12 @@ def createPost(postBody: str, imageURL: str, imageFileID: str, request: Request)
     DBManager.addPost(id, postBody, imageURL, imageFileID)
     return JSONResponse({"message": "Post Added"}, status_code=200)
 
+@app.post("/createComment")
+def createPost(postBody: str, imageURL: str, imageFileID: str, parentID: str, request: Request):
+    id = IdFromCookie(request.cookies["session_cookie"])
+    DBManager.addComment(id, postBody, imageURL, imageFileID, parentID)
+    return JSONResponse({"message": "Post Added"}, status_code=200)
+
 
 @app.post("/editPost")
 def editPost(postID: str, postBody: str, request: Request):
@@ -331,6 +337,17 @@ def getPosts(
     posts = Post.listToJson(posts)
     print("posts: ", len(posts))
     return posts
+
+@app.get("/getComments")
+def getComments(
+    parentID: str,
+    request: Request,
+):
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    # print("userID: ", userID)
+    comments = DBManager.getComments(parentID=parentID,)
+    comments = Post.listToJson(comments)
+    return comments
 
 
 @app.get("/getPostByID")
