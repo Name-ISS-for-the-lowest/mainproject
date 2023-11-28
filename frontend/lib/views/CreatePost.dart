@@ -183,6 +183,12 @@ class _CreatePostState extends State<CreatePost> {
                 ),
                 GestureDetector(
                   onTap: () async {
+                    if (currentPostBody == '') {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Please add some content to your post."),
+                      ));
+                      return;
+                    }
                     if (isEditing) {
                       var response =
                           await PostHelper.editPost(postID, currentPostBody);
