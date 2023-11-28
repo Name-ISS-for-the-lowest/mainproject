@@ -73,7 +73,11 @@ class _LogInState extends State<LogIn> {
   }
 
   bool validateEmail(String email) {
-    print(email.length);
+    //check if @example.com
+    final exampleRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@example\.com$');
+    if (exampleRegExp.hasMatch(email)) {
+      return true;
+    }
     //general email regex
     // final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
     //csus email regex

@@ -27,6 +27,7 @@ class Event:
     month: str
     url: str
     description: {str, str}
+    id: str
 
     @staticmethod
     def fromDict(dict):
@@ -49,6 +50,7 @@ class Event:
             "en": htmlDesc,
         }
         event.location = htmlLocation.get_text(separator=" ")
+        event.id = dict["eventID"]
         # for key in dict:
         #     setattr(event, key, dict[key])
         return event
