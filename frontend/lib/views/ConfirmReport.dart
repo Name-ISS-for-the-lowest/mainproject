@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/views/CoreTemplate.dart';
 import 'package:frontend/classes/Localize.dart';
 
 class ConfirmReport extends StatefulWidget {
@@ -34,7 +33,7 @@ class _ConfirmReportState extends State<ConfirmReport> {
           title: Text(
             Localize("Report Post"),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: Colors.black,
@@ -58,7 +57,7 @@ class _ConfirmReportState extends State<ConfirmReport> {
                 Text(
                   Localize(
                       "We have received your report, thank you for submitting it."),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
                   ),
@@ -68,14 +67,14 @@ class _ConfirmReportState extends State<ConfirmReport> {
                 Text(
                   Localize(
                       "User experience is what we value most at International Student Station and your input is very valuable to us."),
-                  style: TextStyle(fontSize: 17),
+                  style: const TextStyle(fontSize: 17),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
                 Text(
                   Localize(
                       "We will be reviewing your report soon, please click the button below or the close button on your top left to return to the app."),
-                  style: TextStyle(fontSize: 17),
+                  style: const TextStyle(fontSize: 17),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(
@@ -87,7 +86,7 @@ class _ConfirmReportState extends State<ConfirmReport> {
                   },
                   child: Text(
                     Localize("Take me Back"),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xff007EF1),
                       fontSize: 20,
                     ),

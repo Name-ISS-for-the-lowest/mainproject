@@ -131,7 +131,7 @@ class _EventsPageState extends State<EventsPage> {
                           child: Text(
                             Localize('Open Translated Website'),
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/views/CoreTemplate.dart';
 import 'package:frontend/views/ViewImage.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
@@ -171,7 +170,7 @@ class _AdminViewState extends State<AdminView> {
           title: Text(
             Localize("Moderate Post"),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: Colors.black,
@@ -195,7 +194,7 @@ class _AdminViewState extends State<AdminView> {
               ),
               Text(
                 Localize("Posted By"),
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
                 height: 20,
@@ -224,7 +223,7 @@ class _AdminViewState extends State<AdminView> {
               ),
               Text(
                 Localize("Screen Name:"),
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
                 posterName,
@@ -235,15 +234,15 @@ class _AdminViewState extends State<AdminView> {
               ),
               Text(
                 Localize("Email Address:"),
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
                 posterEmail,
                 style: const TextStyle(fontSize: 18),
               ),
               (userBanned)
-                  ? Text("[" + Localize("USER HAS BEEN BANNED") + "]",
-                      style: TextStyle(
+                  ? Text("[${Localize("USER HAS BEEN BANNED")}]",
+                      style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.red))
@@ -251,13 +250,13 @@ class _AdminViewState extends State<AdminView> {
               const Divider(),
               Text(
                 Localize("Image Attached"),
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               (attachmentURL == 'Empty')
                   ? Text(
                       Localize("No Image Attached"),
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     )
                   : GestureDetector(
                       onTap: () {
@@ -274,7 +273,7 @@ class _AdminViewState extends State<AdminView> {
               const Divider(),
               Text(
                 Localize("Post Content"),
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -338,7 +337,7 @@ class _AdminViewState extends State<AdminView> {
               (contentHistory.length > 1)
                   ? Text(Localize("Navigate Edit History"),
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold))
+                          const TextStyle(fontSize: 20, fontWeight: FontWeight.bold))
                   : const SizedBox(),
               (contentHistory.length > 1)
                   ? const SizedBox(
@@ -398,14 +397,14 @@ class _AdminViewState extends State<AdminView> {
                     )
                   : Text(Localize("Post Has No Edit History"),
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                          const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const Divider(),
               Text(
                 Localize("Reports Submitted"),
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               Text(
-                Localize("Total Reports Gathered:") + "$reports",
+                "${Localize("Total Reports Gathered:")}$reports",
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -423,7 +422,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text(Localize("Hate Speech:") + " $hateSpeech"),
+                      Text("${Localize("Hate Speech:")} $hateSpeech"),
                     ],
                   ),
                   Row(
@@ -438,8 +437,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text(Localize("Targeted Harassment:") +
-                          " $targetedHarassment"),
+                      Text("${Localize("Targeted Harassment:")} $targetedHarassment"),
                     ],
                   ),
                   Row(
@@ -454,8 +452,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text(Localize("Inappropriate Content:") +
-                          " $inappropriateContent"),
+                      Text("${Localize("Inappropriate Content:")} $inappropriateContent"),
                     ],
                   ),
                   Row(
@@ -470,7 +467,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text(Localize("Illegal Content:") + " $illegalContent"),
+                      Text("${Localize("Illegal Content:")} $illegalContent"),
                     ],
                   ),
                   Row(
@@ -485,7 +482,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text(Localize("Other Reason:") + " $otherReason"),
+                      Text("${Localize("Other Reason:")} $otherReason"),
                     ],
                   ),
                 ],
@@ -496,7 +493,7 @@ class _AdminViewState extends State<AdminView> {
               const Divider(),
               Text(
                 Localize("Take Action"),
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
                 height: 30,
@@ -521,7 +518,7 @@ class _AdminViewState extends State<AdminView> {
                       ),
                       child: Text(
                         Localize('Approve Post'),
-                        style: TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                   ),
@@ -542,7 +539,7 @@ class _AdminViewState extends State<AdminView> {
                       ),
                       child: Text(
                         Localize('Remove Post'),
-                        style: TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                   ),
@@ -573,7 +570,7 @@ class _AdminViewState extends State<AdminView> {
                   ),
                   child: Text(
                     Localize('Ban User'),
-                    style: TextStyle(color: Colors.black),
+                    style: const TextStyle(color: Colors.black),
                   ),
                 ),
               ),

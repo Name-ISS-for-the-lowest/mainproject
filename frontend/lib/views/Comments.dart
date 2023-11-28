@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,7 +6,6 @@ import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/AdminView.dart';
 import 'package:frontend/views/ConfirmReport.dart';
-import 'package:frontend/views/CreateComment.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ReportPage.dart';
 import 'package:frontend/views/ViewImage.dart';
@@ -227,13 +225,13 @@ class _CommentsState extends State<Comments> {
                 Navigator.of(context).pop();
                 await loadRemovalToggle(postID);
               },
-              child: Text('Yes'),
+              child: const Text('Yes'),
             ),
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
               },
-              child: Text('No'),
+              child: const Text('No'),
             ),
           ],
         );
@@ -290,7 +288,7 @@ class _CommentsState extends State<Comments> {
   Widget _buildList() {
     print('WE GOT HERE');
     int comShift = 0;
-    if (commentData.length == 0) {
+    if (commentData.isEmpty) {
       comShift += 1;
     }
     int parShift = 0;
@@ -308,7 +306,7 @@ class _CommentsState extends State<Comments> {
           }
 
           if (index == parentData.length - parShift) {
-            return Divider(
+            return const Divider(
               height: 3,
               color: Colors.black,
             );
@@ -319,7 +317,7 @@ class _CommentsState extends State<Comments> {
           }
 
           if (index == parentData.length + 2 - parShift) {
-            return Divider(
+            return const Divider(
               height: 3,
               color: Colors.black,
             );
@@ -328,11 +326,11 @@ class _CommentsState extends State<Comments> {
           if (commentData.isEmpty &&
               index == parentData.length + 3 - parShift) {
             return Padding(
-                padding: EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.only(top: 10),
                 child: Center(
                     child: Text(
                   Localize('No Comments Found'),
-                  style: TextStyle(fontSize: 20),
+                  style: const TextStyle(fontSize: 20),
                 )));
           }
 
@@ -591,30 +589,30 @@ class _CommentsState extends State<Comments> {
                         ),
                       ),
                       (posterIsAdmin)
-                          ? Icon(Icons.shield,
+                          ? const Icon(Icons.shield,
                               color: Color.fromRGBO(4, 57, 39, 100))
                           : const SizedBox(),
                     ]),
                   ),
                 ],
               ),
-              Expanded(child: const SizedBox()),
+              const Expanded(child: SizedBox()),
               Container(
                 child: threeDotMenu,
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Padding(
-            padding: EdgeInsets.only(left: 25, top: 5),
+            padding: const EdgeInsets.only(left: 25, top: 5),
             child: Row(
               children: [
                 Flexible(
                   child: Container(
-                    padding: EdgeInsets.only(left: 10),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.only(left: 10),
+                    decoration: const BoxDecoration(
                       border: Border(
                           left: BorderSide(width: 1.0, color: Colors.grey)),
                     ),
@@ -638,7 +636,7 @@ class _CommentsState extends State<Comments> {
                             : const SizedBox(),
                         (attachmentURL != 'Empty')
                             ? Container(
-                                padding: EdgeInsets.only(top: 10),
+                                padding: const EdgeInsets.only(top: 10),
                                 child: GestureDetector(
                                   onTap: () {
                                     navigateToViewImage([attachmentURL]);
@@ -659,7 +657,7 @@ class _CommentsState extends State<Comments> {
                                 ),
                               )
                             : const SizedBox(),
-                        SizedBox(
+                        const SizedBox(
                           height: 15,
                         ),
                         RichText(
@@ -693,7 +691,7 @@ class _CommentsState extends State<Comments> {
                           height: 20,
                         ),
                         Padding(
-                          padding: EdgeInsets.only(right: 20),
+                          padding: const EdgeInsets.only(right: 20),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
@@ -845,7 +843,7 @@ class _CommentsState extends State<Comments> {
                                               )
                                             : Container(
                                                 padding:
-                                                    EdgeInsets.only(top: 5),
+                                                    const EdgeInsets.only(top: 5),
                                                 child: SvgPicture.asset(
                                                   "assets/PostUI/icon-remove.svg",
                                                   height: 24,
@@ -857,7 +855,7 @@ class _CommentsState extends State<Comments> {
                         ),
                         (postPassed != null)
                             ? Padding(
-                                padding: EdgeInsets.only(right: 20),
+                                padding: const EdgeInsets.only(right: 20),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -868,7 +866,7 @@ class _CommentsState extends State<Comments> {
                                         },
                                         child: Row(
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.reply,
                                               color: Colors.black,
                                               size: 30,
@@ -878,7 +876,7 @@ class _CommentsState extends State<Comments> {
                                             ),
                                             Text(
                                               Localize("Reply to User"),
-                                              style: TextStyle(fontSize: 20),
+                                              style: const TextStyle(fontSize: 20),
                                             )
                                           ],
                                         )),
@@ -926,7 +924,7 @@ class _CommentsState extends State<Comments> {
           title: Text(
             Localize("Comments"),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: Colors.black,

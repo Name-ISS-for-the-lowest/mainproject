@@ -15,7 +15,6 @@ import 'package:frontend/views/ReportPage.dart';
 import 'package:frontend/views/ViewImage.dart';
 import 'package:frontend/views/ViewProfile.dart';
 import 'package:html_unescape/html_unescape.dart';
-import 'package:http/http.dart';
 
 class ForumHome extends StatefulWidget {
   const ForumHome({super.key});
@@ -402,13 +401,13 @@ class _ForumHomeState extends State<ForumHome> {
                 Navigator.of(context).pop();
                 await loadRemovalToggle(postID);
               },
-              child: Text('Yes'),
+              child: const Text('Yes'),
             ),
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
               },
-              child: Text('No'),
+              child: const Text('No'),
             ),
           ],
         );
@@ -663,30 +662,30 @@ class _ForumHomeState extends State<ForumHome> {
                         ),
                       ),
                       (posterIsAdmin)
-                          ? Icon(Icons.shield,
+                          ? const Icon(Icons.shield,
                               color: Color.fromRGBO(4, 57, 39, 100))
                           : const SizedBox(),
                     ]),
                   ),
                 ],
               ),
-              Expanded(child: const SizedBox()),
+              const Expanded(child: SizedBox()),
               Container(
                 child: threeDotMenu,
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Padding(
-            padding: EdgeInsets.only(left: 25, top: 5),
+            padding: const EdgeInsets.only(left: 25, top: 5),
             child: Row(
               children: [
                 Flexible(
                   child: Container(
-                    padding: EdgeInsets.only(left: 10),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.only(left: 10),
+                    decoration: const BoxDecoration(
                       border: Border(
                           left: BorderSide(width: 1.0, color: Colors.grey)),
                     ),
@@ -710,7 +709,7 @@ class _ForumHomeState extends State<ForumHome> {
                             : const SizedBox(),
                         (attachmentURL != 'Empty')
                             ? Container(
-                                padding: EdgeInsets.only(top: 10),
+                                padding: const EdgeInsets.only(top: 10),
                                 child: GestureDetector(
                                   onTap: () {
                                     navigateToViewImage([attachmentURL]);
@@ -731,7 +730,7 @@ class _ForumHomeState extends State<ForumHome> {
                                 ),
                               )
                             : const SizedBox(),
-                        SizedBox(
+                        const SizedBox(
                           height: 15,
                         ),
                         GestureDetector(
@@ -789,7 +788,7 @@ class _ForumHomeState extends State<ForumHome> {
                           height: 20,
                         ),
                         Padding(
-                          padding: EdgeInsets.only(right: 20),
+                          padding: const EdgeInsets.only(right: 20),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
@@ -940,7 +939,7 @@ class _ForumHomeState extends State<ForumHome> {
                                               )
                                             : Container(
                                                 padding:
-                                                    EdgeInsets.only(top: 5),
+                                                    const EdgeInsets.only(top: 5),
                                                 child: SvgPicture.asset(
                                                   "assets/PostUI/icon-remove.svg",
                                                   height: 24,

@@ -21,7 +21,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   Future<void> updateUser() async {
-    var response = await AuthHelper.updateUser();
+    await AuthHelper.updateUser();
     if (mounted) {
       setState(() {});
     }
@@ -193,7 +193,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             AuthHelper.userInfoCache['nationality'] =
                                 trueItems[filteredItems[index]];
                           }
-                          await updateUser();
+                          updateUser();
+                          setState(() {});
                           Navigator.of(context).pop();
                         },
                         child: Container(

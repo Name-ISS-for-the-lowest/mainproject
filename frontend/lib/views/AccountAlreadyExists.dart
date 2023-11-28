@@ -119,7 +119,7 @@ class _AccountAlreadyExistsState extends State<AccountAlreadyExists> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 250,
                 ),
 
