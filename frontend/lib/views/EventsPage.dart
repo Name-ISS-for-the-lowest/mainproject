@@ -170,7 +170,7 @@ class _EventsPageState extends State<EventsPage> {
     String? eventId = event['id'];
     return GestureDetector(
       onTap: () {
-        showExpandedInformation(event);
+        showExpandedInformation(event, eventId);
       },
       child: Column(
         children: [
