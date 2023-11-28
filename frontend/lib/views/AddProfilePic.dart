@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/views/AccountAlreadyExists.dart';
 import 'package:frontend/views/SignupComplete.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:lottie/lottie.dart';
+import 'package:dio/dio.dart';
 
 class AddToProfilePic extends StatefulWidget {
   final String email;
-  const AddToProfilePic({super.key, required this.email});
+  final String password;
+  const AddToProfilePic(
+      {super.key, required this.email, required this.password});
 
   @override
   State<AddToProfilePic> createState() => _AddToProfilePicState();
@@ -19,6 +23,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
   File image = File('assets/Default_pfp.png');
   Widget imageWidget = Image.asset('assets/Default_pfp.png',
       width: 200, height: 200, fit: BoxFit.fill);
+  bool isLoading = false;
 
   Future<void> pickImage(ImageSource source) async {
     try {
@@ -37,7 +42,6 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
   }
 
   Future<void> setProfilePic() async {
-    print("made it here$imageSpecified");
     if (imageSpecified) {
       //todo set the profile picture
       await AuthHelper.setProfilePictureOnSignUp(widget.email, image);
@@ -91,6 +95,46 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
         },
       ),
     );
+  }
+
+  void navigateToAccountAlreadyExists() {
+    //navigate back to login
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: Stack(children: [
+              SizedBox(
+                height: 100,
+                child: AppBar(
+                  backgroundColor: Colors.transparent,
+                  iconTheme: const IconThemeData(color: Colors.white),
+                ),
+              ),
+              const AccountAlreadyExists()
+            ]),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<bool> executeSignUp(String email, String password) async {
+    Response response = await AuthHelper.signUp(email, password);
+    print(response.data["message"]);
+    if (response.data["message"] == "Account with this email, already exists") {
+      //navigate to account already exists page
+      navigateToAccountAlreadyExists();
+      return false;
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.data["message"] ?? "Error"),
+        ),
+      );
+    }
+    return true;
   }
 
   @override
@@ -260,17 +304,32 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                                             ),
                                           ),
                                           onPressed: () async {
-                                            // enter logic to go to confirm password screen
-                                            //set the profile picture
-                                            print("am right here");
-                                            await setProfilePic();
-                                            navigateToFinishSignUp();
+                                            //show loading overlay
+                                            setState(() {
+                                              isLoading = true;
+                                            });
+                                            bool result = await executeSignUp(
+                                                widget.email, widget.password);
+                                            if (result) {
+                                              await setProfilePic();
+                                              setState(() {
+                                                isLoading = false;
+                                              });
+                                              navigateToFinishSignUp();
+                                            } else {
+                                              setState(() {
+                                                isLoading = false;
+                                              });
+                                              navigateToAccountAlreadyExists();
+                                            }
+
+                                            //remove loading overlay
                                           },
                                           child: Text(
                                             Localize("Next"),
                                             style: const TextStyle(
                                               fontSize: 16,
-                                              fontWeight: FontWeight.w700,
+                                              fontWeight: FontWeight.w800,
                                               color: Color.fromARGB(
                                                   255, 53, 53, 53),
                                             ),
@@ -294,6 +353,16 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
               ],
             )),
           ),
+
+          if (isLoading)
+            Container(
+              width: screenHeight,
+              height: screenHeight,
+              color: Color.fromARGB(0, 245, 245, 245).withOpacity(0.3),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
         ],
       ),
     );

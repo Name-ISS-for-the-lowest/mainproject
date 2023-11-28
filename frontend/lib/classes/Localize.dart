@@ -20,8 +20,6 @@ class Localizer {
 String Localize(String text) {
   //get defualt language
   String defaultLanguage = 'en';
-  print("User language: ");
-  print(AuthHelper.userInfoCache);
   if (AuthHelper.userInfoCache['language'] != null) {
     defaultLanguage = AuthHelper.userInfoCache['language'];
   }

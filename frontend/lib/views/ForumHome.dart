@@ -155,7 +155,6 @@ class _ForumHomeState extends State<ForumHome> {
     }
 
     return '$returnedNumber$suffix';
-    return '$returnedNumber$suffix';
   }
 
   Future<void> translatePost(String originalText, int index) async {
@@ -378,7 +377,7 @@ class _ForumHomeState extends State<ForumHome> {
 
     String commentNumber = '0';
 
-    Widget postBodyContainer = SizedBox(
+    SizedBox postBodyContainer = SizedBox(
       width: 280,
       child: Builder(
         builder: (BuildContext context) {
@@ -678,9 +677,9 @@ class _ForumHomeState extends State<ForumHome> {
                         child: CachedNetworkImage(
                           imageUrl: "$attachmentURL?tr=w-340,h-340,fo-auto",
                           placeholder: (context, url) =>
-                              CircularProgressIndicator(),
+                              const CircularProgressIndicator(),
                           errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
+                              const Icon(Icons.error),
                         ),
                       ),
                     )
@@ -778,7 +777,8 @@ class _ForumHomeState extends State<ForumHome> {
                                       ? Colors.deepOrange
                                       : Colors.black,
                                 )),
-                            Text(reportNumber, style: TextStyle(fontSize: 11))
+                            Text(reportNumber,
+                                style: const TextStyle(fontSize: 11))
                           ],
                         )
                       : const SizedBox(),

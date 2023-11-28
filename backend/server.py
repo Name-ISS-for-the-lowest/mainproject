@@ -22,7 +22,10 @@ from bson import ObjectId
 import migrate
 from classes.Translator import Translator
 import adminManager
-from datetime import datetime
+from datetime import datetime, timedelta
+from fastapi.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
+import re
 
 # templates = Jinja2Templates(directory="templates")
 
@@ -36,6 +39,9 @@ adminManager.setAdmins()
 class CookiesMiddleWare(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # pattern = r"^/.*$"
+        # any endpoint that is /static/ will not be checked for cookies
+        pattern = r"^/static/.*$"
+        match = re.match(pattern, request.url.path)
         if (
             request.url.path == "/login"
             or request.url.path == "/signup"
@@ -44,7 +50,8 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/logout"
             or request.url.path == "/openapi.json"
             or request.url.path == "/setProfilePictureOnSignUp"
-            or request.url.path == "/resetPassword",
+            or request.url.path == "/resetPassword"
+            or match
         ):
             return await call_next(request)
         # check if the user has a cookie
@@ -100,6 +107,13 @@ def login(creds: credentials, request: Request, response: Response):
         )
     else:
         if user["accountActivated"] == False:
+            passwordHash = user["passwordHash"]
+            salt = user["salt"]
+            correctPass = PassHasher.checkPassword(password, passwordHash, salt)
+            if correctPass:
+                return JSONResponse(
+                    content={"message": "Please verify your email"}, status_code=400
+                )
             return JSONResponse(
                 content={"message": "Data does not match our records"}, status_code=400
             )
@@ -109,7 +123,6 @@ def login(creds: credentials, request: Request, response: Response):
             salt = user["salt"]
             # print(type(salt))
             # print(user.__dict__)
-            print(PassHasher.checkPassword(password, passwordHash, salt))
             if PassHasher.checkPassword(password, passwordHash, salt):
                 # check if the user has a cookie
                 if "session_cookie" in request.cookies:
@@ -181,6 +194,16 @@ def signUp(creds: credentials):
     # check if the user already exists
     user = DBManager.getUserByEmail(email)
     if user is not None:
+        # check if password is correct
+        passwordHash = user["passwordHash"]
+        salt = user["salt"]
+        correctPass = PassHasher.checkPassword(password, passwordHash, salt)
+        if correctPass:
+            return JSONResponse(
+                content={"message": "Account with this email, already exists"},
+                status_code=400,
+            )
+
         return JSONResponse(
             content={"message": "Unable to create account"}, status_code=400
         )
@@ -440,14 +463,12 @@ def getEvents(request: Request, language: str = "en"):
 @app.get("/resetPassword")
 def getResetPassword(token: str):
     user = DBManager.getUserByToken(token)
-    userDic = user.__dict__
-    createAt = userDic["tokenCreatedAt"]
     if user is None:
         return JSONResponse(content={"message": "invalid link"}, status_code=400)
-    if timedelta(seconds=1800) < datetime.now() - createAt:
+    if timedelta(minutes=30) + user["tokenCreatedAt"] < datetime.now():
         return JSONResponse(content={"message": "link expired"}, status_code=400)
     else:
-        createAt = user.__dict__["tokenCreatedAt"]
+        token = user["token"]
     return HTMLResponse(
         content=open("static/resetPassword/index.html", "r").read(), status_code=200
     )
@@ -456,22 +477,18 @@ def getResetPassword(token: str):
 @app.patch("/resetPassword")
 def receivePassword(password: str, token: str):
     user = DBManager.getUserByToken(token)
-    if user is None:
-        return JSONResponse(content={"message": "invalid link"}, status_code=400)
     userDic = user.__dict__
-    createAt = userDic["tokenCreatedAt"]
-    if timedelta(seconds=1800) < datetime.now() - createAt:
+    createAt = user["tokenCreatedAt"]
+    if timedelta(minutes=30) + createAt < datetime.now():
         return JSONResponse(content={"message": "link expired"}, status_code=400)
 
     userDic.pop("tokenCreatedAt")
-    userDic.pop("token")
     salt = PassHasher.generateSalt()
     passwordHash = PassHasher.hashPassword(password, salt)
     userDic["passwordHash"] = passwordHash
     userDic["salt"] = salt
-    email = userDic["email"]
-    print(userDic)
-    DBManager.db["users"].replace_one({"email": email}, userDic)
+    userDic.pop("token")
+    DBManager.db["users"].replace_one({"token": token}, userDic)
 
     return JSONResponse(content={"message": "Password reset successfully"})
 
@@ -486,14 +503,5 @@ def resetPassword(email: str):
     createdAt = datetime.now()
     userDic["token"] = token
     userDic["tokenCreatedAt"] = createdAt
-    DBManager.db["users"].update_one({"email": email}, {"$set": userDic})
+    DBManager.db["users"].replace_one({"email": email}, userDic)
     return JSONResponse(content={"message": "email sent"}, status_code=200)
-
-@app.post("/banUser")
-def banUser(adminID: str, bannedID: str, banMessage:str, request: Request):
-    DBManager.banUser(adminID=adminID, bannedID=bannedID, banMessage=banMessage)
-    return JSONResponse(content="User Banned", status_code=200)
-
-    
-
-

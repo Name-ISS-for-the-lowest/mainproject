@@ -1,8 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:frontend/classes/Localize.dart';
-import 'package:frontend/classes/authHelper.dart';
-import 'package:frontend/views/CoreTemplate.dart';
-import 'package:frontend/views/ProfilePage.dart';
 
 class SelectorHelper {
   static List countryList = [

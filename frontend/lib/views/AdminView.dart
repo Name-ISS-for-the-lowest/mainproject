@@ -27,7 +27,7 @@ class _AdminViewState extends State<AdminView> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return Scaffold(
+          return const Scaffold(
             body: CoreTemplate(),
           );
         },
@@ -270,8 +270,9 @@ class _AdminViewState extends State<AdminView> {
                       child: CachedNetworkImage(
                         imageUrl: "$attachmentURL?tr=w-400,h-auto",
                         placeholder: (context, url) =>
-                            CircularProgressIndicator(),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
+                            const CircularProgressIndicator(),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
                       ),
                     ),
               const Divider(),

@@ -25,7 +25,7 @@ class _CreatePostState extends State<CreatePost> {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (BuildContext context) {
-            return Scaffold(
+            return const Scaffold(
               body: CoreTemplate(),
             );
           },

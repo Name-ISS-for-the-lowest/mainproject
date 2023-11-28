@@ -1,10 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/ResetPassword.dart';
 import 'package:frontend/views/SignUp.dart';
 import 'package:frontend/views/CoreTemplate.dart';
+import 'package:frontend/views/SignupComplete.dart';
 import 'package:lottie/lottie.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
@@ -31,6 +31,9 @@ class _LogInState extends State<LogIn> {
 
   void executeLogin(BuildContext context, email, String password) async {
     //do something with the email and password
+    if (!validateEmail(email)) {
+      return;
+    }
     var response = await AuthHelper.login(email, password);
     bool check = await AuthHelper.isLoggedIn();
     if (check) {
@@ -40,6 +43,59 @@ class _LogInState extends State<LogIn> {
         content: Text(response.data["message"] ?? Localize("Error")),
       ));
     }
+
+    if (response.data["message"] == "Please verify your email") {
+      //navigate to verify email page
+      navigateToFinishSignUp();
+    }
+  }
+
+  void navigateToFinishSignUp() {
+    //navigate back to login
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: Stack(children: [
+              SizedBox(
+                height: 100,
+                child: AppBar(
+                  backgroundColor: Colors.transparent,
+                  iconTheme: const IconThemeData(color: Colors.white),
+                ),
+              ),
+              const SignupComplete()
+            ]),
+          );
+        },
+      ),
+    );
+  }
+
+  bool validateEmail(String email) {
+    print(email.length);
+    //general email regex
+    // final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+    //csus email regex
+    final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@csus\.edu$');
+    if (!emailRegExp.hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(Localize('Invalid email, must be a CSUS email')),
+        ),
+      );
+      return false;
+    }
+    //make sure email is not over 100 characters
+    if (email.length > 50) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(Localize('Email must be less than 50 characters')),
+        ),
+      );
+      return false;
+    }
+    return true;
   }
 
   void navigateToSignUp() {
@@ -85,8 +141,10 @@ class _LogInState extends State<LogIn> {
   }
 
   void navigateToPrimaryScreens() {
-    Navigator.pushAndRemoveUntil(context,
-        MaterialPageRoute(builder: (_) => CoreTemplate()), (route) => false);
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const CoreTemplate()),
+        (route) => false);
   }
 
   @override

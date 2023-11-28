@@ -196,7 +196,7 @@ class EmailSender:
   <body>
     <div class="main-container">
       <h1 class="main-header">
-        Reset Email!
+        Reset Password!
       </h1>
       <p class="mb-6">
        We received a request for you to reset your password. If you did not make this request, you can safely ignore this email.

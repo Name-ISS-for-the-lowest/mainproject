@@ -186,6 +186,7 @@ class AuthHelper {
       AuthHelper.userInfoCache['profilePicture.fileId'] =
           userInfo['profilePicture.fileId'];
       userInfoCache['admin'] = userInfo['admin'];
+      print(userInfoCache);
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),

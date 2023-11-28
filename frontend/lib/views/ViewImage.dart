@@ -5,7 +5,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 class ViewImage extends StatefulWidget {
   final List<String> imageUrls;
 
-  ViewImage({required this.imageUrls});
+  const ViewImage({super.key, required this.imageUrls});
 
   @override
   State<ViewImage> createState() => _ViewImageState();
@@ -58,8 +58,8 @@ class _ViewImageState extends State<ViewImage> {
             maxScale: PhotoViewComputedScale.covered * 2,
           );
         },
-        scrollPhysics: BouncingScrollPhysics(),
-        backgroundDecoration: BoxDecoration(
+        scrollPhysics: const BouncingScrollPhysics(),
+        backgroundDecoration: const BoxDecoration(
           color: Colors.black,
         ),
         pageController: PageController(),

@@ -8,8 +8,6 @@ import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/selectorHelper.dart';
-// import 'package:language_picker/language_picker.dart';
-// import 'package:language_picker/languages.dart';
 import '../languagePicker/languages.dart';
 import '../languagePicker/language_picker.dart';
 import 'package:frontend/classes/authHelper.dart';
@@ -72,7 +70,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     //USER VARIABLES
-
     String imageURL = AuthHelper.userInfoCache['profilePicture.url'];
     String displayName = AuthHelper.userInfoCache['username'];
     String englishNationality = AuthHelper.userInfoCache['nationality'];
@@ -106,8 +103,10 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Text(Localize("Continue")),
         onPressed: () async {
           AuthHelper.logout();
-          Navigator.pushAndRemoveUntil(context,
-              MaterialPageRoute(builder: (_) => Home()), (route) => false);
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const Home()),
+              (route) => false);
         },
       );
 
@@ -144,16 +143,16 @@ class _ProfilePageState extends State<ProfilePage> {
       Map<String, String> trueItems = {};
       List items = [];
       if (languagesPicked) {
-        listChoice.forEach((element) {
+        for (var element in listChoice) {
           items.add(element);
           trueItems[element] = SelectorHelper.langMap[element]!;
-        });
+        }
       } else {
-        listChoice.forEach((element) {
+        for (var element in listChoice) {
           String localizedElem = Localize(element);
           items.add(localizedElem);
           trueItems[localizedElem] = element;
-        });
+        }
       }
 
       List filteredItems = List.from(items);
@@ -180,7 +179,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 .toList();
                           });
                         },
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Search',
                           hintText: 'Enter your search query',
                         ),
@@ -188,7 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ],
                 ),
-                content: Container(
+                content: SizedBox(
                   width: double.maxFinite,
                   height: 500,
                   child: ListView.builder(
@@ -213,23 +212,20 @@ class _ProfilePageState extends State<ProfilePage> {
                             children: [
                               Row(
                                 children: [
-                                  Container(
+                                  SizedBox(
                                     width: 280,
                                     child: Text(
                                       (languagesPicked)
                                           ? filteredItems[index]
-                                          : SelectorHelper.countryEmojiMap[
-                                                  trueItems[
-                                                      filteredItems[index]]]! +
-                                              '  ' +
+                                          : '${SelectorHelper.countryEmojiMap[trueItems[filteredItems[index]]]!}  ' +
                                               filteredItems[index],
-                                      style: TextStyle(fontSize: 20),
+                                      style: const TextStyle(fontSize: 20),
                                       softWrap: true,
                                     ),
                                   ),
                                 ],
                               ),
-                              Divider(),
+                              const Divider(),
                             ],
                           ),
                         ),
@@ -242,7 +238,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     onPressed: () {
                       Navigator.of(context).pop(); // Close the dialog
                     },
-                    child: Text('Cancel'),
+                    child: const Text('Cancel'),
                   ),
                 ],
               );
@@ -266,8 +262,10 @@ class _ProfilePageState extends State<ProfilePage> {
         onPressed: () async {
           await AuthHelper.logout();
 
-          Navigator.pushAndRemoveUntil(context,
-              MaterialPageRoute(builder: (_) => Home()), (route) => false);
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const Home()),
+              (route) => false);
         },
       );
 

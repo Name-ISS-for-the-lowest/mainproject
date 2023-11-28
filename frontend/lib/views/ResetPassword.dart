@@ -22,38 +22,12 @@ class _ResetPasswordState extends State<ResetPassword> {
     emailController.text = widget.email;
   }
 
-  bool validateEmail(String email) {
-    //general email regex
-    // final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
-    //csus email regex
-    final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@csus\.edu$');
-    return emailRegExp.hasMatch(email);
-  }
-
-  void executeResetPassWord(String email) async {
-    final validEmail = validateEmail(email);
-    if (!validEmail) {
-      //show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(Localize('Invalid email, must be a CSUS email')),
-        ),
-      );
-
-      return;
-    } else {
-      await AuthHelper.resetPassword(email);
-      navigateToLogin();
-    }
-  }
-
-  void navigateToLogin() {
-    //navigate to confirm email page
+  void navigateBacktoLogIn() {
+    //navigate back to login
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
           return Scaffold(
-            resizeToAvoidBottomInset: false,
             body: Stack(children: [
               SizedBox(
                 height: 100,
@@ -68,6 +42,36 @@ class _ResetPasswordState extends State<ResetPassword> {
         },
       ),
     );
+  }
+
+  bool validateEmail(String email) {
+    //general email regex
+    // final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+    //csus email regex
+    final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@csus\.edu$');
+    return emailRegExp.hasMatch(email);
+  }
+
+  Future<void> executeRestsetPassWord(String email) async {
+    final validEmail = validateEmail(email);
+
+    if (!validEmail) {
+      //show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(Localize('Invalid email, must be a CSUS email')),
+        ),
+      );
+
+      return;
+    } else {
+      await AuthHelper.resetPassword(email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(Localize('Email sent')),
+        ),
+      );
+    }
   }
 
   @override
@@ -178,8 +182,10 @@ class _ResetPasswordState extends State<ResetPassword> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           labelText: Localize('Email'),
-                          filled: true,
+                          contentPadding: const EdgeInsets.all(18),
                           fillColor: Colors.white,
+                          filled: true,
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
                         ),
                       ),
                     ),
@@ -202,8 +208,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                   ),
                 ),
                 child: Text(Localize('Send Recovery Email')),
-                onPressed: () => {
-                  executeResetPassWord(emailController.text),
+                onPressed: () async {
+                  await executeRestsetPassWord(emailController.text);
+                  navigateBacktoLogIn();
                 },
               ),
             )

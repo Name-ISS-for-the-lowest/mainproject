@@ -33,7 +33,7 @@ class _ReportPageState extends State<ReportPage> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return Scaffold(
+          return const Scaffold(
             body: CoreTemplate(),
           );
         },
@@ -45,7 +45,7 @@ class _ReportPageState extends State<ReportPage> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return Scaffold(
+          return const Scaffold(
             body: ConfirmReport(),
           );
         },
