@@ -50,7 +50,7 @@ class _CoreTemplateState extends State<CoreTemplate> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffece7d5),
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: Column(
         children: [
           SizedBox(
