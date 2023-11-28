@@ -334,7 +334,10 @@ def getPosts(
         showRemoved=showRemoved,
         userID=userID,
     )
-    posts = Post.listToJson(posts)
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    user = DBManager.getUserById(userID)
+    userLang = user['language']
+    posts = Post.listToJson(posts, userLang)
     print("posts: ", len(posts))
     return posts
 
@@ -346,7 +349,10 @@ def getComments(
     userID = IdFromCookie(request.cookies["session_cookie"])
     # print("userID: ", userID)
     comments = DBManager.getComments(parentID=parentID, userID=userID)
-    comments = Post.listToJson(comments)
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    user = DBManager.getUserById(userID)
+    userLang = user['language']
+    comments = Post.listToJson(comments, userLang)
     return comments
 
 @app.get("/getParents")
@@ -357,14 +363,20 @@ def getParents(
     userID = IdFromCookie(request.cookies["session_cookie"])
     # print("userID: ", userID)
     comments = DBManager.getParents(parentID=parentID,)
-    comments = Post.listToJson(comments)
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    user = DBManager.getUserById(userID)
+    userLang = user['language']
+    comments = Post.listToJson(comments, userLang)
     return comments
 
 
 @app.get("/getPostByID")
 def getPostByID(postID: str, request: Request):
     post = DBManager.getPostByID(postID)
-    post = Post.toJson(post)
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    user = DBManager.getUserById(userID)
+    userLang = user['language']
+    post = Post.toJson(post, userLang)
     return post
 
 
@@ -481,7 +493,10 @@ def searchPosts(data: postsearch):
         showReported=showReported,
         userID=userID,
     )
-    posts = Post.listToJson(posts)
+    userIDz = IdFromCookie(request.cookies["session_cookie"])
+    user = DBManager.getUserById(userIDz)
+    userLang = user['language']
+    posts = Post.listToJson(posts, userLang)
     return posts
 
 

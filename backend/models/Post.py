@@ -94,7 +94,7 @@ class Post:
         return history
 
     @staticmethod
-    def toJson(post):
+    def toJson(post, targetLang=None):
         # turn all to string
         post.date = str(post.date)
         post._id = str(post._id)
@@ -104,7 +104,14 @@ class Post:
         post.removed = str(post.removed)
         post.reports = str(post.reports)
         post.posterIsAdmin = str(post.posterIsAdmin)
-        return post.__dict__
+        print(targetLang)
+        if targetLang != None:
+            if targetLang in post.translations:
+                print(targetLang)
+                post.translations = str(post.translations[targetLang])
+            else:
+                post.translations = ""
+            return post.__dict__
 
     @staticmethod
     def listToJson(posts, targetLang=None):
@@ -118,9 +125,5 @@ class Post:
             post.removed = str(post.removed)
             post.reports = str(post.reports)
             post.posterIsAdmin = str(post.posterIsAdmin)
-            if targetLang in post.translations:
-                post.translations = str(post.translations[targetLang])
-            else:
-                post.translations = ""
-            post = Post.toJson(post)
+            post = Post.toJson(post, targetLang=targetLang)
         return posts
