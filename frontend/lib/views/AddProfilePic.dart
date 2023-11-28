@@ -1,15 +1,18 @@
-import 'dart:convert';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/views/AccountAlreadyExists.dart';
+import 'package:frontend/views/SignupComplete.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:lottie/lottie.dart';
+import 'package:dio/dio.dart';
 
 class AddToProfilePic extends StatefulWidget {
-  const AddToProfilePic({super.key});
+  final String email;
+  final String password;
+  const AddToProfilePic(
+      {super.key, required this.email, required this.password});
 
   @override
   State<AddToProfilePic> createState() => _AddToProfilePicState();
@@ -17,8 +20,10 @@ class AddToProfilePic extends StatefulWidget {
 
 class _AddToProfilePicState extends State<AddToProfilePic> {
   bool imageSpecified = false;
+  File image = File('assets/Default_pfp.png');
   Widget imageWidget = Image.asset('assets/Default_pfp.png',
       width: 200, height: 200, fit: BoxFit.fill);
+  bool isLoading = false;
 
   Future<void> pickImage(ImageSource source) async {
     try {
@@ -27,11 +32,19 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
         File getImage = File(pickedFile.path);
         setState(() {
           imageWidget = Image.file(getImage, fit: BoxFit.fill);
+          image = getImage;
           imageSpecified = true;
         });
       }
     } catch (e) {
       print("${Localize("Error picking image:")} $e");
+    }
+  }
+
+  Future<void> setProfilePic() async {
+    if (imageSpecified) {
+      //todo set the profile picture
+      await AuthHelper.setProfilePictureOnSignUp(widget.email, image);
     }
   }
 
@@ -62,88 +75,168 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
     );
   }
 
+  void navigateToFinishSignUp() {
+    //navigate back to login
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: Stack(children: [
+              SizedBox(
+                height: 100,
+                child: AppBar(
+                  backgroundColor: Colors.transparent,
+                  iconTheme: const IconThemeData(color: Colors.white),
+                ),
+              ),
+              const SignupComplete()
+            ]),
+          );
+        },
+      ),
+    );
+  }
+
+  void navigateToAccountAlreadyExists() {
+    //navigate back to login
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: Stack(children: [
+              SizedBox(
+                height: 100,
+                child: AppBar(
+                  backgroundColor: Colors.transparent,
+                  iconTheme: const IconThemeData(color: Colors.white),
+                ),
+              ),
+              const AccountAlreadyExists()
+            ]),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<bool> executeSignUp(String email, String password) async {
+    Response response = await AuthHelper.signUp(email, password);
+    print(response.data["message"]);
+    if (response.data["message"] == "Account with this email, already exists") {
+      //navigate to account already exists page
+      navigateToAccountAlreadyExists();
+      return false;
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.data["message"] ?? "Error"),
+        ),
+      );
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.sizeOf(context).height;
+
     return Scaffold(
+      backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
+      resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true, // Extend content behind the AppBar
       appBar: AppBar(
         backgroundColor:
             Colors.transparent, // Set the background color to transparent
         elevation: 0, // Remove the shadow
-        iconTheme:
-            IconThemeData(color: Colors.white), // Set the back arrow color
+        iconTheme: const IconThemeData(
+            color: Colors.white), // Set the back arrow color
       ),
-      body: SingleChildScrollView(
-        physics:
-            NeverScrollableScrollPhysics(), // This line makes it non-scrollable
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.75,
+      body: Stack(
+        alignment: Alignment.center,
+        children: [
+          //Background animation (increase top offset value to move anim down, decrease to move up)
+          Positioned(
+              top: 200,
+              child: SizedBox(
+                height: screenHeight,
+                child: LottieBuilder.asset(
+                  'assets/BackgroundWave.json',
+                  fit: BoxFit.fill,
                 ),
+              )),
+
+          //Returning User Form begins Here--------------------------
+          Positioned(
+            top: 100,
+            child: SingleChildScrollView(
+                child: Column(
+              children: [
+                //This part is just text and formatting
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.40,
-                  child: SvgPicture.asset(
-                    'assets/BackGround.svg',
-                    fit: BoxFit.fitWidth,
+                  width: 280,
+                  child: Text(
+                    Localize('Add Profile Picture'),
+                    style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 45,
+                        color: Color.fromRGBO(255, 255, 255, 1)),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-              ],
-            ),
-            Column(
-              children: [
-                //spacer for top
+
+                //Spacer for Column elements
                 const SizedBox(
-                  height: 100,
+                  height: 25,
                 ),
-                //Log in title
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      Localize("Add Profile Picture"),
-                      style: TextStyle(
-                        fontSize: 50,
-                        fontWeight: FontWeight.w700,
-                        color: Color.fromRGBO(230, 183, 17, 1),
-                      ),
-                      textAlign: TextAlign.center, // Center-align the text
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      Localize(
-                          "Finally, add an image that you want to use to represent yourself"),
-                      style: TextStyle(
-                        fontSize: 16,
+
+                SizedBox(
+                  width: 300,
+                  child: Text(
+                    Localize(
+                        'Finally, add an image that you want to use to represent yourself'),
+                    style: const TextStyle(
+                        fontFamily: 'Inter',
                         fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(230, 183, 17, 1),
-                      ),
-                      textAlign: TextAlign.center, // Center-align the text
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      Localize(
-                          "Please be mindful of other users, Avoid using images that may be considered disturbing or offensive. Images should be inline with Sac State's Hornet Honor Code policy"),
-                      style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(230, 183, 17, 1),
-                      ),
-                      textAlign: TextAlign.center, // Center-align the text
-                    ),
+                        color: Color.fromRGBO(230, 183, 17, 1)),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                //Input fields
+
+                //Spacer for Column elements
+                const SizedBox(
+                  height: 20,
+                ),
+
+                SizedBox(
+                  width: 300,
+                  child: Text(
+                    Localize(
+                        "Please be mindful of other users, Avoid using images that may be considered disturbing or offensive. Images should be inline with Sac State's Hornet Honor Code policy"),
+                    style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color.fromRGBO(230, 183, 17, 1)),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+
+                //Spacer for Column elements
+                const SizedBox(
+                  height: 20,
+                ),
+
+                //Spacer for Column elements
+                const SizedBox(
+                  height: 20,
+                ),
+
+                //Email Field Styling
+
+//Input fields
                 Column(
                   children: [
                     const SizedBox(
@@ -173,11 +266,11 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                               ),
                             ),
                             Positioned.fill(
-                              left: 140,
+                              left: 100,
                               child: Align(
                                 alignment: Alignment.bottomCenter,
                                 child: IconButton(
-                                    icon: Icon(Icons.camera_alt),
+                                    icon: const Icon(Icons.camera_alt),
                                     iconSize: 50,
                                     onPressed: () async {
                                       _showImagePickerDialog(context);
@@ -210,14 +303,33 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                                                   BorderRadius.circular(10.0),
                                             ),
                                           ),
-                                          onPressed: () => {
-                                            // enter logic to go to confirm password screen
+                                          onPressed: () async {
+                                            //show loading overlay
+                                            setState(() {
+                                              isLoading = true;
+                                            });
+                                            bool result = await executeSignUp(
+                                                widget.email, widget.password);
+                                            if (result) {
+                                              await setProfilePic();
+                                              setState(() {
+                                                isLoading = false;
+                                              });
+                                              navigateToFinishSignUp();
+                                            } else {
+                                              setState(() {
+                                                isLoading = false;
+                                              });
+                                              navigateToAccountAlreadyExists();
+                                            }
+
+                                            //remove loading overlay
                                           },
                                           child: Text(
                                             Localize("Next"),
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontSize: 16,
-                                              fontWeight: FontWeight.w700,
+                                              fontWeight: FontWeight.w800,
                                               color: Color.fromARGB(
                                                   255, 53, 53, 53),
                                             ),
@@ -239,9 +351,19 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                   ],
                 ),
               ],
+            )),
+          ),
+
+          if (isLoading)
+            Container(
+              width: screenHeight,
+              height: screenHeight,
+              color: const Color.fromARGB(0, 245, 245, 245).withOpacity(0.3),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }

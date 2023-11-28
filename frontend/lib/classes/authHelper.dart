@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:frontend/classes/Data.dart';
 import 'package:frontend/classes/routeHandler.dart';
-import 'package:intl/intl.dart';
 
 //todo add persitent storage for session cookie
 
@@ -24,10 +23,34 @@ class AuthHelper {
         data: jsonEncode(data),
         options: Options(contentType: Headers.jsonContentType),
       );
-      await cacheUserInfo();
       return response;
 
       //on anything but a 200 response this code will run
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!;
+      } else {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'Unable to connect to server'},
+          statusCode: 500,
+          statusMessage: 'Unable to connect to server',
+        );
+      }
+    }
+  }
+
+//need reset password function
+  static Future<Response> resetPassword(String email) async {
+    final params = {'email': email};
+    String endPoint = '/resetPassword';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.post(
+        url,
+        queryParameters: params,
+      );
+      return response;
     } on DioException catch (e) {
       if (e.response != null) {
         return e.response!;
@@ -93,7 +116,11 @@ class AuthHelper {
 
   static Future<bool> isLoggedIn() async {
     var sessionCookie = await readCookie('session_cookie');
-    if (sessionCookie == null) return false;
+    print('COOKIES!');
+    print(sessionCookie);
+    if (sessionCookie == null) {
+      return false;
+    }
 
     //I want to make a request to the protected endpoint and check the response code
     String endPoint = '/protected';
@@ -158,6 +185,7 @@ class AuthHelper {
       AuthHelper.userInfoCache['profilePicture.fileId'] =
           userInfo['profilePicture.fileId'];
       userInfoCache['admin'] = userInfo['admin'];
+      print(userInfoCache);
     } on DioException catch (e) {
       return Response(
         requestOptions: RequestOptions(path: url),
@@ -205,6 +233,41 @@ class AuthHelper {
     }
   }
 
+  static Future<Response> banUser(
+      String adminID, String bannedID, String banMessage) async {
+    final params = {
+      'adminID': adminID,
+      'bannedID': bannedID,
+      'banMessage': banMessage
+    };
+    String endPoint = '/banUser';
+    var url = '$defaultHost$endPoint';
+
+    //this is the dio library making a post request
+    try {
+      final response = await RouteHandler.dio.post(
+        url,
+        queryParameters: params,
+        options: Options(contentType: Headers.jsonContentType),
+      );
+      return response;
+
+      //on anything but a 200 response this code will run
+    } on DioException catch (e) {
+      print(e);
+      if (e.response != null) {
+        return e.response!;
+      } else {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': 'Unable to connect to server'},
+          statusCode: 500,
+          statusMessage: 'Unable to connect to server',
+        );
+      }
+    }
+  }
+
   static setProfilePicture(File photo) async {
     var sessionCookie = await readCookie('session_cookie');
     String userID = sessionCookie['user_id'];
@@ -218,6 +281,33 @@ class AuthHelper {
     var params = {
       'name': name,
       'type': 'profilePictures',
+    };
+
+    try {
+      final response = await RouteHandler.dio.post(url,
+          data: formData,
+          queryParameters: params,
+          options: Options(contentType: Headers.multipartFormDataContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static setProfilePictureOnSignUp(String email, File photo) async {
+    //this endpoint can change a profile picture, but email, only if account is unverified
+    String endPoint = '/setProfilePictureOnSignUp';
+    var url = '$defaultHost$endPoint';
+
+    var formData = FormData.fromMap({
+      'photo': await MultipartFile.fromFile(photo.path),
+    });
+    var params = {
+      'email': email,
     };
 
     try {

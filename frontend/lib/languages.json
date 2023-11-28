@@ -131,6 +131,5 @@
   { "isoCode": "xh", "name": "Xhosa" },
   { "isoCode": "yi", "name": "Yiddish" },
   { "isoCode": "yo", "name": "Yoruba" },
-  { "isoCode": "zu", "name": "Zulu" },
-  { "isoCode": "thisNuts", "name": "Gottem" }
+  { "isoCode": "zu", "name": "Zulu" }
 ]

@@ -30,6 +30,8 @@ class DBManager:
         else:
             return User.fromDict(user)
 
+    # def resetUserPassword(email, new_password):
+
     @staticmethod
     def getUserByToken(token):
         user = DBManager.db["users"].find_one({"token": token})
@@ -85,6 +87,13 @@ class DBManager:
         DBManager.db["users"].update_one({"_id": id}, {"$set": newDict})
 
     @staticmethod
+    def banUser(adminID: str, bannedID: str, banMessage: str):
+        adminID = ObjectId(adminID)
+        bannedID = ObjectId(bannedID)
+        newDict = {'banned' : True, 'bannedBy': adminID, 'banMessage': banMessage}
+        DBManager.db["users"].update_one({"_id": bannedID}, {"$set": newDict})
+
+    @staticmethod
     def activateAccount(token):
         DBManager.db["users"].update_one(
             {"token": token}, {"$set": {"accountActivated": True}}
@@ -122,10 +131,9 @@ class DBManager:
     @staticmethod
     def addPost(userID, content, imageURL, imageFileID):
         newPost = Post(content, userID)
-        if imageURL != 'False':
+        if imageURL != "False":
             Attachment = Picture(imageURL, imageFileID)
             newPost.attachedImage = Attachment.__dict__
-        user = DBManager.getUserById(userID)
         DBManager.db["posts"].insert_one(newPost.__dict__)
 
     @staticmethod
@@ -157,14 +165,23 @@ class DBManager:
         DBManager.db["posts"].update_one({"_id": postID}, {"$set": {"deleted": True}})
 
     @staticmethod
-    def toggleRemovalOfPost(postID):
+    def toggleRemovalOfPost(postID, forceRemove):
         postID = ObjectId(postID)
         post = DBManager.db["posts"].find_one({"_id": postID})
         isRemoved = post.get("removed")
         removalToggle = not isRemoved
-        DBManager.db["posts"].update_one(
-            {"_id": postID}, {"$set": {"removed": removalToggle}}
+        if forceRemove == 'Remove':
+            DBManager.db["posts"].update_one(
+            {"_id": postID}, {"$set": {"removed": True, "unreviewedReport" : False}}
         )
+        elif forceRemove == 'Approve':
+            DBManager.db["posts"].update_one(
+            {"_id": postID}, {"$set": {"removed": False, "unreviewedReport" : False}}
+        )
+        else:
+            DBManager.db["posts"].update_one(
+                {"_id": postID}, {"$set": {"removed": removalToggle}}
+            )
 
     @staticmethod
     def getPosts(start, end, showRemoved, showDeleted, showReported, userID=None):
@@ -177,6 +194,11 @@ class DBManager:
             specialSearchParams["deleted"] = True
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
+        if showReported == "Only":
+            specialSearchParams["reports"] = {"$gt" : 0}
+        elif showReported == "Unreviewed":
+            specialSearchParams["unreviewedReport"] = True
+
         posts = (
             DBManager.db["posts"]
             .find(specialSearchParams)
@@ -191,10 +213,14 @@ class DBManager:
             post.profilePicture = user.get("profilePicture")
             post.username = user.get("username")
             post.posterIsAdmin = user.get("admin")
+            post.posterIsBanned = user.get("banned")
             comboID = str(post._id) + str(userID)
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
             if likedResult is not None:
                 post.liked = True
+            reportResult = DBManager.db['reports'].find_one({"comboID": comboID})
+            if reportResult is not None:
+                post.reportedByUser = True
 
             returnPosts.append(post)
         return returnPosts
@@ -206,11 +232,17 @@ class DBManager:
         user = DBManager.db["users"].find_one({"_id": ObjectId(post["userID"])})
         post["profilePicture"] = user["profilePicture"]
         post["username"] = user["username"]
+        post["userID"] = user["_id"]
         post["posterIsAdmin"] = user["admin"]
+        post["email"] = user["email"]
+        post['posterIsBanned'] = user.get("banned")
         comboID = str(post["_id"]) + str(post["userID"])
         likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
+        reportedResult = DBManager.db["reports"].find_one({"comboID": comboID})
         if likedResult is not None:
             post["liked"] = True
+        if reportedResult is not None:
+            post["reportedByUser"] = True
         returnPost = Post.fromDict(post)
         return returnPost
 
@@ -225,6 +257,11 @@ class DBManager:
             specialSearchParams["deleted"] = True
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
+        if showReported == "Only":
+            #print(specialSearchParams["reports"])
+            specialSearchParams["reports"] = {"$gt" : 0}
+        elif showReported == "Unreviewed":
+            specialSearchParams["unreviewedReport"] = True
         posts = (
             DBManager.db["posts"]
             .find(specialSearchParams)
@@ -271,19 +308,30 @@ class DBManager:
             return {"message": "Post unliked"}
         
     @staticmethod
-    def reportPost(postID, userID):
+    def reportPost(postID, userID, specialDict):
         # check if the user has already liked the post
         comboID = str(postID) + str(userID)
         postID = ObjectId(postID)
         reportResult = DBManager.db["reports"].find_one({"comboID": comboID})
+        postResult = DBManager.db['posts'].find_one({'_id': postID})
+        reasonDict = postResult.get('reportReasons')
         if reportResult is None:
+            postDict = {"reports" : 1}
+            reasons = ['hateSpeech', 'illegalContent', 'targetedHarassment', 'inappropriateContent', 'otherReason']
+            for reason in reasons:
+                if specialDict[reason]:
+                    reasonDict[reason] += 1
             result = DBManager.db["posts"].update_one(
                 {"_id": postID}, {"$inc": {"reports": 1}}
             )
+            result2 = DBManager.db["posts"].update_one(
+                {"_id": postID}, {"$set": {'reportReasons' : reasonDict, 'unreviewedReport' : True}}
+            )
             print(result.modified_count)
 
-            # add the reports to the reports collection
-            DBManager.db["reports"].insert_one({"PostID": postID, "comboID": comboID, "Reason": 'harassment'})
+            # add the reports to the reports collection\
+            newReport = {"PostID": postID, "comboID": comboID, "hateSpeech": specialDict['hateSpeech'], 'illegalContent': specialDict['illegalContent'], 'targetedHarassment' : specialDict['targetedHarassment'], 'inappropriateContent': specialDict['inappropriateContent'], 'otherReason': specialDict['otherReason']}
+            DBManager.db["reports"].insert_one(newReport)
             print("Reported")
             return {"message": "Post reported"}
         else:
@@ -301,7 +349,7 @@ class DBManager:
         else:
             return {"message": "Post not found"}
 
-    def insertUserList(users: list[User]):
+    def insertUserList(users: [User]):
         for user in users:
             userJson = user.__dict__
             DBManager.db["users"].insert_one(userJson)
@@ -319,7 +367,7 @@ class DBManager:
         print("Admin privilleges assigned successfully!")
 
     @staticmethod
-    def insertPostList(posts: list[Post]):
+    def insertPostList(posts: [Post]):
         for post in posts:
             postJson = post.__dict__
             postJson["userID"] = ObjectId(postJson["userID"]["$oid"])

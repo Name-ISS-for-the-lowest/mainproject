@@ -76,7 +76,7 @@ class LanguagePickerDialog extends StatefulWidget {
   /// List of languages available in this picker.
   final List<Language>? languages;
 
-  LanguagePickerDialog({
+  const LanguagePickerDialog({
     Key? key,
     this.onValuePicked,
     this.title,
@@ -97,7 +97,7 @@ class LanguagePickerDialog extends StatefulWidget {
 
   @override
   SingleChoiceDialogState createState() {
-    return new SingleChoiceDialogState();
+    return SingleChoiceDialogState();
   }
 }
 
@@ -141,7 +141,7 @@ class SingleChoiceDialogState extends State<LanguagePickerDialog> {
                 .toList(),
           )
         : widget.searchEmptyView ??
-            Center(
+            const Center(
               child: Text('No language found.'),
             );
   }
@@ -170,7 +170,7 @@ class SingleChoiceDialogState extends State<LanguagePickerDialog> {
     return TextField(
       cursorColor: widget.searchCursorColor,
       decoration:
-          widget.searchInputDecoration ?? InputDecoration(hintText: 'Search'),
+          widget.searchInputDecoration ?? const InputDecoration(hintText: 'Search'),
       onChanged: (String value) {
         setState(() {
           _filteredLanguages = _allLanguages

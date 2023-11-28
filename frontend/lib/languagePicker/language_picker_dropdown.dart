@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 
 ///Provides a customizable [DropdownButton] for all languages
 class LanguagePickerDropdown extends StatefulWidget {
-  LanguagePickerDropdown(
-      {this.itemBuilder,
+  const LanguagePickerDropdown(
+      {super.key, this.itemBuilder,
       this.controller,
       this.initialValue,
       this.onValuePicked,

@@ -1,18 +1,13 @@
-import 'dart:convert';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
-import 'package:frontend/views/CoreTemplate.dart';
 import 'package:frontend/views/CreatePost.dart';
 
 class Comments extends StatefulWidget {
   final String postID;
 
-  Comments({Key? key, required this.postID}) : super(key: key);
+  const Comments({Key? key, required this.postID}) : super(key: key);
 
   @override
   _CommentsState createState() => _CommentsState();
@@ -21,14 +16,13 @@ class Comments extends StatefulWidget {
 class _CommentsState extends State<Comments> {
   var post = {};
   bool init = true;
+  bool fetched = false;
   final Map<String, String> currentlyTranslated = {};
   Map postData = {};
   bool fetched = false;
 
   Future load() async {
     var dataCall = await PostHelper.getPostByID(widget.postID);
-    print("printing data call...");
-    print(dataCall);
     if (mounted) {
       setState(() {
         fetched = true;
@@ -114,10 +108,19 @@ class _CommentsState extends State<Comments> {
   }
 
   Widget _buildPost() {
+<<<<<<< HEAD
     if (!fetched) {
       return const Text("Loading");
     }
     String imageURL = post["profilePicture"]["url"];
+=======
+    if (post.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+>>>>>>> origin/main
     String posterName = post["username"];
     String postContent = post["content"];
     String postID = post["_id"];
@@ -149,7 +152,7 @@ class _CommentsState extends State<Comments> {
     String formattedLikes = formatLargeNumber(likes);
     postContent = postContent.replaceAll('\n', ' ');
 
-    Container postBodyContainer = Container(
+    SizedBox postBodyContainer = SizedBox(
       width: 280,
       child: Builder(
         builder: (BuildContext context) {
@@ -161,12 +164,12 @@ class _CommentsState extends State<Comments> {
                     text: (currentlyTranslated.containsKey(postContent))
                         ? currentlyTranslated[postContent]!
                         : postContent,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                       fontFamily: 'Inter',
                     )),
                 if (isEdited)
-                  TextSpan(
+                  const TextSpan(
                     text: ' (Edited)',
                     style: TextStyle(
                       fontStyle: FontStyle.italic,
@@ -201,17 +204,17 @@ class _CommentsState extends State<Comments> {
             value: 'closeMenu',
             child: Row(
               children: [
-                Container(
+                SizedBox(
                   height: 15,
                   width: 15,
                   child: SvgPicture.asset(
                     'assets/icon-x.svg',
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
-                Text('Close Menu'),
+                const Text('Close Menu'),
               ],
             ),
           ),
@@ -223,18 +226,18 @@ class _CommentsState extends State<Comments> {
               value: 'editPost',
               child: Row(
                 children: [
-                  Container(
+                  SizedBox(
                     height: 15,
                     width: 15,
                     child: SvgPicture.asset(
                       'assets/PostUI/icon-editpost.svg',
-                      color: Color(0xff0094FF),
+                      color: const Color(0xff0094FF),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
-                  Text(
+                  const Text(
                     'Edit Post',
                     style: TextStyle(
                       color: Color(0xff0094FF),
@@ -250,7 +253,7 @@ class _CommentsState extends State<Comments> {
               value: 'deletePost',
               child: Row(
                 children: [
-                  Container(
+                  SizedBox(
                     height: 15,
                     width: 15,
                     child: SvgPicture.asset(
@@ -258,10 +261,10 @@ class _CommentsState extends State<Comments> {
                       color: Colors.red,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
-                  Text(
+                  const Text(
                     'Delete Post',
                     style: TextStyle(
                       color: Colors.red,
@@ -277,7 +280,7 @@ class _CommentsState extends State<Comments> {
               value: 'reportPost',
               child: Row(
                 children: [
-                  Container(
+                  SizedBox(
                     height: 15,
                     width: 15,
                     child: SvgPicture.asset(
@@ -285,10 +288,10 @@ class _CommentsState extends State<Comments> {
                       color: Colors.red,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
-                  Text(
+                  const Text(
                     'Report Post',
                     style: TextStyle(
                       color: Colors.red,
@@ -302,7 +305,7 @@ class _CommentsState extends State<Comments> {
 
         return menuItems;
       },
-      color: Color(0xffffffff),
+      color: const Color(0xffffffff),
       child: SvgPicture.asset(
         "assets/PostUI/icon-3dots.svg",
         width: 20,
@@ -324,11 +327,11 @@ class _CommentsState extends State<Comments> {
               child: Container(
                 width: 50, // Set your desired width
                 height: 50, // Set your desired height
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                 ),
-                child: ClipOval(
-                    child: CachedNetworkImage(
+                child: const ClipOval(
+                    /*child: CachedNetworkImage(
                     imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
                     placeholder: (context, url) => CircularProgressIndicator(),
                     errorWidget: (context, url, error) => Icon(Icons.error),
@@ -345,12 +348,12 @@ class _CommentsState extends State<Comments> {
                   children: [
                     TextSpan(
                         text: posterName,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black,
                           fontFamily: 'Inter',
                         )),
                     if (posterIsAdmin)
-                      TextSpan(
+                      const TextSpan(
                         text: ' [Admin]',
                         style: TextStyle(
                           color: Color.fromRGBO(4, 57, 39, 100),
@@ -366,19 +369,19 @@ class _CommentsState extends State<Comments> {
                 //I'm sorry for my sins
                 child: (userIsAdmin)
                     ? (deleted)
-                        ? Text(
+                        ? const Text(
                             "[Deleted By User]",
                             style: TextStyle(color: Colors.red),
                           )
                         : (removed)
-                            ? Text(
+                            ? const Text(
                                 "[Post Removed]",
                                 style: TextStyle(
                                   color: Colors.red,
                                 ),
                               )
-                            : SizedBox()
-                    : SizedBox()),
+                            : const SizedBox()
+                    : const SizedBox()),
             Positioned(
               left: 350,
               top: 22.5,
@@ -392,7 +395,7 @@ class _CommentsState extends State<Comments> {
               child: Container(
                 height: calculatedHeight,
                 width: 1,
-                color: Color(0x5f000000),
+                color: const Color(0x5f000000),
               ),
             ),
             Positioned(
@@ -429,15 +432,15 @@ class _CommentsState extends State<Comments> {
             Positioned(
               bottom: 15,
               left: 45,
-              child: Text(formattedLikes, style: TextStyle(fontSize: 11)),
+              child: Text(formattedLikes, style: const TextStyle(fontSize: 11)),
             ),
             Positioned(
               bottom: 33,
               left: 120,
               child: GestureDetector(
                 onTap: () {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text("Flag Tapped")));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Flag Tapped")));
                 },
                 child: (userIsAdmin)
                     ? SvgPicture.asset(
@@ -446,7 +449,7 @@ class _CommentsState extends State<Comments> {
                         width: 20,
                         color: Colors.deepOrange,
                       )
-                    : SizedBox(),
+                    : const SizedBox(),
               ),
             ),
             Positioned(
@@ -454,7 +457,7 @@ class _CommentsState extends State<Comments> {
               left: 155,
               child: (userIsAdmin)
                   ? (deleted)
-                      ? SizedBox()
+                      ? const SizedBox()
                       : GestureDetector(
                           onTap: () async {
                             await loadRemovalToggle(postID);
@@ -472,7 +475,7 @@ class _CommentsState extends State<Comments> {
                                   width: 18,
                                   color: Colors.red,
                                 ))
-                  : SizedBox(),
+                  : const SizedBox(),
             ),
             Positioned(
               bottom: 33,
@@ -500,7 +503,7 @@ class _CommentsState extends State<Comments> {
                   (currentlyTranslated.containsKey(postContent))
                       ? "Original Text"
                       : "Translate",
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Color(0xff0094FF),
                   ),
                 ),
@@ -524,7 +527,11 @@ class _CommentsState extends State<Comments> {
       userIsAdmin = true;
     }
     return Scaffold(
+<<<<<<< HEAD
         appBar: AppBar(
+=======
+      appBar: AppBar(
+>>>>>>> origin/main
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -556,15 +563,7 @@ class _CommentsState extends State<Comments> {
       ),
       backgroundColor: const Color(0xffece7d5),
       body: Column(
-        children: [
-          SizedBox(height: 5),
-          Expanded(
-            child:
-                _buildPost()
-          ),
-          const Spacer(),
-        ]
-      ),
+          children: [const SizedBox(height: 5), Expanded(child: _buildPost())]),
     );
   }
 }

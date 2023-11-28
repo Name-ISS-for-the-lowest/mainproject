@@ -1,58 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
-import 'package:frontend/views/PasswordSetup.dart';
+import 'package:frontend/views/LogIn.dart';
 import 'package:lottie/lottie.dart';
 
-class SignUp extends StatefulWidget {
-  String email = "";
-  SignUp({super.key, required this.email});
+class AccountAlreadyExists extends StatefulWidget {
+  const AccountAlreadyExists({super.key});
+
+//varibles
 
   @override
-  State<SignUp> createState() => _SignUpState();
+  State<AccountAlreadyExists> createState() => _AccountAlreadyExistsState();
 }
 
-class _SignUpState extends State<SignUp> {
-  TextEditingController emailController = TextEditingController();
-
-  //on mount
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  bool validateEmail(String email) {
-    //general email regex
-    // final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
-    //csus email regex
-    final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@csus\.edu$');
-    if (!emailRegExp.hasMatch(email)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(Localize('Invalid email, must be a CSUS email')),
-        ),
-      );
-      return false;
-    }
-    //make sure it is shorter than 50 characters
-    if (email.length > 50) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(Localize('Email must be less than 50 characters')),
-        ),
-      );
-      return false;
-    }
-    widget.email = email;
-    return true;
-  }
-
-  void navigateToPassWordSetUp(String email) {
-    //navigate to confirm email page
+class _AccountAlreadyExistsState extends State<AccountAlreadyExists> {
+  void navigateBacktoLogIn() {
+    //navigate back to login
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
           return Scaffold(
-            resizeToAvoidBottomInset: false,
             body: Stack(children: [
               SizedBox(
                 height: 100,
@@ -61,7 +27,7 @@ class _SignUpState extends State<SignUp> {
                   iconTheme: const IconThemeData(color: Colors.white),
                 ),
               ),
-              PasswordSetUp(email: email)
+              const LogIn()
             ]),
           );
         },
@@ -75,7 +41,7 @@ class _SignUpState extends State<SignUp> {
 
     return Scaffold(
         backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
-        // resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: true, // Extend content behind the AppBar
         appBar: AppBar(
           backgroundColor:
@@ -106,9 +72,9 @@ class _SignUpState extends State<SignUp> {
                   children: [
                     //This part is just text and formatting
                     SizedBox(
-                      width: 280,
+                      width: 350,
                       child: Text(
-                        Localize('Welcome to the I.S.S!'),
+                        Localize('Account Already Exists'),
                         style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
@@ -126,8 +92,7 @@ class _SignUpState extends State<SignUp> {
                     SizedBox(
                       width: 300,
                       child: Text(
-                        Localize(
-                            'Before we begin, please enter a valid Sacramento State email.'),
+                        Localize('Please login or reset password to continue.'),
                         style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
@@ -146,40 +111,13 @@ class _SignUpState extends State<SignUp> {
                       width: 300,
                       child: Text(
                         Localize(
-                            'These can be identified by the “@csus.edu” handle near the end like this:'),
+                            'We hope you enjoy your time with us. Press the button below at any time to return to the login page and begin browsing.'),
                         style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                             color: Color.fromRGBO(230, 183, 17, 1)),
                         textAlign: TextAlign.center,
-                      ),
-                    ),
-
-                    //Spacer for Column elements
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    //Spacer for Column elements
-
-                    //Email Field Styling
-
-                    SizedBox(
-                      width: 330,
-                      height: 55,
-                      child: TextField(
-                        controller: emailController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          labelText: Localize('Email'),
-                          contentPadding: const EdgeInsets.all(18),
-                          fillColor: Colors.white,
-                          filled: true,
-                          floatingLabelBehavior: FloatingLabelBehavior.never,
-                        ),
                       ),
                     ),
                   ],
@@ -200,12 +138,9 @@ class _SignUpState extends State<SignUp> {
                     fontSize: 16,
                   ),
                 ),
-                child: Text(Localize('Next')),
+                child: Text(Localize('Return to Login')),
                 onPressed: () => {
-                  if (validateEmail(emailController.text))
-                    {
-                      navigateToPassWordSetUp(emailController.text),
-                    }
+                  navigateBacktoLogIn(),
                 },
               ),
             )

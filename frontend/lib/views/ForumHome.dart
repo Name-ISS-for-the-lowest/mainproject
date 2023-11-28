@@ -5,13 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/classes/keywordData.dart';
 import 'package:frontend/classes/postHelper.dart';
+import 'package:frontend/views/AdminView.dart';
 import 'package:frontend/views/Comments.dart';
+import 'package:frontend/views/ConfirmReport.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ReportPage.dart';
-import 'package:frontend/classes/keywordData.dart';
+import 'package:frontend/views/ViewProfile.dart';
+import 'package:frontend/views/ViewImage.dart';
 import 'package:html_unescape/html_unescape.dart';
-import 'package:http/http.dart';
 
 class ForumHome extends StatefulWidget {
   const ForumHome({super.key});
@@ -63,8 +66,8 @@ class _ForumHomeState extends State<ForumHome> {
     // print("Posts Per Fetch:$postsPerFetch");
     if (search == "") {
       try {
-        var dataCall = await PostHelper.getPosts(
-            searchParams["postsFetched"], postsPerFetch);
+        var dataCall = await await PostHelper.getPosts(
+            0, searchParams["postsFetched"], specialSearchArgs);
         print("Data Call:$dataCall");
         Map dataCallMap = {};
         for (var item in dataCall) {
@@ -151,7 +154,7 @@ class _ForumHomeState extends State<ForumHome> {
       returnedNumber = num.toStringAsFixed(1);
     }
 
-    return '${returnedNumber}$suffix';
+    return '$returnedNumber$suffix';
   }
 
   Future<void> translatePost(String originalText, int index) async {
@@ -202,27 +205,78 @@ class _ForumHomeState extends State<ForumHome> {
     );
   }
 
+  void navigateToAdminView(String postID) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: AdminView(postID: postID),
+          );
+        },
+      ),
+    );
+  }
+
+  void navigateToViewProfile(String postID, String posterID) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ViewProfile(posterID: posterID),
+          );
+        },
+      ),
+    );
+  }
+
+  void navigateToViewImage(List<String> inputs) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ViewImage(imageUrls: inputs),
+          );
+        },
+      ),
+    );
+  }
+
+  void navigateToConfirmPost() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return const Scaffold(
+            body: ConfirmReport(),
+          );
+        },
+      ),
+    );
+  }
+
   void deletePost(String postID) {
     loadDelete(postID);
   }
 
   Widget _buildList() {
-    return ListView.builder(
-      itemBuilder: (BuildContext context, int index) {
-        print("Current Index:$index");
-        print("Current Length:${postData.length}");
-        if (postData.isEmpty && index == 0) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
+    return RefreshIndicator(
+      onRefresh: () => loadUpdate(),
+      child: ListView.builder(
+        itemBuilder: (BuildContext context, int index) {
+          print("Current Index:$index");
+          print("Current Length:${postData.length}");
+          if (postData.isEmpty && index == 0) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
-        if (index >= postData.length) {
-          searchPosts(searchParams["search"], scrolling: true);
-          return null;
-        }
-        return _buildPost(index);
-      },
+          if (index >= postData.length) {
+            searchPosts(searchParams["search"], scrolling: true);
+            return null;
+          }
+          return _buildPost(index);
+        },
+      ),
     );
   }
 
@@ -270,6 +324,10 @@ class _ForumHomeState extends State<ForumHome> {
     }
   }
 
+  void refresh() {
+    loadUpdate();
+  }
+
   Widget _buildPost(int index) {
     String imageURL = postData[index]["profilePicture"]['url'];
     String attachmentURL = 'Empty';
@@ -292,6 +350,8 @@ class _ForumHomeState extends State<ForumHome> {
     }
     bool isEdited = false;
     var liked = postData[index]['liked'];
+    var reportedByUser = postData[index]['reportedByUser'];
+    var unreviewedReport = postData[index]['unreviewedReport'];
     if (postData[index]['edited'] == 'True') {
       isEdited = true;
     }
@@ -317,7 +377,7 @@ class _ForumHomeState extends State<ForumHome> {
 
     String commentNumber = '0';
 
-    Container postBodyContainer = Container(
+    SizedBox postBodyContainer = SizedBox(
       width: 280,
       child: Builder(
         builder: (BuildContext context) {
@@ -330,14 +390,14 @@ class _ForumHomeState extends State<ForumHome> {
                         ? unescape.convert(
                             PostHelper.cachedTranslations[postContent]!)
                         : postContent,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                       fontFamily: 'Inter',
                     )),
                 if (isEdited)
                   TextSpan(
                     text: Localize('(Edited)'),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontStyle: FontStyle.italic,
                       color: Colors.grey,
                     ),
@@ -359,7 +419,11 @@ class _ForumHomeState extends State<ForumHome> {
         } else if (result == 'deletePost') {
           deletePost(postID);
         } else if (result == 'reportPost') {
-          navigateToReportPost(postID);
+          if (reportedByUser) {
+            navigateToConfirmPost();
+          } else {
+            navigateToReportPost(postID);
+          }
         }
       },
       itemBuilder: (BuildContext context) {
@@ -370,14 +434,14 @@ class _ForumHomeState extends State<ForumHome> {
             value: 'closeMenu',
             child: Row(
               children: [
-                Container(
+                SizedBox(
                   height: 15,
                   width: 15,
                   child: SvgPicture.asset(
                     'assets/icon-x.svg',
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 Text(Localize('Close Menu')),
@@ -392,20 +456,20 @@ class _ForumHomeState extends State<ForumHome> {
               value: 'editPost',
               child: Row(
                 children: [
-                  Container(
+                  SizedBox(
                     height: 15,
                     width: 15,
                     child: SvgPicture.asset(
                       'assets/PostUI/icon-editpost.svg',
-                      color: Color(0xff0094FF),
+                      color: const Color(0xff0094FF),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Text(
                     Localize('Edit Post'),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xff0094FF),
                     ),
                   ),
@@ -419,7 +483,7 @@ class _ForumHomeState extends State<ForumHome> {
               value: 'deletePost',
               child: Row(
                 children: [
-                  Container(
+                  SizedBox(
                     height: 15,
                     width: 15,
                     child: SvgPicture.asset(
@@ -427,12 +491,12 @@ class _ForumHomeState extends State<ForumHome> {
                       color: Colors.red,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Text(
                     Localize('Delete Post'),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.red,
                     ),
                   ),
@@ -446,7 +510,7 @@ class _ForumHomeState extends State<ForumHome> {
               value: 'reportPost',
               child: Row(
                 children: [
-                  Container(
+                  SizedBox(
                     height: 15,
                     width: 15,
                     child: SvgPicture.asset(
@@ -454,12 +518,12 @@ class _ForumHomeState extends State<ForumHome> {
                       color: Colors.red,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Text(
                     Localize('Report Post'),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.red,
                     ),
                   ),
@@ -471,11 +535,11 @@ class _ForumHomeState extends State<ForumHome> {
 
         return menuItems;
       },
-      color: Color(0xffffffff),
+      color: const Color(0xffffffff),
       child: Stack(
         children: [
-          Positioned(
-            child: Container(
+          const Positioned(
+            child: SizedBox(
               width: 40,
               height: 25,
             ),
@@ -497,7 +561,7 @@ class _ForumHomeState extends State<ForumHome> {
     double calculatedHeight = (postContent.length / 25 * 14) + 50;
     if (postTooLong) calculatedHeight += 35;
     if (attachmentURL != 'Empty') {
-      calculatedHeight += 400;
+      calculatedHeight += 410;
     }
 
     return Padding(
@@ -508,18 +572,24 @@ class _ForumHomeState extends State<ForumHome> {
           children: [
             Positioned(
               left: 15,
-              child: Container(
-                width: 50, // Set your desired width
-                height: 50, // Set your desired height
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
-                    placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
-                    fit: BoxFit.fill,
+              child: GestureDetector(
+                onTap: () {
+                  navigateToViewProfile(postID, posterID);
+                },
+                child: Container(
+                  width: 50, // Set your desired width
+                  height: 50, // Set your desired height
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
+                      placeholder: (context, url) =>
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
               ),
@@ -527,23 +597,28 @@ class _ForumHomeState extends State<ForumHome> {
             Positioned(
               left: 80,
               top: 14,
-              child: RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                        text: posterName,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontFamily: 'Inter',
-                        )),
-                    if (posterIsAdmin)
+              child: GestureDetector(
+                onTap: () {
+                  navigateToViewProfile(postID, posterID);
+                },
+                child: RichText(
+                  text: TextSpan(
+                    children: [
                       TextSpan(
-                        text: ' [${Localize("Admin")}]',
-                        style: TextStyle(
-                          color: Color.fromRGBO(4, 57, 39, 100),
+                          text: posterName,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Inter',
+                          )),
+                      if (posterIsAdmin)
+                        TextSpan(
+                          text: ' [${Localize("Admin")}]',
+                          style: const TextStyle(
+                            color: Color.fromRGBO(4, 57, 39, 100),
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -555,17 +630,17 @@ class _ForumHomeState extends State<ForumHome> {
                     ? (deleted)
                         ? Text(
                             "[${Localize('Deleted By User')}]",
-                            style: TextStyle(color: Colors.red),
+                            style: const TextStyle(color: Colors.red),
                           )
                         : (removed)
                             ? Text(
                                 "[${Localize('Post Removed')}]",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.red,
                                 ),
                               )
-                            : SizedBox()
-                    : SizedBox()),
+                            : const SizedBox()
+                    : const SizedBox()),
             Positioned(
               left: 340,
               top: 12.5,
@@ -579,13 +654,36 @@ class _ForumHomeState extends State<ForumHome> {
               child: Container(
                 height: calculatedHeight,
                 width: 1,
-                color: Color(0x5f000000),
+                color: const Color(0x5f000000),
               ),
             ),
             Positioned(
               top: 65,
               left: 55,
               child: postBodyContainer,
+            ),
+            Positioned(
+              bottom: 80,
+              right: 10,
+              child: (attachmentURL != 'Empty')
+                  ? GestureDetector(
+                      onTap: () {
+                        navigateToViewImage([attachmentURL]);
+                      },
+                      child: Container(
+                        height: 340,
+                        width: 340,
+                        color: Colors.black,
+                        child: CachedNetworkImage(
+                          imageUrl: "$attachmentURL?tr=w-340,h-340,fo-auto",
+                          placeholder: (context, url) =>
+                              const CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                        ),
+                      ),
+                    )
+                  : const SizedBox(),
             ),
             Positioned(
               bottom: 20,
@@ -638,7 +736,7 @@ class _ForumHomeState extends State<ForumHome> {
                                 width: 20,
                               ),
                       ),
-                      Text(formattedLikes, style: TextStyle(fontSize: 11))
+                      Text(formattedLikes, style: const TextStyle(fontSize: 11))
                     ],
                   ),
                   const SizedBox(width: 5),
@@ -649,7 +747,8 @@ class _ForumHomeState extends State<ForumHome> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Comments(postID: postID)));
+                                  builder: (context) =>
+                                      Comments(postID: postID)));
                           /*ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Comment Tapped")));*/
                         },
@@ -659,7 +758,7 @@ class _ForumHomeState extends State<ForumHome> {
                           width: 20,
                         ),
                       ),
-                      Text(commentNumber, style: TextStyle(fontSize: 11))
+                      Text(commentNumber, style: const TextStyle(fontSize: 11))
                     ],
                   ),
                   (userIsAdmin) ? const SizedBox(width: 5) : const SizedBox(),
@@ -668,16 +767,18 @@ class _ForumHomeState extends State<ForumHome> {
                           children: [
                             GestureDetector(
                                 onTap: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Flag Tapped")));
+                                  navigateToAdminView(postID);
                                 },
                                 child: SvgPicture.asset(
                                   "assets/PostUI/icon-flag.svg",
                                   height: 20,
                                   width: 20,
-                                  color: Colors.deepOrange,
+                                  color: (unreviewedReport)
+                                      ? Colors.deepOrange
+                                      : Colors.black,
                                 )),
-                            Text(reportNumber, style: TextStyle(fontSize: 11))
+                            Text(reportNumber,
+                                style: const TextStyle(fontSize: 11))
                           ],
                         )
                       : const SizedBox(),
@@ -688,7 +789,7 @@ class _ForumHomeState extends State<ForumHome> {
                       : const SizedBox(),
                   (userIsAdmin)
                       ? (deleted)
-                          ? SizedBox()
+                          ? const SizedBox()
                           : GestureDetector(
                               onTap: () async {
                                 await loadRemovalToggle(postID);
@@ -706,7 +807,7 @@ class _ForumHomeState extends State<ForumHome> {
                                       width: 18,
                                       color: Colors.red,
                                     ))
-                      : SizedBox(),
+                      : const SizedBox(),
                 ],
               ),
             ),
@@ -735,7 +836,7 @@ class _ForumHomeState extends State<ForumHome> {
                   (currentlyTranslated.containsKey(postID))
                       ? Localize("Original Text")
                       : Localize("Translate"),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Color(0xff0094FF),
                   ),
                 ),
@@ -752,19 +853,19 @@ class _ForumHomeState extends State<ForumHome> {
                               content: Text(Localize(
                                   "Expanded Post (should go to same place as comments)"))));
                         },
-                        child: Container(
+                        child: SizedBox(
                           width: 250,
                           child: Text(
                             Localize(
                                 "Post too tall to view on home page. Please click here to expand post."),
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Color(0x55000000),
                             ),
                           ),
                         ),
                       ),
                     )
-                  : SizedBox(),
+                  : const SizedBox(),
             ),
           ],
         ),
@@ -774,18 +875,18 @@ class _ForumHomeState extends State<ForumHome> {
 
   Widget AdminOptions() {
     Widget emptyBox = const SizedBox();
-    Color unselected = Color(0xaa000000);
+    Color unselected = const Color(0xaa000000);
     Color toggleColor = unselected;
     if (adminOptionsToggled) {
       toggleColor = Colors.black;
     }
 
-    Color unselectedOption = Color(0xffF2F0F4);
-    Color selectedOption = Color(0xffC9C9C9);
+    Color unselectedOption = const Color(0xffF2F0F4);
+    Color selectedOption = const Color(0xffC9C9C9);
     Color selectedText = Colors.black;
     Color unselectedText = unselected;
 
-    return Container(
+    return SizedBox(
       height: (adminOptionsToggled) ? 343 : 25,
       width: 400,
       child: Stack(
@@ -872,14 +973,14 @@ class _ForumHomeState extends State<ForumHome> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Spacer(),
+                      const Spacer(),
                       GestureDetector(
                         onTap: () async {
                           specialSearchArgs['showReported'] = 'All';
                           await loadUpdate();
                         },
                         child: Container(
-                          padding: EdgeInsets.only(
+                          padding: const EdgeInsets.only(
                               top: 8, bottom: 8, left: 16, right: 16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
@@ -898,14 +999,14 @@ class _ForumHomeState extends State<ForumHome> {
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       GestureDetector(
                         onTap: () async {
                           specialSearchArgs['showReported'] = 'Only';
                           await loadUpdate();
                         },
                         child: Container(
-                          padding: EdgeInsets.only(
+                          padding: const EdgeInsets.only(
                               top: 8, bottom: 8, left: 16, right: 16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
@@ -924,7 +1025,34 @@ class _ForumHomeState extends State<ForumHome> {
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          specialSearchArgs['showReported'] = 'Unreviewed';
+                          await loadUpdate();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: (specialSearchArgs['showReported'] ==
+                                    'Unreviewed')
+                                ? selectedOption
+                                : unselectedOption,
+                          ),
+                          child: Text(
+                            Localize("Unreviewed"),
+                            style: TextStyle(
+                                color: (specialSearchArgs['showReported'] ==
+                                        'Unreviewed')
+                                    ? selectedText
+                                    : unselectedText),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
                     ],
                   ),
                 )
@@ -947,14 +1075,14 @@ class _ForumHomeState extends State<ForumHome> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Spacer(),
+                      const Spacer(),
                       GestureDetector(
                         onTap: () async {
                           specialSearchArgs['showRemoved'] = 'All';
                           await loadUpdate();
                         },
                         child: Container(
-                          padding: EdgeInsets.only(
+                          padding: const EdgeInsets.only(
                               top: 8, bottom: 8, left: 16, right: 16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
@@ -973,14 +1101,14 @@ class _ForumHomeState extends State<ForumHome> {
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       GestureDetector(
                         onTap: () async {
                           specialSearchArgs['showRemoved'] = 'Only';
                           await loadUpdate();
                         },
                         child: Container(
-                          padding: EdgeInsets.only(
+                          padding: const EdgeInsets.only(
                               top: 8, bottom: 8, left: 16, right: 16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
@@ -999,14 +1127,14 @@ class _ForumHomeState extends State<ForumHome> {
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       GestureDetector(
                         onTap: () async {
                           specialSearchArgs['showRemoved'] = 'None';
                           await loadUpdate();
                         },
                         child: Container(
-                          padding: EdgeInsets.only(
+                          padding: const EdgeInsets.only(
                               top: 8, bottom: 8, left: 16, right: 16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
@@ -1025,7 +1153,7 @@ class _ForumHomeState extends State<ForumHome> {
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                     ],
                   ),
                 )
@@ -1049,14 +1177,14 @@ class _ForumHomeState extends State<ForumHome> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Spacer(),
+                      const Spacer(),
                       GestureDetector(
                         onTap: () async {
                           specialSearchArgs['showDeleted'] = 'All';
                           await loadUpdate();
                         },
                         child: Container(
-                          padding: EdgeInsets.only(
+                          padding: const EdgeInsets.only(
                               top: 8, bottom: 8, left: 16, right: 16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
@@ -1075,14 +1203,14 @@ class _ForumHomeState extends State<ForumHome> {
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       GestureDetector(
                         onTap: () async {
                           specialSearchArgs['showDeleted'] = 'Only';
                           await loadUpdate();
                         },
                         child: Container(
-                          padding: EdgeInsets.only(
+                          padding: const EdgeInsets.only(
                               top: 8, bottom: 8, left: 16, right: 16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
@@ -1101,14 +1229,14 @@ class _ForumHomeState extends State<ForumHome> {
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       GestureDetector(
                         onTap: () async {
                           specialSearchArgs['showDeleted'] = 'None';
                           await loadUpdate();
                         },
                         child: Container(
-                          padding: EdgeInsets.only(
+                          padding: const EdgeInsets.only(
                               top: 8, bottom: 8, left: 16, right: 16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
@@ -1127,7 +1255,7 @@ class _ForumHomeState extends State<ForumHome> {
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                     ],
                   ),
                 )
@@ -1144,7 +1272,7 @@ class _ForumHomeState extends State<ForumHome> {
       userIsAdmin = true;
     }
     return Scaffold(
-      backgroundColor: Color(0xffece7d5),
+      backgroundColor: const Color(0xffece7d5),
       appBar: AppBar(
         backgroundColor: const Color(0xffece7d5),
         automaticallyImplyLeading: false,
@@ -1164,7 +1292,7 @@ class _ForumHomeState extends State<ForumHome> {
                   height: 10,
                 ),
           Expanded(
-            child: (postData.length > 0)
+            child: (postData.isNotEmpty)
                 ? _buildList()
                 : Center(
                     child: Text(Localize("No Posts Found")),
@@ -1270,8 +1398,8 @@ class _SearchBarState extends State<SearchBarWidget> {
       },
       decoration: InputDecoration(
         hintText: Localize('Search'),
-        prefixIcon: Icon(Icons.search),
-        border: OutlineInputBorder(
+        prefixIcon: const Icon(Icons.search),
+        border: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black),
         ),
       ),

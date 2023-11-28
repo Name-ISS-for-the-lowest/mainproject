@@ -5,7 +5,7 @@ import 'package:frontend/languagePicker/languages.dart';
 
 toGetterName(String languageName) => languageName
     // Remove commas and parentheses
-    .replaceAll(RegExp('[,\(\)]'), '')
+    .replaceAll(RegExp('[,()]'), '')
     // Replace punctuated name
     .replaceAll('ü', 'u')
     .camelCase;

@@ -139,7 +139,7 @@ class _CupertinoLanguagePickerState extends State<LanguagePickerCupertino> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          SizedBox(width: 8.0),
+          const SizedBox(width: 8.0),
           Flexible(child: Text(language.name))
         ],
       ),
