@@ -257,8 +257,8 @@ class DBManager:
 
     @staticmethod
     def getComments(parentID: str):
-        objectID = ObjectId(parentID)
-        comments = DBManager.db["posts"].find({"parent_id": objectID})
+        ##objectID = ObjectId(parentID)
+        comments = DBManager.db["posts"].find({"parent_id": parentID})
         returnComments = []
         for elem in comments:
             comment = Post.fromDict(elem)

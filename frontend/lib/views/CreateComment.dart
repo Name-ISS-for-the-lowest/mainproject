@@ -179,8 +179,8 @@ class _CreateCommentState extends State<CreateComment> {
                         setState(() {
                           isSubmitting = true;
                         });
-                        var response = await PostHelper.createPost(
-                            userID, currentCommentBody, imageAttachment);
+                        var response = await PostHelper.createComment(
+                            userID, currentCommentBody, postID, imageAttachment);
                       }
                     }
 
