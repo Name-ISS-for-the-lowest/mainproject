@@ -52,7 +52,8 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/setProfilePictureOnSignUp"
             or request.url.path == "/resetPassword"
             or match
-            or request.url.path == "/getEvents"
+            # or request.url.path == "/getEvents"
+            # or request.url.path == "/getPosts"
         ):
             return await call_next(request)
         # check if the user has a cookie
@@ -328,6 +329,7 @@ def getPosts(
         userID=userID,
     )
     posts = Post.listToJson(posts)
+    print("posts: ", len(posts))
     return posts
 
 
