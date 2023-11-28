@@ -181,7 +181,7 @@ class EmailSender:
         message = MIMEMultipart()
         message["From"] = EmailSender.fromEmail
         message["To"] = userEmail
-        message["Subject"] = "ISS - Rest Email Verification"
+        message["Subject"] = "ISS - Reset Email Verification"
         token = secrets.token_urlsafe(32)
 
         body = f"""

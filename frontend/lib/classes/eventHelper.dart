@@ -55,6 +55,7 @@ class EventHelper {
                 'month': event['month'],
                 'description': event['description'][language],
                 'recommended': 'True',
+                'id': event['id'].toString(),
               });
             } else {
               eventsSecondary.add({
@@ -65,6 +66,7 @@ class EventHelper {
                 'month': event['month'],
                 'description': event['description'][language],
                 'recommended': 'false',
+                'id': event['id'].toString(),
               });
             }
           }

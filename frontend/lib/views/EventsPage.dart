@@ -35,7 +35,11 @@ class _EventsPageState extends State<EventsPage> {
     }
   }
 
-  void showExpandedInformation(Map<String, dynamic> event) {
+  void showExpandedInformation(Map<String, dynamic> event, String? eventId) {
+    print(event);
+    var language = AuthHelper.userInfoCache['language'];
+    var url =
+        "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$language";
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
@@ -58,7 +62,7 @@ class _EventsPageState extends State<EventsPage> {
                   )),
                   GestureDetector(
                     onTap: () {
-                      _launchURL(Uri.parse(event['url']!));
+                      _launchURL(Uri.parse(url));
                     },
                     child: Container(
                       padding: const EdgeInsets.all(8.0),
@@ -117,16 +121,16 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   Widget _buildEvent(Map<String, dynamic> event) {
+    String? eventId = event['id'];
     return GestureDetector(
       onTap: () {
-        String? eventId = event['id'];
         var language = AuthHelper.userInfoCache['language'];
         var url =
             "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$language";
         _launchURL(Uri.parse(url));
       },
       onLongPress: () {
-        showExpandedInformation(event);
+        showExpandedInformation(event, eventId);
       },
       child: Column(
         children: [

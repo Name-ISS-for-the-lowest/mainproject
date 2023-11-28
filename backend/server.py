@@ -47,6 +47,7 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/setProfilePictureOnSignUp"
             or request.url.path == "/resetPassword"
             or match
+            or request.url.path == "/getEvents"
         ):
             return await call_next(request)
         # check if the user has a cookie
