@@ -511,3 +511,9 @@ def resetPassword(email: str):
     userDic["tokenCreatedAt"] = createdAt
     DBManager.db["users"].replace_one({"email": email}, userDic)
     return JSONResponse(content={"message": "email sent"}, status_code=200)
+
+
+@app.post("/banUser")
+def banUser(adminID: str, bannedID: str, banMessage: str, request: Request):
+    DBManager.banUser(adminID=adminID, bannedID=bannedID, banMessage=banMessage)
+    return JSONResponse(content="User Banned", status_code=200)
