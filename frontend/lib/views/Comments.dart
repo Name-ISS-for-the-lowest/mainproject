@@ -6,6 +6,7 @@ import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/AdminView.dart';
+import 'package:frontend/views/CreateComment.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ViewImage.dart';
 import 'package:frontend/views/ViewProfile.dart';
@@ -20,17 +21,24 @@ class Comments extends StatefulWidget {
 }
 
 class _CommentsState extends State<Comments> {
+  //for the main post
   var post = {};
   bool init = true;
   bool fetched = false;
   final Map<String, String> currentlyTranslated = {};
 
+  //for the comments of the post
+  var commentData = [];
+
+
   Future load() async {
     var dataCall = await PostHelper.getPostByID(widget.postID);
+    var comCall = await PostHelper.getComments(widget.postID);
     if (mounted) {
       setState(() {
         fetched = true;
         post = dataCall;
+        commentData = comCall;
         init = false;
       });
     }
@@ -144,7 +152,7 @@ class _CommentsState extends State<Comments> {
     }
   }
 
-  Widget _buildPost() {
+  Widget _buildPost(bool main) {
     if (!fetched) {
       return const Text("Loading");
     }
@@ -539,13 +547,18 @@ class _CommentsState extends State<Comments> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      Comments(postID: postID)));
-                          /*ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Comment Tapped")));*/
+                          if (main) {
+                            Navigator.push(
+                              context, 
+                                MaterialPageRoute(builder: (context) => CreateComment(isEditing: false)));
+                          }
+                          else {
+                            Navigator.push(
+                                context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          Comments(postID: postID)));
+                          }
                         },
                         child: SvgPicture.asset(
                           "assets/PostUI/icon-comment.svg",
@@ -689,7 +702,7 @@ class _CommentsState extends State<Comments> {
       body: Column(
           children: [
             const SizedBox(height: 5), 
-            Expanded(child: _buildPost())]),
+            Expanded(child: _buildPost(true))]),
     );
   }
 }

@@ -137,6 +137,14 @@ class DBManager:
         DBManager.db["posts"].insert_one(newPost.__dict__)
 
     @staticmethod
+    def addComment(userID, content, imageURL, imageFileID, postID):
+        newPost = Post(content, userID, parent_id=postID)
+        if imageURL != "False":
+            Attachment = Picture(imageURL, imageFileID)
+            newPost.attachedImage = Attachment.__dict__
+        DBManager.db["posts"].insert_one(newPost.__dict__)
+
+    @staticmethod
     def editPost(postID, postBody):
         postID = ObjectId(postID)
         post = DBManager.db["posts"].find_one({"_id": postID})
@@ -225,6 +233,7 @@ class DBManager:
             returnPosts.append(post)
         return returnPosts
 
+
     @staticmethod
     def getPostByID(postID: str):
         objectID = ObjectId(postID)
@@ -245,6 +254,29 @@ class DBManager:
             post["reportedByUser"] = True
         returnPost = Post.fromDict(post)
         return returnPost
+
+    @staticmethod
+    def getComments(parentID: str):
+        objectID = ObjectId(parentID)
+        comments = DBManager.db["posts"].find({"parent_id": objectID})
+        returnComments = []
+        for elem in comments:
+            comment = Post.fromDict(elem)
+            user = DBManager.db["users"].find_one({"_id": ObjectId(comment.userID)})
+            comment.profilePicture = user["profilePicture"]
+            comment.username = user["username"]
+            comment.posterIsAdmin = user["admin"]
+            comment.posterIsBanned = user["banned"]
+            comboID = str(comment["_id"]) + str(comment.userID)
+            likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
+            if likedResult is not None:
+                comment.liked = True
+            reportResult = DBManager.db['reports'].find_one({"comboID": comboID})
+            if reportResult is not None:
+                comment.reportedByUser = True
+            returnComments.append(comment)
+        
+        return returnComments
 
     @staticmethod
     def searchPosts(start, end, showRemoved, showDeleted, showReported, search, userID):
@@ -349,7 +381,7 @@ class DBManager:
         else:
             return {"message": "Post not found"}
 
-    def insertUserList(users: [User]):
+    def insertUserList(users: list[User]):
         for user in users:
             userJson = user.__dict__
             DBManager.db["users"].insert_one(userJson)
@@ -367,7 +399,7 @@ class DBManager:
         print("Admin privilleges assigned successfully!")
 
     @staticmethod
-    def insertPostList(posts: [Post]):
+    def insertPostList(posts: list[Post]):
         for post in posts:
             postJson = post.__dict__
             postJson["userID"] = ObjectId(postJson["userID"]["$oid"])

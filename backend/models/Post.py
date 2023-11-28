@@ -21,8 +21,8 @@ class Post:
     edited: bool
     deleted: bool
     removed: bool
-    contentHistory: []
-    translations: {}
+    contentHistory: list
+    translations: dict
     posterIsAdmin: bool = False
     posterIsBanned: bool = False
     reports: int
