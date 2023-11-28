@@ -189,7 +189,7 @@ def logout(request: Request, response: Response):
 
 
 @app.post("/signup")
-def signUp(creds: credentials):
+def signUp(creds: credentials, language: str = "en"):
     email = creds.email
     password = creds.password
     # check if the user already exists
@@ -214,7 +214,7 @@ def signUp(creds: credentials):
     # generate a token
     token = EmailSender.sendAuthenticationEmail(email)
     # insert the user into the db
-    DBManager.insertUser(email, passwordHash, salt, token)
+    DBManager.insertUser(email, passwordHash, salt, token, language)
     return JSONResponse(
         content={"message": "Please verify your email"}, status_code=200
     )

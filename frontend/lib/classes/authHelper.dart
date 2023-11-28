@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
+import 'dart:ui' as ui;
 import 'package:dio/dio.dart';
 import 'package:frontend/classes/Data.dart';
 import 'package:frontend/classes/routeHandler.dart';
@@ -90,13 +92,19 @@ class AuthHelper {
   }
 
   static Future<Response> signUp(String email, String password) async {
+    Locale systemLocale = ui.window.locale;
+    String defaultLanguage = systemLocale.languageCode;
     final data = {'email': email, 'password': password};
+    var params = {
+      'language': defaultLanguage,
+    };
     String endPoint = '/signup';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.post(
         url,
         data: jsonEncode(data),
+        queryParameters: params,
         options: Options(contentType: Headers.jsonContentType),
       );
       return response;
@@ -175,6 +183,12 @@ class AuthHelper {
           queryParameters: params,
           options: Options(contentType: Headers.jsonContentType));
       var userInfo = response.data;
+      print(userInfo);
+      if (!userInfo.containsKey('nationality')) {
+        print("nationality not found");
+        userInfo['nationality'] = "N\\A";
+      }
+
       AuthHelper.userInfoCache['_id'] = userInfo['_id'];
       AuthHelper.userInfoCache['email'] = userInfo['email'];
       AuthHelper.userInfoCache['username'] = userInfo['username'];

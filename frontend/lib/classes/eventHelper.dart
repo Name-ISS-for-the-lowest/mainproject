@@ -21,7 +21,7 @@ class EventHelper {
         events.clear();
       }
     }
-
+    print(events);
     try {
       if (fetching) {
         return;
@@ -39,6 +39,8 @@ class EventHelper {
           queryParameters: params,
           options: Options(responseType: ResponseType.json));
       var results = response.data;
+      print("I am right here");
+      print(results[0]['id']);
 
       final eventsSecondary = <Map<String, String>>[];
 
@@ -89,8 +91,14 @@ class EventHelper {
   static bool isEventRecommended(var event) {
     String eventTitle = event['title']["en"];
     String eventDescription = event['description']["en"];
-    String userNationality = AuthHelper.userInfoCache['nationality'];
-    List? userKeywords = keywordData.countryKeywords[userNationality];
+    List? userKeywords = [];
+    String userNationality = "N\\A";
+    if (AuthHelper.userInfoCache.containsKey('nationality')) {
+      userKeywords =
+          keywordData.countryKeywords[AuthHelper.userInfoCache['nationality']];
+      userNationality = AuthHelper.userInfoCache['nationality'];
+    }
+
     userNationality = userNationality.toLowerCase();
     String userLanguage =
         AuthHelper.languageNames[AuthHelper.userInfoCache['language']];
@@ -103,9 +111,8 @@ class EventHelper {
         eventDescription.contains(userLanguage)) {
       return true;
     }
-    userKeywords ??= [];
-    userKeywords =
-        keywordData.countryKeywords[AuthHelper.userInfoCache['nationality']]!;
+    userKeywords = [];
+
     for (String keyword in userKeywords) {
       if (eventTitle.toLowerCase().contains(keyword.toLowerCase()) ||
           eventDescription.toLowerCase().contains(keyword.toLowerCase())) {
