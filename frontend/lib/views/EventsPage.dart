@@ -70,7 +70,7 @@ class _EventsPageState extends State<EventsPage> {
                           const SizedBox(
                             width: 5,
                           ),
-                          const Text("Close Screen"),
+                          Text(Localize("Close Screen")),
                         ],
                       ),
                     ),
@@ -128,8 +128,8 @@ class _EventsPageState extends State<EventsPage> {
                             border: Border.all(color: Colors.black, width: 1.0),
                             color: Colors.white,
                           ),
-                          child: const Text(
-                            'Open Translated Website',
+                          child: Text(
+                            Localize('Open Translated Website'),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontSize: 16.0,

@@ -73,13 +73,9 @@ class _ProfilePageState extends State<ProfilePage> {
     if (emojiCheck != null) {
       emoji = '$emojiCheck ';
     }
-    String? localizedLanguage =
-        SelectorHelper.reverseLangMap[AuthHelper.userInfoCache['language']];
     String language =
         AuthHelper.languageNames[AuthHelper.userInfoCache['language']];
-    if (localizedLanguage != null) {
-      language = localizedLanguage;
-    }
+    language = Localize(language);
     String emailAddress = AuthHelper.userInfoCache['email'];
     Language selectedDialogLanguage = Languages.english;
 
@@ -394,20 +390,25 @@ class _ProfilePageState extends State<ProfilePage> {
                 Positioned(
                   child: Align(
                     alignment: Alignment.center,
-                    child: Container(
-                      width: 150, // Set your desired width
-                      height: 150, // Set your desired height
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: "$imageURL?tr=w-150,h-150,fo-auto",
-                          placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                          fit: BoxFit.fill,
+                    child: GestureDetector(
+                      onTap: () {
+                        navigateToViewImage([imageURL]);
+                      },
+                      child: Container(
+                        width: 150, // Set your desired width
+                        height: 150, // Set your desired height
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
+                        child: ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: "$imageURL?tr=w-150,h-150,fo-auto",
+                            placeholder: (context, url) =>
+                                const CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                            fit: BoxFit.fill,
+                          ),
                         ),
                       ),
                     ),

@@ -114,7 +114,13 @@ class _CommentsState extends State<Comments> {
 
           if (commentData.isEmpty &&
               index == parentData.length + 3 - parShift) {
-            return Center(child: Text('No Comments Found'));
+            return Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Center(
+                    child: Text(
+                  Localize('No Comments Found'),
+                  style: TextStyle(fontSize: 20),
+                )));
           }
 
           return _buildComment(index - parentData.length - 3 + parShift);
@@ -856,7 +862,7 @@ class _CommentsState extends State<Comments> {
                                               width: 5,
                                             ),
                                             Text(
-                                              "Reply to User",
+                                              Localize("Reply to User"),
                                               style: TextStyle(fontSize: 20),
                                             )
                                           ],
@@ -902,8 +908,8 @@ class _CommentsState extends State<Comments> {
             ),
             onTap: () => Navigator.pop(context),
           ),
-          title: const Text(
-            "Comments",
+          title: Text(
+            Localize("Comments"),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.bold,

@@ -141,10 +141,10 @@ class _CreatePostState extends State<CreatePost> {
           title: Text(
             (isEditing)
                 ? (isCommenting)
-                    ? ("Edit Comment")
+                    ? (Localize("Edit Comment"))
                     : Localize("Edit Post")
                 : (isCommenting)
-                    ? ("New Comment")
+                    ? (Localize("New Comment"))
                     : Localize("New Post"),
             textAlign: TextAlign.center,
             style: const TextStyle(
@@ -201,8 +201,9 @@ class _CreatePostState extends State<CreatePost> {
                 GestureDetector(
                   onTap: () async {
                     if (currentPostBody == '') {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("Please add some content to your post."),
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            Localize("Please add some content to your post.")),
                       ));
                       return;
                     }
