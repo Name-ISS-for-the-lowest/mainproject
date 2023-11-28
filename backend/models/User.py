@@ -16,6 +16,8 @@ class User:
     profilePicture = Picture()
     username: str = ""
     admin: bool
+    usernameHistory: list
+    profilePictureHistory: list
 
     def __init__(self, email, passwordHash, salt, token=None):
         self.email = email
@@ -29,6 +31,11 @@ class User:
         self.language = "en"
         self.nationality = "N/A"
         self.admin = False
+        self.usernameHistory = []
+        self.profilePictureHistory = []
+        self.banned = False
+        self.bannedBy = 'None'
+        self.banMessage = 'None'
 
     @staticmethod
     def fromDict(dict):

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class CreatePost extends StatefulWidget {
   final bool isEditing;
@@ -18,17 +21,80 @@ class CreatePost extends StatefulWidget {
 
 class _CreatePostState extends State<CreatePost> {
   void navigateToPrimaryScreens() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return const Scaffold(
-            body: CoreTemplate(),
-          );
-        },
-      ),
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (BuildContext context) {
+            return const Scaffold(
+              body: CoreTemplate(),
+            );
+          },
+        ),
+      );
+    }
+  }
+
+  File? imageAttachment;
+  String currentPostBody = "";
+  bool isSubmitting = false;
+
+  Future pickImage() async {
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+
+    if (mounted) {
+      setState(() {
+        imageAttachment = File(image.path);
+      });
+    }
+    Navigator.of(context).pop();
+  }
+
+  Future pickCamera() async {
+    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (image == null) return;
+
+    if (mounted) {
+      setState(() {
+        imageAttachment = File(image.path);
+      });
+    }
+    Navigator.of(context).pop();
+  }
+
+  void openCameraDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Theme(
+          data: Theme.of(context)
+              .copyWith(dialogBackgroundColor: const Color(0xfff7ebe1)),
+          child: SimpleDialog(
+            title: Text(Localize("Image Source")),
+            children: <Widget>[
+              SimpleDialogOption(
+                child: Text(Localize('Select from Gallery')),
+                onPressed: () => pickImage(),
+              ),
+              SimpleDialogOption(
+                child: Text(Localize('Open Camera')),
+                onPressed: () => pickCamera(),
+              ),
+              SimpleDialogOption(
+                child: Text(Localize('Close')),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
+  @override
   Widget build(BuildContext context) {
     var userInfo = AuthHelper.userInfoCache;
     bool isEditing = widget.isEditing;
@@ -36,11 +102,8 @@ class _CreatePostState extends State<CreatePost> {
     String? originalID = widget.postID;
     String imageURL = userInfo['profilePicture.url'];
     String screenName = userInfo['username'];
-    String currentPostBody;
     String postID;
-    if (originalText == null) {
-      currentPostBody = "";
-    } else {
+    if (originalText != null) {
       currentPostBody = originalText;
     }
     if (originalID == null) {
@@ -67,7 +130,7 @@ class _CreatePostState extends State<CreatePost> {
           title: Text(
             (isEditing) ? Localize("Edit Post") : Localize("New Post"),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: Colors.black,
@@ -93,16 +156,16 @@ class _CreatePostState extends State<CreatePost> {
                     Container(
                       width: 50, // Set your desired width
                       height: 50, // Set your desired height
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                       ),
                       child: ClipOval(
                         child: CachedNetworkImage(
                           imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
                           placeholder: (context, url) =>
-                              CircularProgressIndicator(),
+                              const CircularProgressIndicator(),
                           errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
+                              const Icon(Icons.error),
                           fit: BoxFit.fill,
                         ),
                       ),
@@ -124,15 +187,20 @@ class _CreatePostState extends State<CreatePost> {
                       var response =
                           await PostHelper.editPost(postID, currentPostBody);
                     } else {
-                      var response =
-                          await PostHelper.createPost(userID, currentPostBody);
+                      if (isSubmitting == false) {
+                        setState(() {
+                          isSubmitting = true;
+                        });
+                        var response = await PostHelper.createPost(
+                            userID, currentPostBody, imageAttachment);
+                      }
                     }
 
                     navigateToPrimaryScreens();
                   },
                   child: Text(
                     Localize("Publish Post"),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xff007EF1),
                     ),
                   ),
@@ -178,6 +246,90 @@ class _CreatePostState extends State<CreatePost> {
               ),
             ],
           ),
+          (isEditing == false)
+              ? SizedBox(
+                  height: 500,
+                  width: 400,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        top: 20,
+                        width: 400,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                openCameraDialog(context);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.only(
+                                    top: 8, bottom: 8, left: 16, right: 16),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  border: Border.all(
+                                      color: Colors.black, width: 1.0),
+                                  color: Colors.white,
+                                ),
+                                child: Text(
+                                  (imageAttachment == null)
+                                      ? "Attach Image"
+                                      : "Change Image",
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 50,
+                        right: 25,
+                        height: 350,
+                        width: 350,
+                        child: (imageAttachment != null)
+                            ? Stack(
+                                children: [
+                                  Positioned(
+                                    child: Container(
+                                      height: 350,
+                                      width: 350,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    child: Image.file(
+                                      imageAttachment!,
+                                      height: 350,
+                                      width: 350,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    right: 0,
+                                    top: 0,
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        imageAttachment = null;
+                                        if (mounted) {
+                                          setState(() {});
+                                        }
+                                      },
+                                      child: SvgPicture.asset(
+                                        'assets/PostUI/icon-xcircle.svg',
+                                        color: Colors.grey,
+                                        height: 40,
+                                        width: 40,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              )
+                            : const SizedBox(),
+                      ),
+                    ],
+                  ),
+                )
+              : const SizedBox(),
         ],
       ),
     );

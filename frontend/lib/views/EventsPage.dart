@@ -1,15 +1,10 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frontend/classes/eventHelper.dart';
-import 'package:frontend/classes/routeHandler.dart';
-import 'package:frontend/views/SearchBar.dart';
-import 'package:html_unescape/html_unescape.dart';
-import 'package:html/parser.dart' show parse;
-import 'package:url_launcher/url_launcher.dart';
-import 'package:memoized/memoized.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:frontend/classes/Localize.dart';
+import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/classes/eventHelper.dart';
+import 'package:frontend/views/SearchBar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -24,7 +19,8 @@ class _EventsPageState extends State<EventsPage> {
   void initState() {
     super.initState();
     EventHelper.mounted = true;
-    EventHelper.fetchEvents(setState);
+    EventHelper.setState = setState;
+    EventHelper.fetchEvents();
   }
 
   @override
@@ -39,6 +35,116 @@ class _EventsPageState extends State<EventsPage> {
     }
   }
 
+  void showExpandedInformation(Map<String, dynamic> event, String? eventId) {
+    print(event);
+    var language = AuthHelper.userInfoCache['language'];
+    var url =
+        "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$language";
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            decoration: const BoxDecoration(
+              color: Color(0xffece7d5),
+            ),
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    String? eventId = event['id'];
+                    var language = AuthHelper.userInfoCache['language'];
+                    var url = Navigator.of(context).pop();
+                  },
+                  child: Container(
+                    width: 300,
+                    color: Colors.transparent,
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8.0),
+                          child: const Icon(Icons.close),
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        const Text("Close Screen"),
+                      ],
+                    ),
+                  ),
+                ),
+                Row(children: [
+                  Expanded(
+                      child: Text(
+                    event['title']!,
+                    style: const TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )),
+                ]),
+                const SizedBox(height: 10.0),
+                Text(
+                  event['date']!,
+                  style: const TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10.0),
+                Text(
+                  event['location']!,
+                  style: const TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 5.0),
+                Text(
+                  event['description']!,
+                  style: const TextStyle(fontSize: 14.0),
+                ),
+                const SizedBox(
+                  height: 50,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        String? eventId = event['id'];
+                        var language = AuthHelper.userInfoCache['language'];
+                        var url =
+                            "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$language";
+                        _launchURL(Uri.parse(url));
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.only(
+                            top: 8, bottom: 8, left: 16, right: 16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(color: Colors.black, width: 1.0),
+                          color: Colors.white,
+                        ),
+                        child: const Text(
+                          'Open Translated Website',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
 //I need to move this function to events helper where I can make
 //the results memoized by hand since flutter hooks and memoization absolutelty failed me
   Widget _buildList() {
@@ -47,9 +153,6 @@ class _EventsPageState extends State<EventsPage> {
       itemBuilder: (context, index) {
         //if at bottom of list show loading indicator
         if (index == EventHelper.events.length) {
-          if (EventHelper.fetched == true) {
-            return null;
-          }
           return const Center(
             child: CircularProgressIndicator(),
           );
@@ -63,10 +166,11 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  Widget _buildEvent(Map<String, String> event) {
+  Widget _buildEvent(Map<String, dynamic> event) {
+    String? eventId = event['id'];
     return GestureDetector(
-      onTap: () => {
-        _launchURL(Uri.parse(event['url']!)),
+      onTap: () {
+        showExpandedInformation(event, eventId);
       },
       child: Column(
         children: [
@@ -84,7 +188,7 @@ class _EventsPageState extends State<EventsPage> {
                         ),
                       ),
                       Text(
-                        event['month']!,
+                        Localize(event['month']!),
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -134,7 +238,7 @@ class _EventsPageState extends State<EventsPage> {
                                   children: [
                                     Text(
                                       Localize("Recommended for you!"),
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w400,
                                           color: Colors.red),
@@ -156,7 +260,7 @@ class _EventsPageState extends State<EventsPage> {
               ),
             ],
           ),
-          const Divider()
+          const Divider(),
         ],
       ),
     );
