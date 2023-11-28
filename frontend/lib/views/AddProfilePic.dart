@@ -358,7 +358,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
             Container(
               width: screenHeight,
               height: screenHeight,
-              color: Color.fromARGB(0, 245, 245, 245).withOpacity(0.3),
+              color: const Color.fromARGB(0, 245, 245, 245).withOpacity(0.3),
               child: const Center(
                 child: CircularProgressIndicator(),
               ),

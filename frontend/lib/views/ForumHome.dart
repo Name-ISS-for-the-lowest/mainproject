@@ -586,8 +586,8 @@ class _ForumHomeState extends State<ForumHome> {
                     child: CachedNetworkImage(
                       imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
                       placeholder: (context, url) =>
-                          CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => const Icon(Icons.error),
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -606,7 +606,7 @@ class _ForumHomeState extends State<ForumHome> {
                     children: [
                       TextSpan(
                           text: posterName,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.black,
                             fontFamily: 'Inter',
                           )),

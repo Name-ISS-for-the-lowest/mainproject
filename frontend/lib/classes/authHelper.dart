@@ -23,7 +23,6 @@ class AuthHelper {
         data: jsonEncode(data),
         options: Options(contentType: Headers.jsonContentType),
       );
-      await cacheUserInfo();
       return response;
 
       //on anything but a 200 response this code will run

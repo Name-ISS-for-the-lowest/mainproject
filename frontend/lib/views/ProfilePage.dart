@@ -2,19 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
-import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/selectorHelper.dart';
 import '../languagePicker/languages.dart';
-import '../languagePicker/language_picker.dart';
-import 'package:frontend/classes/authHelper.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'dart:async';
 import 'package:frontend/home.dart';
 import 'package:frontend/views/ViewImage.dart';
 
@@ -74,10 +67,10 @@ class _ProfilePageState extends State<ProfilePage> {
     String displayName = AuthHelper.userInfoCache['username'];
     String englishNationality = AuthHelper.userInfoCache['nationality'];
     String nationality = Localize(englishNationality);
-    String? emoji_check = SelectorHelper.countryEmojiMap[englishNationality];
+    String? emojiCheck = SelectorHelper.countryEmojiMap[englishNationality];
     String emoji = '';
-    if (emoji_check != null) {
-      emoji = emoji_check + ' ';
+    if (emojiCheck != null) {
+      emoji = '$emojiCheck ';
     }
     String? localizedLanguage =
         SelectorHelper.reverseLangMap[AuthHelper.userInfoCache['language']];
@@ -402,16 +395,16 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Container(
                       width: 150, // Set your desired width
                       height: 150, // Set your desired height
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                       ),
                       child: ClipOval(
                         child: CachedNetworkImage(
                           imageUrl: "$imageURL?tr=w-150,h-150,fo-auto",
                           placeholder: (context, url) =>
-                              CircularProgressIndicator(),
+                              const CircularProgressIndicator(),
                           errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
+                              const Icon(Icons.error),
                           fit: BoxFit.fill,
                         ),
                       ),

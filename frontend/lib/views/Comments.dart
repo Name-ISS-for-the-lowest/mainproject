@@ -149,7 +149,7 @@ class _CommentsState extends State<Comments> {
       postContent += "...";
     }
 
-    Container postBodyContainer = Container(
+    SizedBox postBodyContainer = SizedBox(
       width: 280,
       child: Builder(
         builder: (BuildContext context) {

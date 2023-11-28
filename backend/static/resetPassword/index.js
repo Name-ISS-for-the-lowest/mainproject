@@ -27,18 +27,6 @@ resetPasswordButton.addEventListener("click", (e) => {
     return;
   } else {
     //send a patch request to the server with the token and password as params
-<<<<<<< HEAD
-    fetch(
-      `http://localhost:8000/resetPassword/?token=${token}&password=${password}`,
-      {
-        method: "PATCH",
-      }
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        alert(data.message);
-=======
     fetch(`/resetPassword?token=${token}&password=${password}`, {
       method: "PATCH",
     })
@@ -46,7 +34,6 @@ resetPasswordButton.addEventListener("click", (e) => {
       .then((data) => {
         alert(data.message);
         window.location.href = "";
->>>>>>> origin/gabriel
       });
   }
 });

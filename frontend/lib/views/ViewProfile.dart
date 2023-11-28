@@ -81,10 +81,10 @@ class _ViewProfileState extends State<ViewProfile> {
     String posterNationality = Localize(user["nationality"]);
     String posterLanguage = AuthHelper.languageNames[user["language"]];
     String englishNationality = user['nationality'];
-    String? emoji_check = SelectorHelper.countryEmojiMap[englishNationality];
+    String? emojiCheck = SelectorHelper.countryEmojiMap[englishNationality];
     String emoji = '';
-    if (emoji_check != null) {
-      emoji = emoji_check + ' ';
+    if (emojiCheck != null) {
+      emoji = '$emojiCheck ';
     }
     String? localizedLanguage = SelectorHelper.reverseLangMap[user['language']];
     if (localizedLanguage != null) {

@@ -4,8 +4,6 @@ import 'package:frontend/views/ViewImage.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:frontend/views/CoreTemplate.dart';
 
 class AdminView extends StatefulWidget {
   String postID;
@@ -66,16 +64,16 @@ class _AdminViewState extends State<AdminView> {
   }
 
   Future<void> banDialog(BuildContext context, String userID) async {
-    TextEditingController _textController = TextEditingController();
+    TextEditingController textController = TextEditingController();
 
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Would you like to ban this user?'),
+          title: const Text('Would you like to ban this user?'),
           content: TextField(
-            controller: _textController,
-            decoration: InputDecoration(hintText: 'Ban Reasoning'),
+            controller: textController,
+            decoration: const InputDecoration(hintText: 'Ban Reasoning'),
             maxLines: null,
           ),
           actions: <Widget>[
@@ -84,21 +82,21 @@ class _AdminViewState extends State<AdminView> {
                 // Close the alert dialog
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
                 await AuthHelper.banUser(AuthHelper.userInfoCache['_id'],
-                    userID, _textController.text);
+                    userID, textController.text);
                 Navigator.of(context).pop();
                 setState(() {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text("User has been Banned."),
                   ));
                   firstLoad = true;
                 });
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -134,7 +132,7 @@ class _AdminViewState extends State<AdminView> {
     }
     if (bannedCheck != null) {
       if (bannedCheck) {
-        userBanned = bannedCheck!;
+        userBanned = bannedCheck;
       }
     }
     String currentlyViewedContent = contentHistory[contentIndex];
@@ -246,7 +244,7 @@ class _AdminViewState extends State<AdminView> {
                 style: const TextStyle(fontSize: 18),
               ),
               (userBanned)
-                  ? Text("[USER HAS BEEN BANNED]",
+                  ? const Text("[USER HAS BEEN BANNED]",
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -557,7 +555,7 @@ class _AdminViewState extends State<AdminView> {
               GestureDetector(
                 onTap: () async {
                   if (posterIsAdmin) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("You cannot ban an admin account!"),
                     ));
                   } else {

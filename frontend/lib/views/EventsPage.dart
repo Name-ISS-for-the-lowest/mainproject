@@ -5,7 +5,6 @@ import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/eventHelper.dart';
 import 'package:frontend/views/SearchBar.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:frontend/classes/Localize.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -63,10 +62,10 @@ class _EventsPageState extends State<EventsPage> {
                           padding: const EdgeInsets.all(8.0),
                           child: const Icon(Icons.close),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 5,
                         ),
-                        Text("Close Screen"),
+                        const Text("Close Screen"),
                       ],
                     ),
                   ),
@@ -124,7 +123,7 @@ class _EventsPageState extends State<EventsPage> {
                           border: Border.all(color: Colors.black, width: 1.0),
                           color: Colors.white,
                         ),
-                        child: Text(
+                        child: const Text(
                           'Open Translated Website',
                           textAlign: TextAlign.center,
                           style: TextStyle(
