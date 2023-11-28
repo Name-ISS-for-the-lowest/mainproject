@@ -148,12 +148,6 @@ class _CommentsState extends State<Comments> {
 
     String formattedLikes = formatLargeNumber(likes);
     postContent = postContent.replaceAll('\n', ' ');
-    bool postTooLong = false;
-    if (postContent.length > 200) {
-      postTooLong = true;
-      postContent = postContent.substring(0, 200);
-      postContent += "...";
-    }
 
     Container postBodyContainer = Container(
       width: 280,
@@ -318,12 +312,11 @@ class _CommentsState extends State<Comments> {
     );
 
     double calculatedHeight = (postContent.length / 25 * 14) + 50;
-    if (postTooLong) calculatedHeight += 35;
 
     return Padding(
       padding: const EdgeInsets.all(6.0),
       child: SizedBox(
-        height: calculatedHeight + 100,
+        height: calculatedHeight,
         child: Stack(
           children: [
             Positioned(
@@ -335,13 +328,13 @@ class _CommentsState extends State<Comments> {
                   shape: BoxShape.circle,
                 ),
                 child: ClipOval(
-                    /*child: CachedNetworkImage(
+                    child: CachedNetworkImage(
                     imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
                     placeholder: (context, url) => CircularProgressIndicator(),
                     errorWidget: (context, url, error) => Icon(Icons.error),
                     fit: BoxFit.fill,
-                  ),*/
-                    ),
+                  ),
+                ),
               ),
             ),
             Positioned(
@@ -440,25 +433,6 @@ class _CommentsState extends State<Comments> {
             ),
             Positioned(
               bottom: 33,
-              left: 85,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => Comments(postID: postID)));
-                  /*ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text("Comment Tapped")));*/
-                },
-                child: SvgPicture.asset(
-                  "assets/PostUI/icon-comment.svg",
-                  height: 20,
-                  width: 20,
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 33,
               left: 120,
               child: GestureDetector(
                 onTap: () {
@@ -532,27 +506,6 @@ class _CommentsState extends State<Comments> {
                 ),
               ),
             ),
-            Positioned(
-              bottom: 60,
-              left: 55,
-              child: postTooLong
-                  ? Container(
-                      child: GestureDetector(
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(
-                                  "Expanded Post (should go to same place as comments)")));
-                        },
-                        child: Text(
-                          "Post too tall to view on home page.\nPlease click here to expand post.",
-                          style: TextStyle(
-                            color: Color(0x55000000),
-                          ),
-                        ),
-                      ),
-                    )
-                  : SizedBox(),
-            ),
           ],
         ),
       ),
@@ -608,7 +561,8 @@ class _CommentsState extends State<Comments> {
           Expanded(
             child:
                 _buildPost()
-          )
+          ),
+          const Spacer(),
         ]
       ),
     );
