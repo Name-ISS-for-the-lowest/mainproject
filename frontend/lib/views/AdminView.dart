@@ -3,6 +3,7 @@ import 'package:frontend/views/CoreTemplate.dart';
 import 'package:frontend/views/ViewImage.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class AdminView extends StatefulWidget {
@@ -62,10 +63,10 @@ class _AdminViewState extends State<AdminView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Would you like to ban this user?'),
+          title: Text(Localize('Would you like to ban this user?')),
           content: TextField(
             controller: textController,
-            decoration: const InputDecoration(hintText: 'Ban Reasoning'),
+            decoration: InputDecoration(hintText: Localize('Ban Reasoning')),
             maxLines: null,
           ),
           actions: <Widget>[
@@ -74,7 +75,7 @@ class _AdminViewState extends State<AdminView> {
                 // Close the alert dialog
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(Localize('Cancel')),
             ),
             TextButton(
               onPressed: () async {
@@ -82,13 +83,13 @@ class _AdminViewState extends State<AdminView> {
                     userID, textController.text);
                 Navigator.of(context).pop();
                 setState(() {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text("User has been Banned."),
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(Localize("User has been Banned.")),
                   ));
                   firstLoad = true;
                 });
               },
-              child: const Text('OK'),
+              child: Text(Localize('Confirm')),
             ),
           ],
         );
@@ -167,8 +168,8 @@ class _AdminViewState extends State<AdminView> {
             ),
             onTap: () => navigateToPrimaryScreens(),
           ),
-          title: const Text(
-            "Moderate Post",
+          title: Text(
+            Localize("Moderate Post"),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -192,32 +193,37 @@ class _AdminViewState extends State<AdminView> {
               const SizedBox(
                 height: 20,
               ),
-              const Text(
-                "Posted By",
+              Text(
+                Localize("Posted By"),
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
                 height: 20,
               ),
-              Container(
-                width: 200, // Set your desired width
-                height: 200, // Set your desired height
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: "$pfpURL?tr=w-200,h-200,fo-auto",
-                    placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                    fit: BoxFit.fill,
+              GestureDetector(
+                onTap: () {
+                  navigateToViewImage([pfpURL]);
+                },
+                child: Container(
+                  width: 200, // Set your desired width
+                  height: 200, // Set your desired height
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: "$pfpURL?tr=w-200,h-200,fo-auto",
+                      placeholder: (context, url) =>
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
               ),
-              const Text(
-                "Screen Name: ",
+              Text(
+                Localize("Screen Name:"),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
@@ -227,8 +233,8 @@ class _AdminViewState extends State<AdminView> {
               const SizedBox(
                 height: 15,
               ),
-              const Text(
-                "Email Address: ",
+              Text(
+                Localize("Email Address:"),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
@@ -236,20 +242,20 @@ class _AdminViewState extends State<AdminView> {
                 style: const TextStyle(fontSize: 18),
               ),
               (userBanned)
-                  ? const Text("[USER HAS BEEN BANNED]",
+                  ? Text("[" + Localize("USER HAS BEEN BANNED") + "]",
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.red))
                   : const SizedBox(),
               const Divider(),
-              const Text(
-                "Image Attached",
+              Text(
+                Localize("Image Attached"),
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               (attachmentURL == 'Empty')
-                  ? const Text(
-                      "No Image Attached",
+                  ? Text(
+                      Localize("No Image Attached"),
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     )
@@ -266,8 +272,8 @@ class _AdminViewState extends State<AdminView> {
                       ),
                     ),
               const Divider(),
-              const Text(
-                "Post Content",
+              Text(
+                Localize("Post Content"),
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               Padding(
@@ -319,8 +325,8 @@ class _AdminViewState extends State<AdminView> {
                   ),
                   child: Text(
                       (currentlyTranslated.containsKey(currentlyViewedContent))
-                          ? 'Original Text'
-                          : 'Translate',
+                          ? Localize('Original Text')
+                          : Localize('Translate'),
                       style: const TextStyle(
                         color: Color(0xff0094FF),
                       )),
@@ -330,7 +336,7 @@ class _AdminViewState extends State<AdminView> {
                 height: 20,
               ),
               (contentHistory.length > 1)
-                  ? const Text("Navigate Edit History",
+                  ? Text(Localize("Navigate Edit History"),
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold))
                   : const SizedBox(),
@@ -360,7 +366,7 @@ class _AdminViewState extends State<AdminView> {
                                         color: Colors.black, width: 1.0),
                                     color: Colors.white,
                                   ),
-                                  child: const Text('Older Version'),
+                                  child: Text(Localize('Older Version')),
                                 ),
                               )
                             : const SizedBox(),
@@ -381,8 +387,8 @@ class _AdminViewState extends State<AdminView> {
                                         color: Colors.black, width: 1.0),
                                     color: Colors.white,
                                   ),
-                                  child: const Text(
-                                    'Newer Version',
+                                  child: Text(
+                                    Localize('Newer Version'),
                                   ),
                                 ),
                               )
@@ -390,16 +396,16 @@ class _AdminViewState extends State<AdminView> {
                         const Spacer(),
                       ],
                     )
-                  : const Text("Post Has No Edit History",
+                  : Text(Localize("Post Has No Edit History"),
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const Divider(),
-              const Text(
-                "Reports Submitted",
+              Text(
+                Localize("Reports Submitted"),
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               Text(
-                "Total Reports Gathered: $reports",
+                Localize("Total Reports Gathered:") + "$reports",
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -417,7 +423,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text("Hate Speech: $hateSpeech"),
+                      Text(Localize("Hate Speech:") + " $hateSpeech"),
                     ],
                   ),
                   Row(
@@ -432,7 +438,8 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text("Targeted Harassment: $targetedHarassment"),
+                      Text(Localize("Targeted Harassment:") +
+                          " $targetedHarassment"),
                     ],
                   ),
                   Row(
@@ -447,7 +454,8 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text("Inappropriate Content: $inappropriateContent"),
+                      Text(Localize("Inappropriate Content:") +
+                          " $inappropriateContent"),
                     ],
                   ),
                   Row(
@@ -462,7 +470,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text("Illegal Content: $illegalContent"),
+                      Text(Localize("Illegal Content:") + " $illegalContent"),
                     ],
                   ),
                   Row(
@@ -477,7 +485,7 @@ class _AdminViewState extends State<AdminView> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text("Other Reasons: $otherReason"),
+                      Text(Localize("Other Reason:") + " $otherReason"),
                     ],
                   ),
                 ],
@@ -486,8 +494,8 @@ class _AdminViewState extends State<AdminView> {
                 height: 20,
               ),
               const Divider(),
-              const Text(
-                "Take Action",
+              Text(
+                Localize("Take Action"),
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
@@ -511,8 +519,8 @@ class _AdminViewState extends State<AdminView> {
                         border: Border.all(color: Colors.black, width: 1.0),
                         color: Colors.white,
                       ),
-                      child: const Text(
-                        'Approve Post',
+                      child: Text(
+                        Localize('Approve Post'),
                         style: TextStyle(color: Colors.black),
                       ),
                     ),
@@ -532,8 +540,8 @@ class _AdminViewState extends State<AdminView> {
                         border: Border.all(color: Colors.black, width: 1.0),
                         color: Colors.white,
                       ),
-                      child: const Text(
-                        'Remove Post',
+                      child: Text(
+                        Localize('Remove Post'),
                         style: TextStyle(color: Colors.black),
                       ),
                     ),
@@ -547,8 +555,9 @@ class _AdminViewState extends State<AdminView> {
               GestureDetector(
                 onTap: () async {
                   if (posterIsAdmin) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("You cannot ban an admin account!"),
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content:
+                          Text(Localize("You cannot ban an admin account!")),
                     ));
                   } else {
                     await banDialog(context, userID);
@@ -562,8 +571,8 @@ class _AdminViewState extends State<AdminView> {
                     border: Border.all(color: Colors.black, width: 1.0),
                     color: Colors.white,
                   ),
-                  child: const Text(
-                    'Ban User',
+                  child: Text(
+                    Localize('Ban User'),
                     style: TextStyle(color: Colors.black),
                   ),
                 ),

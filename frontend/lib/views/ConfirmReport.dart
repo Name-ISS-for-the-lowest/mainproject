@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/views/CoreTemplate.dart';
+import 'package:frontend/classes/Localize.dart';
 
 class ConfirmReport extends StatefulWidget {
   const ConfirmReport({super.key});
@@ -30,8 +31,8 @@ class _ConfirmReportState extends State<ConfirmReport> {
             ),
             onTap: () => navigateToPrimaryScreens(),
           ),
-          title: const Text(
-            "Report Post",
+          title: Text(
+            Localize("Report Post"),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -54,8 +55,9 @@ class _ConfirmReportState extends State<ConfirmReport> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  "We have received your report, thank you for submitting it.",
+                Text(
+                  Localize(
+                      "We have received your report, thank you for submitting it."),
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
@@ -63,14 +65,16 @@ class _ConfirmReportState extends State<ConfirmReport> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  "User experience is what we value most at International Student Station and your input is very valuable to us.",
+                Text(
+                  Localize(
+                      "User experience is what we value most at International Student Station and your input is very valuable to us."),
                   style: TextStyle(fontSize: 17),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  "We will be reviewing your report soon, please click the button below or the close button on your top left to return to the app.",
+                Text(
+                  Localize(
+                      "We will be reviewing your report soon, please click the button below or the close button on your top left to return to the app."),
                   style: TextStyle(fontSize: 17),
                   textAlign: TextAlign.center,
                 ),
@@ -81,8 +85,8 @@ class _ConfirmReportState extends State<ConfirmReport> {
                   onTap: () {
                     navigateToPrimaryScreens();
                   },
-                  child: const Text(
-                    "Take me Back",
+                  child: Text(
+                    Localize("Take me Back"),
                     style: TextStyle(
                       color: Color(0xff007EF1),
                       fontSize: 20,

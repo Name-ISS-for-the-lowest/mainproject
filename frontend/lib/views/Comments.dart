@@ -1,8 +1,18 @@
+import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/views/AdminView.dart';
+import 'package:frontend/views/ConfirmReport.dart';
+import 'package:frontend/views/CreateComment.dart';
 import 'package:frontend/views/CreatePost.dart';
+import 'package:frontend/views/ReportPage.dart';
+import 'package:frontend/views/ViewImage.dart';
+import 'package:frontend/views/ViewProfile.dart';
+import 'package:html_unescape/html_unescape.dart';
 
 class Comments extends StatefulWidget {
   final String postID;
@@ -14,21 +24,44 @@ class Comments extends StatefulWidget {
 }
 
 class _CommentsState extends State<Comments> {
+  //for the main post
   var post = {};
   bool init = true;
   bool fetched = false;
   final Map<String, String> currentlyTranslated = {};
-  Map postData = {};
 
-  void load() async {
+  //for the comments of the post
+  var commentData = [];
+  //for the parents of the post
+  var parentData = [];
+  bool viewParents = false;
+
+  Future load() async {
     var dataCall = await PostHelper.getPostByID(widget.postID);
+    var comCall = await PostHelper.getComments(widget.postID);
+    var parCall = await PostHelper.getParents(widget.postID);
+    Map comCallMap = {};
+    Map parCallMap = {};
+    /*for (var item in comCall) {
+      comCallMap[item["_id"]] = item;
+    }
+    var arrayOfCurrentIds = [];
+    for (var item in commentData) {
+          arrayOfCurrentIds.add(item['_id']);
+        }
+    for (var item in dataCall) {
+        //only input items with unique id's
+        if (!arrayOfCurrentIds.contains(item['_id'])) {
+          commentData.add(item);
+        }
+        }*/
     if (mounted) {
       setState(() {
+        fetched = true;
         post = dataCall;
-        print("printing...");
-        print(post);
+        commentData = comCall;
+        parentData = parCall.reversed.toList();
         init = false;
-        //postData = jsonDecode(dataCall) as Map<String, dynamic>;
       });
     }
   }
@@ -41,20 +74,73 @@ class _CommentsState extends State<Comments> {
     loadDelete(postID);
   }
 
+  Widget _buildList() {
+    print('WE GOT HERE');
+    int comShift = 0;
+    if (commentData.length == 0) {
+      comShift += 1;
+    }
+    int parShift = 0;
+    if (!viewParents) {
+      parShift = parentData.length;
+    }
+    return RefreshIndicator(
+      onRefresh: () => loadUpdate(),
+      child: ListView.builder(
+        itemCount:
+            commentData.length + 3 + parentData.length - parShift + comShift,
+        itemBuilder: (BuildContext context, int index) {
+          if (index < parentData.length && viewParents) {
+            return _buildComment(index, parentData, true);
+          }
+
+          if (index == parentData.length - parShift) {
+            return Divider(
+              height: 3,
+              color: Colors.black,
+            );
+          }
+
+          if (index == parentData.length + 1 - parShift) {
+            return _buildPost();
+          }
+
+          if (index == parentData.length + 2 - parShift) {
+            return Divider(
+              height: 3,
+              color: Colors.black,
+            );
+          }
+
+          if (commentData.isEmpty &&
+              index == parentData.length + 3 - parShift) {
+            return Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Center(
+                    child: Text(
+                  Localize('No Comments Found'),
+                  style: TextStyle(fontSize: 20),
+                )));
+          }
+
+          return _buildComment(index - parentData.length - 3 + parShift);
+        },
+      ),
+    );
+  }
+
   Future<void> loadDelete(String postID) async {
     await PostHelper.deletePost(postID);
-    var dataCall = await PostHelper.getPostByID(postID);
-    if (mounted) {
-      setState(() {});
-    }
+    await load();
   }
 
   Future<void> loadRemovalToggle(String postID) async {
     await PostHelper.toggleRemoval(postID);
-    var dataCall = await PostHelper.getPostByID(postID);
-    if (mounted) {
-      setState(() {});
-    }
+    await load();
+  }
+
+  Future<void> loadUpdate() async {
+    await load();
   }
 
   String formatLargeNumber(int number) {
@@ -77,10 +163,136 @@ class _CommentsState extends State<Comments> {
         builder: (BuildContext context) {
           return Scaffold(
             body: CreatePost(
-                isEditing: true, originalText: postContent, postID: postID),
+                isEditing: true,
+                isCommenting: true,
+                originalText: postContent,
+                postID: postID),
           );
         },
       ),
+    ).then((result) async {
+      await loadUpdate();
+    });
+  }
+
+  void navigateToViewProfile(String postID, String posterID) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ViewProfile(postID: postID, posterID: posterID),
+          );
+        },
+      ),
+    ).then((result) async {
+      await loadUpdate();
+    });
+  }
+
+  void navigateToViewImage(List<String> inputs) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ViewImage(imageUrls: inputs),
+          );
+        },
+      ),
+    ).then((result) async {
+      await loadUpdate();
+    });
+  }
+
+  void navigateToAdminView(String postID) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: AdminView(postID: postID),
+          );
+        },
+      ),
+    ).then((result) async {
+      await loadUpdate();
+    });
+  }
+
+  void navigateToReportPost(String postID) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: ReportPage(postID: postID),
+          );
+        },
+      ),
+    ).then((result) async {
+      await loadUpdate();
+    });
+  }
+
+  void navigateToConfirmPost() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return const Scaffold(
+            body: ConfirmReport(),
+          );
+        },
+      ),
+    ).then((result) async {
+      await loadUpdate();
+    });
+  }
+
+  void navigateToComments(String postID) {
+    Navigator.push(context,
+            MaterialPageRoute(builder: (context) => Comments(postID: postID)))
+        .then((result) async {
+      await loadUpdate();
+    });
+  }
+
+  void navigateToCreateComment(String postID) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => CreatePost(
+                  postID: postID,
+                  isEditing: false,
+                  isCommenting: true,
+                ))).then((result) async {
+      await loadUpdate();
+    });
+  }
+
+  Future<void> removalAlertDialog(
+      BuildContext context, String postID, bool removed) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text((removed)
+              ? 'Do you wish to approve this post?'
+              : 'Do you wish to remove this post?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await loadRemovalToggle(postID);
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -106,17 +318,39 @@ class _CommentsState extends State<Comments> {
   }
 
   Widget _buildPost() {
+    if (!fetched) {
+      return const Text("Loading");
+    }
+    String imageURL = post["profilePicture"]["url"];
     if (post.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
 
-    String posterName = post["username"];
-    String postContent = post["content"];
-    String postID = post["_id"];
-    String posterID = post['userID'];
-    late int likes = post['likes'];
+    return _buildComment(0, [post]);
+  }
+
+  Widget _buildComment(int index, [var postPassed, var parentPassed]) {
+    var parentOverride = false;
+    if (parentPassed != null) {
+      parentOverride = true;
+    }
+    var dataSource = commentData;
+    if (postPassed != null) {
+      dataSource = postPassed;
+    }
+    String imageURL = dataSource[index]["profilePicture"]['url'];
+    String attachmentURL = 'Empty';
+    if (dataSource[index]['attachedImage'] != 'Empty') {
+      attachmentURL = dataSource[index]['attachedImage']['url'];
+    }
+    String posterName = dataSource[index]["username"];
+    String postContent = dataSource[index]["content"];
+    String postID = dataSource[index]["_id"];
+    String posterID = dataSource[index]['userID'];
+    String reportNumber = dataSource[index]['reports'];
+    late int likes = dataSource[index]['likes'];
     bool posterIsAdmin = false;
     bool userIsAdmin = false;
     //These booleans below may come in handy when we are making admin views
@@ -126,71 +360,43 @@ class _CommentsState extends State<Comments> {
       userIsAdmin = true;
     }
     bool isEdited = false;
-    var liked = post['liked'];
-    if (post['edited'] == 'True') {
+    var liked = dataSource[index]['liked'];
+    var reportedByUser = dataSource[index]['reportedByUser'];
+    var unreviewedReport = dataSource[index]['unreviewedReport'];
+    if (dataSource[index]['edited'] == 'True') {
       isEdited = true;
     }
-    if (post['posterIsAdmin'] == 'True') {
+    if (dataSource[index]['posterIsAdmin'] == 'True') {
       posterIsAdmin = true;
     }
-    if (post['deleted'] == 'True') {
+    if (dataSource[index]['deleted'] == 'True') {
       deleted = true;
     }
-    if (post['removed'] == 'True') {
+    if (dataSource[index]['removed'] == 'True') {
       removed = true;
     }
+    var unescape = HtmlUnescape();
 
     String formattedLikes = formatLargeNumber(likes);
     postContent = postContent.replaceAll('\n', ' ');
-    bool postTooLong = false;
-    if (postContent.length > 200) {
-      postTooLong = true;
-      postContent = postContent.substring(0, 200);
-      postContent += "...";
-    }
 
-    SizedBox postBodyContainer = SizedBox(
-      width: 280,
-      child: Builder(
-        builder: (BuildContext context) {
-          return RichText(
-            softWrap: true,
-            text: TextSpan(
-              children: [
-                TextSpan(
-                    text: (currentlyTranslated.containsKey(postContent))
-                        ? currentlyTranslated[postContent]!
-                        : postContent,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'Inter',
-                    )),
-                if (isEdited)
-                  const TextSpan(
-                    text: ' (Edited)',
-                    style: TextStyle(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey,
-                    ),
-                  ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+    String commentNumber = dataSource[index]['comments'].toString();
 
     PopupMenuButton<String> threeDotMenu = PopupMenuButton<String>(
-      onSelected: (String result) {
+      onSelected: (String result) async {
         // Handle the selected option
         if (result == 'closeMenu') {
           // Closes menu and does absolutely nothing
         } else if (result == 'editPost') {
-          navigateToEditPost(post["content"], postID);
+          navigateToEditPost(dataSource[index]["content"], postID);
         } else if (result == 'deletePost') {
           deletePost(postID);
         } else if (result == 'reportPost') {
-          // Handle option 2
+          if (reportedByUser) {
+            navigateToConfirmPost();
+          } else {
+            navigateToReportPost(postID);
+          }
         }
       },
       itemBuilder: (BuildContext context) {
@@ -211,7 +417,7 @@ class _CommentsState extends State<Comments> {
                 const SizedBox(
                   width: 10,
                 ),
-                const Text('Close Menu'),
+                Text(Localize('Close Menu')),
               ],
             ),
           ),
@@ -234,9 +440,9 @@ class _CommentsState extends State<Comments> {
                   const SizedBox(
                     width: 10,
                   ),
-                  const Text(
-                    'Edit Post',
-                    style: TextStyle(
+                  Text(
+                    Localize('Edit Post'),
+                    style: const TextStyle(
                       color: Color(0xff0094FF),
                     ),
                   ),
@@ -261,9 +467,9 @@ class _CommentsState extends State<Comments> {
                   const SizedBox(
                     width: 10,
                   ),
-                  const Text(
-                    'Delete Post',
-                    style: TextStyle(
+                  Text(
+                    Localize('Delete Post'),
+                    style: const TextStyle(
                       color: Colors.red,
                     ),
                   ),
@@ -288,9 +494,9 @@ class _CommentsState extends State<Comments> {
                   const SizedBox(
                     width: 10,
                   ),
-                  const Text(
-                    'Report Post',
-                    style: TextStyle(
+                  Text(
+                    Localize('Report Post'),
+                    style: const TextStyle(
                       color: Colors.red,
                     ),
                   ),
@@ -303,258 +509,383 @@ class _CommentsState extends State<Comments> {
         return menuItems;
       },
       color: const Color(0xffffffff),
-      child: SvgPicture.asset(
-        "assets/PostUI/icon-3dots.svg",
-        width: 20,
-        height: 5,
-        color: Colors.black,
+      child: Stack(
+        children: [
+          const Positioned(
+            child: SizedBox(
+              width: 40,
+              height: 25,
+            ),
+          ),
+          Positioned(
+            left: 10,
+            top: 10,
+            child: SvgPicture.asset(
+              "assets/PostUI/icon-3dots.svg",
+              width: 20,
+              height: 5,
+              color: Colors.black,
+            ),
+          ),
+        ],
       ),
     );
 
-    double calculatedHeight = (postContent.length / 25 * 14) + 50;
-    if (postTooLong) calculatedHeight += 35;
-
     return Padding(
-      padding: const EdgeInsets.all(6.0),
-      child: SizedBox(
-        height: calculatedHeight + 100,
-        child: Stack(
-          children: [
-            Positioned(
-              left: 15,
-              child: Container(
-                width: 50, // Set your desired width
-                height: 50, // Set your desired height
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: const ClipOval(
-                    /*child: CachedNetworkImage(
-                    imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
-                    placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
-                    fit: BoxFit.fill,
-                  ),*/
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 50),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      navigateToViewProfile(postID, posterID);
+                    },
+                    child: Container(
+                      width: 50, // Set your desired width
+                      height: 50, // Set your desired height
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
+                          placeholder: (context, url) =>
+                              const CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
                     ),
-              ),
-            ),
-            Positioned(
-              left: 80,
-              top: 14,
-              child: RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                        text: posterName,
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      navigateToViewProfile(postID, posterID);
+                      loadUpdate();
+                    },
+                    child: Row(children: [
+                      Text(
+                        posterName,
                         style: const TextStyle(
                           color: Colors.black,
                           fontFamily: 'Inter',
-                        )),
-                    if (posterIsAdmin)
-                      const TextSpan(
-                        text: ' [Admin]',
-                        style: TextStyle(
-                          color: Color.fromRGBO(4, 57, 39, 100),
+                          fontSize: 22,
                         ),
                       ),
-                  ],
-                ),
+                      (posterIsAdmin)
+                          ? Icon(Icons.shield,
+                              color: Color.fromRGBO(4, 57, 39, 100))
+                          : const SizedBox(),
+                    ]),
+                  ),
+                ],
               ),
-            ),
-            Positioned(
-                left: 80,
-                top: 40,
-                //I'm sorry for my sins
-                child: (userIsAdmin)
-                    ? (deleted)
-                        ? const Text(
-                            "[Deleted By User]",
-                            style: TextStyle(color: Colors.red),
-                          )
-                        : (removed)
-                            ? const Text(
-                                "[Post Removed]",
-                                style: TextStyle(
-                                  color: Colors.red,
-                                ),
-                              )
-                            : const SizedBox()
-                    : const SizedBox()),
-            Positioned(
-              left: 350,
-              top: 22.5,
-              child: Container(
+              Expanded(child: const SizedBox()),
+              Container(
                 child: threeDotMenu,
               ),
-            ),
-            Positioned(
-              left: 40,
-              top: 65,
-              child: Container(
-                height: calculatedHeight,
-                width: 1,
-                color: const Color(0x5f000000),
-              ),
-            ),
-            Positioned(
-              top: 65,
-              left: 55,
-              child: postBodyContainer,
-            ),
-            Positioned(
-              bottom: 33,
-              left: 50,
-              child: GestureDetector(
-                  onTap: () async {
-                    var response = await PostHelper.likePost(postID);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(response['message'])));
-                    setState(() {
-                      post['liked'] = !liked;
-
-                      liked = !liked;
-
-                      if (liked) {
-                        post['likes']++;
-                      } else {
-                        post['likes']--;
-                      }
-                    });
-                  },
-                  child: Icon(
-                    liked ? Icons.favorite : Icons.favorite_border,
-                    color: liked ? Colors.red : Colors.black,
-                    size: 20,
-                  )),
-            ),
-            Positioned(
-              bottom: 15,
-              left: 45,
-              child: Text(formattedLikes, style: const TextStyle(fontSize: 11)),
-            ),
-            Positioned(
-              bottom: 33,
-              left: 85,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => Comments(postID: postID)));
-                  /*ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text("Comment Tapped")));*/
-                },
-                child: SvgPicture.asset(
-                  "assets/PostUI/icon-comment.svg",
-                  height: 20,
-                  width: 20,
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 33,
-              left: 120,
-              child: GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Flag Tapped")));
-                },
-                child: (userIsAdmin)
-                    ? SvgPicture.asset(
-                        "assets/PostUI/icon-flag.svg",
-                        height: 20,
-                        width: 20,
-                        color: Colors.deepOrange,
-                      )
-                    : const SizedBox(),
-              ),
-            ),
-            Positioned(
-              bottom: 33,
-              left: 155,
-              child: (userIsAdmin)
-                  ? (deleted)
-                      ? const SizedBox()
-                      : GestureDetector(
-                          onTap: () async {
-                            await loadRemovalToggle(postID);
-                          },
-                          child: (removed)
-                              ? SvgPicture.asset(
-                                  "assets/PostUI/icon-approve.svg",
-                                  height: 20,
-                                  width: 20,
-                                  color: Colors.green,
-                                )
-                              : SvgPicture.asset(
-                                  "assets/PostUI/icon-remove.svg",
-                                  height: 18,
-                                  width: 18,
-                                  color: Colors.red,
-                                ))
-                  : const SizedBox(),
-            ),
-            Positioned(
-              bottom: 33,
-              left: 280,
-              child: GestureDetector(
-                onTap: () async {
-                  await translatePost(postContent);
-                  if (post['translations'] == '') {
-                    await PostHelper.storeTranslation(
-                        PostHelper.cachedTranslations[postContent]!,
-                        post['_id']);
-                  }
-                  if (mounted) {
-                    setState(() {
-                      if (currentlyTranslated.containsKey(postContent)) {
-                        currentlyTranslated.remove(postContent);
-                      } else {
-                        currentlyTranslated[postContent] =
-                            PostHelper.cachedTranslations[postContent]!;
-                      }
-                    });
-                  }
-                },
-                child: Text(
-                  (currentlyTranslated.containsKey(postContent))
-                      ? "Original Text"
-                      : "Translate",
-                  style: const TextStyle(
-                    color: Color(0xff0094FF),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 60,
-              left: 55,
-              child: postTooLong
-                  ? Container(
-                      child: GestureDetector(
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                              content: Text(
-                                  "Expanded Post (should go to same place as comments)")));
-                        },
-                        child: const Text(
-                          "Post too tall to view on home page.\nPlease click here to expand post.",
-                          style: TextStyle(
-                            color: Color(0x55000000),
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 25, top: 5),
+            child: Row(
+              children: [
+                Flexible(
+                  child: Container(
+                    padding: EdgeInsets.only(left: 10),
+                    decoration: BoxDecoration(
+                      border: Border(
+                          left: BorderSide(width: 1.0, color: Colors.grey)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        (userIsAdmin)
+                            ? (deleted)
+                                ? Text(
+                                    "[${Localize('Deleted By User')}]",
+                                    style: const TextStyle(color: Colors.red),
+                                  )
+                                : (removed)
+                                    ? Text(
+                                        "[${Localize('Post Removed')}]",
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      )
+                                    : const SizedBox()
+                            : const SizedBox(),
+                        (attachmentURL != 'Empty')
+                            ? Container(
+                                padding: EdgeInsets.only(top: 10),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    navigateToViewImage([attachmentURL]);
+                                  },
+                                  child: Container(
+                                    height: 340,
+                                    width: 340,
+                                    color: Colors.black,
+                                    child: CachedNetworkImage(
+                                      imageUrl:
+                                          "$attachmentURL?tr=w-340,h-340,fo-auto",
+                                      placeholder: (context, url) =>
+                                          const CircularProgressIndicator(),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox(),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        RichText(
+                          maxLines: null,
+                          softWrap: true,
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                  text:
+                                      (currentlyTranslated.containsKey(postID))
+                                          ? unescape.convert(PostHelper
+                                              .cachedTranslations[postContent]!)
+                                          : postContent,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: 'Inter',
+                                    fontSize: 18,
+                                  )),
+                              if (isEdited)
+                                TextSpan(
+                                  text: Localize('(Edited)'),
+                                  style: const TextStyle(
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                      ),
-                    )
-                  : const SizedBox(),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(right: 20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  await translatePost(postContent);
+                                  if (dataSource[index]['translations'] == '') {
+                                    await PostHelper.storeTranslation(
+                                        PostHelper
+                                            .cachedTranslations[postContent]!,
+                                        dataSource[index]['_id']);
+                                  }
+                                  if (mounted) {
+                                    setState(() {
+                                      if (currentlyTranslated
+                                          .containsKey(postID)) {
+                                        currentlyTranslated.remove(postID);
+                                      } else {
+                                        currentlyTranslated[postID] = 'True';
+                                      }
+                                    });
+                                  }
+                                },
+                                child: Text(
+                                  (currentlyTranslated.containsKey(postID))
+                                      ? Localize("Original Text")
+                                      : Localize("Translate"),
+                                  style: const TextStyle(
+                                    color: Color(0xff0094FF),
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () async {
+                                    var response =
+                                        await PostHelper.likePost(postID);
+                                    setState(() {
+                                      dataSource[index]['liked'] = !liked;
+
+                                      liked = !liked;
+
+                                      if (liked) {
+                                        dataSource[index]['likes']++;
+                                      } else {
+                                        dataSource[index]['likes']--;
+                                      }
+                                    });
+                                  },
+                                  child: (liked)
+                                      ? Stack(
+                                          children: [
+                                            Positioned(
+                                              left: 1,
+                                              child: SvgPicture.asset(
+                                                'assets/PostUI/icon-heartFilled.svg',
+                                                color: Colors.red,
+                                                height: 30,
+                                                width: 30,
+                                              ),
+                                            ),
+                                            SvgPicture.asset(
+                                              'assets/PostUI/icon-heart.svg',
+                                              color: Colors.black,
+                                              height: 30,
+                                              width: 30,
+                                            )
+                                          ],
+                                        )
+                                      : SvgPicture.asset(
+                                          'assets/PostUI/icon-heart.svg',
+                                          color: Colors.black,
+                                          height: 30,
+                                          width: 30,
+                                        ),
+                                ),
+                                Text(formattedLikes,
+                                    style: const TextStyle(fontSize: 14))
+                              ],
+                            ),
+                            const SizedBox(width: 10),
+                            (postPassed != null)
+                                ? Column(
+                                    children: [
+                                      SvgPicture.asset(
+                                        "assets/PostUI/icon-comment.svg",
+                                        height: 30,
+                                        width: 30,
+                                      ),
+                                      Text(commentNumber,
+                                          style: const TextStyle(fontSize: 14))
+                                    ],
+                                  )
+                                : const SizedBox(),
+                            (userIsAdmin && postPassed != null)
+                                ? const SizedBox(width: 10)
+                                : const SizedBox(),
+                            (userIsAdmin)
+                                ? Column(
+                                    children: [
+                                      GestureDetector(
+                                          onTap: () {
+                                            navigateToAdminView(postID);
+                                          },
+                                          child: SvgPicture.asset(
+                                            "assets/PostUI/icon-flag.svg",
+                                            height: 30,
+                                            width: 30,
+                                            color: (unreviewedReport)
+                                                ? Colors.deepOrange
+                                                : Colors.black,
+                                          )),
+                                      Text(reportNumber,
+                                          style: const TextStyle(fontSize: 14))
+                                    ],
+                                  )
+                                : const SizedBox(),
+                            (userIsAdmin)
+                                ? (deleted)
+                                    ? const SizedBox()
+                                    : const SizedBox(width: 10)
+                                : const SizedBox(),
+                            (userIsAdmin)
+                                ? (deleted)
+                                    ? const SizedBox()
+                                    : GestureDetector(
+                                        onTap: () async {
+                                          await removalAlertDialog(
+                                              context, postID, removed);
+                                        },
+                                        child: (removed)
+                                            ? SvgPicture.asset(
+                                                "assets/PostUI/icon-approve.svg",
+                                                height: 30,
+                                                width: 30,
+                                                color: Colors.green,
+                                              )
+                                            : Container(
+                                                padding:
+                                                    EdgeInsets.only(top: 5),
+                                                child: SvgPicture.asset(
+                                                  "assets/PostUI/icon-remove.svg",
+                                                  height: 24,
+                                                  color: Colors.red,
+                                                ),
+                                              ))
+                                : const SizedBox(),
+                          ],
+                        ),
+                        (postPassed != null)
+                            ? Padding(
+                                padding: EdgeInsets.only(right: 20),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    GestureDetector(
+                                        onTap: () async {
+                                          navigateToCreateComment(postID);
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.reply,
+                                              color: Colors.black,
+                                              size: 30,
+                                            ),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(
+                                              Localize("Reply to User"),
+                                              style: TextStyle(fontSize: 20),
+                                            )
+                                          ],
+                                        )),
+                                  ],
+                                ),
+                              )
+                            : const SizedBox(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    print(widget.postID);
     if (init) {
       firstload();
       init = false;
@@ -564,39 +895,37 @@ class _CommentsState extends State<Comments> {
       userIsAdmin = true;
     }
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        leading: GestureDetector(
-          child: const Icon(
-            Icons.close,
-            color: Colors.black,
-            size: 30,
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.black),
+          leading: GestureDetector(
+            child: const Icon(
+              Icons.close,
+              color: Colors.black,
+              size: 30,
+            ),
+            onTap: () => Navigator.pop(context),
           ),
-          onTap: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          "Comments",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            color: Colors.black,
+          title: Text(
+            Localize("Comments"),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.black,
+            ),
+          ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1.0),
+            child: Container(
+              height: 1.0,
+              color: const Color(0x5f000000),
+            ),
           ),
         ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(
-            height: 1.0,
-            color: const Color(0x5f000000),
-          ),
-        ),
-      ),
-      backgroundColor: const Color(0xffece7d5),
-      body: Column(
-          children: [const SizedBox(height: 5), Expanded(child: _buildPost())]),
-    );
+        backgroundColor: const Color(0xffece7d5),
+        body: _buildList());
   }
 }

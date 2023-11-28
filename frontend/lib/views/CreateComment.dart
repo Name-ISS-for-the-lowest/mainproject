@@ -1,58 +1,31 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frontend/classes/Localize.dart';
-import 'package:frontend/classes/postHelper.dart';
-import 'package:frontend/classes/authHelper.dart';
-import 'package:frontend/views/CoreTemplate.dart';
-import 'package:frontend/views/Comments.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import "dart:io";
+import "package:cached_network_image/cached_network_image.dart";
+import "package:flutter/material.dart";
+import "package:flutter_svg/svg.dart";
+import "package:frontend/classes/Localize.dart";
+import "package:frontend/classes/authHelper.dart";
+import "package:frontend/classes/postHelper.dart";
+import "package:image_picker/image_picker.dart";
 
-class CreatePost extends StatefulWidget {
+class CreateComment extends StatefulWidget {
   final bool isEditing;
-  final bool isCommenting;
   final String? originalText;
   final String? postID;
-  const CreatePost(
-      {super.key,
-      required this.isEditing,
-      required this.isCommenting,
-      this.originalText,
-      this.postID});
+  const CreateComment(
+      {super.key, required this.isEditing, this.originalText, this.postID});
 
   @override
-  State<CreatePost> createState() => _CreatePostState();
+  State<CreateComment> createState() => _CreateCommentState();
 }
 
-class _CreatePostState extends State<CreatePost> {
-  void navigateToPrimaryScreens() {
-    if (mounted) {
-      if (widget.isCommenting) {
-        Navigator.of(context).pop();
-        return;
-      }
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (BuildContext context) {
-            return const Scaffold(
-              body: CoreTemplate(),
-            );
-          },
-        ),
-      );
-    }
-  }
+class _CreateCommentState extends State<CreateComment> {
 
-  static File? imageAttachment;
-  String currentPostBody = "";
+  File? imageAttachment;
+  String currentCommentBody = "";
   bool isSubmitting = false;
 
   Future pickImage() async {
-    final image = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 50,
-    );
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image == null) return;
 
     if (mounted) {
@@ -64,15 +37,12 @@ class _CreatePostState extends State<CreatePost> {
   }
 
   Future pickCamera() async {
-    final image = await ImagePicker().pickImage(
-      source: ImageSource.camera,
-      imageQuality: 50,
-    );
+    final image = await ImagePicker().pickImage(source: ImageSource.camera);
     if (image == null) return;
 
     if (mounted) {
       setState(() {
-        _CreatePostState.imageAttachment = File(image.path);
+        imageAttachment = File(image.path);
       });
     }
     Navigator.of(context).pop();
@@ -110,18 +80,19 @@ class _CreatePostState extends State<CreatePost> {
     );
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     var userInfo = AuthHelper.userInfoCache;
     bool isEditing = widget.isEditing;
-    bool isCommenting = widget.isCommenting;
     String? originalText = widget.originalText;
     String? originalID = widget.postID;
     String imageURL = userInfo['profilePicture.url'];
     String screenName = userInfo['username'];
     String postID;
     if (originalText != null) {
-      currentPostBody = originalText;
+      currentCommentBody = originalText;
     }
     if (originalID == null) {
       postID = "";
@@ -142,16 +113,10 @@ class _CreatePostState extends State<CreatePost> {
               color: Colors.black,
               size: 30,
             ),
-            onTap: () => navigateToPrimaryScreens(),
+            onTap: () => Navigator.pop(context),
           ),
           title: Text(
-            (isEditing)
-                ? (isCommenting)
-                    ? (Localize("Edit Comment"))
-                    : Localize("Edit Post")
-                : (isCommenting)
-                    ? (Localize("New Comment"))
-                    : Localize("New Post"),
+            (isEditing) ? Localize("Edit Comment") : Localize("New Comment"),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -206,35 +171,23 @@ class _CreatePostState extends State<CreatePost> {
                 ),
                 GestureDetector(
                   onTap: () async {
-                    if (currentPostBody == '') {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            Localize("Please add some content to your post.")),
-                      ));
-                      return;
-                    }
                     if (isEditing) {
                       var response =
-                          await PostHelper.editPost(postID, currentPostBody);
+                          await PostHelper.editPost(postID, currentCommentBody);
                     } else {
                       if (isSubmitting == false) {
                         setState(() {
                           isSubmitting = true;
                         });
-                        if (widget.isCommenting) {
-                          var response = await PostHelper.createComment(
-                              userID, currentPostBody, postID, imageAttachment);
-                        } else {
-                          var response = await PostHelper.createPost(
-                              userID, currentPostBody, imageAttachment);
-                        }
+                        var response = await PostHelper.createComment(
+                            userID, currentCommentBody, postID, imageAttachment);
                       }
                     }
 
-                    navigateToPrimaryScreens();
+                    Navigator.pop(context);
                   },
                   child: Text(
-                    Localize("Publish Post"),
+                    Localize("Publish Comment"),
                     style: const TextStyle(
                       color: Color(0xff007EF1),
                     ),
@@ -258,47 +211,26 @@ class _CreatePostState extends State<CreatePost> {
                   ),
                 ),
               ),
-              Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      height: 200,
-                      child: TextField(
-                        autofocus: true,
-                        controller:
-                            TextEditingController(text: currentPostBody),
-                        decoration: InputDecoration(
-                          hintText: Localize("Begin Typing"),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 15.0, horizontal: 10.0),
-                        ),
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        onChanged: (text) {
-                          currentPostBody = text;
-                        },
-                      ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  height: 200,
+                  child: TextField(
+                    controller: TextEditingController(text: currentCommentBody),
+                    decoration: InputDecoration(
+                      hintText: Localize("Begin Typing"),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15.0, horizontal: 10.0),
                     ),
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    onChanged: (text) {
+                      currentCommentBody = text;
+                    },
                   ),
-                  (isEditing)
-                      ? const SizedBox()
-                      : Padding(
-                          padding: const EdgeInsets.only(left: 24.0, top: 0),
-                          child: GestureDetector(
-                            onTap: () {
-                              openCameraDialog(context);
-                            },
-                            child: SvgPicture.asset(
-                              'assets/PostUI/photos.svg',
-                              height: 20,
-                              width: 20,
-                            ),
-                          ),
-                        ),
-                ],
+                ),
               ),
             ],
           ),
@@ -310,12 +242,49 @@ class _CreatePostState extends State<CreatePost> {
                     children: [
                       Positioned(
                         top: 20,
+                        width: 400,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                openCameraDialog(context);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.only(
+                                    top: 8, bottom: 8, left: 16, right: 16),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  border: Border.all(
+                                      color: Colors.black, width: 1.0),
+                                  color: Colors.white,
+                                ),
+                                child: Text(
+                                  (imageAttachment == null)
+                                      ? "Attach Image"
+                                      : "Change Image",
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 50,
                         right: 25,
                         height: 350,
                         width: 350,
                         child: (imageAttachment != null)
                             ? Stack(
                                 children: [
+                                  Positioned(
+                                    child: Container(
+                                      height: 350,
+                                      width: 350,
+                                      color: Colors.black,
+                                    ),
+                                  ),
                                   Positioned(
                                     child: Image.file(
                                       imageAttachment!,
