@@ -73,6 +73,7 @@ class _CommentsState extends State<Comments> {
     return RefreshIndicator(
       onRefresh: () => loadUpdate(),
       child: ListView.builder(
+        itemCount: commentData.length,
         itemBuilder: (BuildContext context, int index) {
           print("Current Index:$index");
           print("Current Length:${commentData.length}");
@@ -1309,8 +1310,8 @@ Widget _buildComment(int index) {
       body: Column(
           children: [
             const SizedBox(height: 5), 
-            Expanded(child: _buildPost()),
-            Expanded(
+            Flexible(child: _buildPost()),
+            Flexible(
               child: (commentData.isNotEmpty)
                 ? _buildList()
                 : Center(
