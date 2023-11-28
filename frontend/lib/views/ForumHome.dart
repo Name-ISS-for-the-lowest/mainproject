@@ -617,6 +617,356 @@ class _ForumHomeState extends State<ForumHome> {
     }
 
     return Padding(
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 50),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      navigateToViewProfile(postID, posterID);
+                    },
+                    child: Container(
+                      width: 50, // Set your desired width
+                      height: 50, // Set your desired height
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
+                          placeholder: (context, url) =>
+                              const CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      navigateToViewProfile(postID, posterID);
+                      loadUpdate();
+                    },
+                    child: Row(children: [
+                      Text(
+                        posterName,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'Inter',
+                          fontSize: 20,
+                        ),
+                      ),
+                      (posterIsAdmin)
+                          ? Icon(Icons.shield,
+                              color: Color.fromRGBO(4, 57, 39, 100))
+                          : const SizedBox(),
+                    ]),
+                  ),
+                ],
+              ),
+              Expanded(child: const SizedBox()),
+              Container(
+                child: threeDotMenu,
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 25, top: 5),
+            child: Row(
+              children: [
+                Flexible(
+                  child: Container(
+                    padding: EdgeInsets.only(left: 10),
+                    decoration: BoxDecoration(
+                      border: Border(
+                          left: BorderSide(width: 1.0, color: Colors.grey)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        (userIsAdmin)
+                            ? (deleted)
+                                ? Text(
+                                    "[${Localize('Deleted By User')}]",
+                                    style: const TextStyle(color: Colors.red),
+                                  )
+                                : (removed)
+                                    ? Text(
+                                        "[${Localize('Post Removed')}]",
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      )
+                                    : const SizedBox()
+                            : const SizedBox(),
+                        (attachmentURL != 'Empty')
+                            ? Container(
+                                padding: EdgeInsets.only(top: 10),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    navigateToViewImage([attachmentURL]);
+                                  },
+                                  child: Container(
+                                    height: 340,
+                                    width: 340,
+                                    color: Colors.black,
+                                    child: CachedNetworkImage(
+                                      imageUrl:
+                                          "$attachmentURL?tr=w-340,h-340,fo-auto",
+                                      placeholder: (context, url) =>
+                                          const CircularProgressIndicator(),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox(),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        RichText(
+                          maxLines: null,
+                          softWrap: true,
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                  text:
+                                      (currentlyTranslated.containsKey(postID))
+                                          ? unescape.convert(PostHelper
+                                              .cachedTranslations[postContent]!)
+                                          : postContent,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: 'Inter',
+                                    fontSize: 18,
+                                  )),
+                              if (isEdited)
+                                TextSpan(
+                                  text: Localize('(Edited)'),
+                                  style: const TextStyle(
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        postTooLong
+                            ? Container(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text(Localize(
+                                                "Expanded Post (should go to same place as comments)"))));
+                                  },
+                                  child: SizedBox(
+                                    width: 250,
+                                    child: Text(
+                                      Localize(
+                                          "Post too tall to view on home page. Please click here to expand post."),
+                                      style: const TextStyle(
+                                        color: Color(0x55000000),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox(),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(right: 20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  await translatePost(postContent, index);
+                                  if (postData[index]['translations'] == '') {
+                                    await PostHelper.storeTranslation(
+                                        PostHelper
+                                            .cachedTranslations[postContent]!,
+                                        postData[index]['_id']);
+                                  }
+                                  if (mounted) {
+                                    setState(() {
+                                      if (currentlyTranslated
+                                          .containsKey(postID)) {
+                                        currentlyTranslated.remove(postID);
+                                      } else {
+                                        currentlyTranslated[postID] = 'True';
+                                      }
+                                    });
+                                  }
+                                },
+                                child: Text(
+                                  (currentlyTranslated.containsKey(postID))
+                                      ? Localize("Original Text")
+                                      : Localize("Translate"),
+                                  style: const TextStyle(
+                                    color: Color(0xff0094FF),
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () async {
+                                    var response =
+                                        await PostHelper.likePost(postID);
+                                    setState(() {
+                                      postData[index]['liked'] = !liked;
+
+                                      liked = !liked;
+
+                                      if (liked) {
+                                        postData[index]['likes']++;
+                                      } else {
+                                        postData[index]['likes']--;
+                                      }
+                                    });
+                                  },
+                                  child: (liked)
+                                      ? Stack(
+                                          children: [
+                                            Positioned(
+                                              left: 1,
+                                              child: SvgPicture.asset(
+                                                'assets/PostUI/icon-heartFilled.svg',
+                                                color: Colors.red,
+                                                height: 30,
+                                                width: 30,
+                                              ),
+                                            ),
+                                            SvgPicture.asset(
+                                              'assets/PostUI/icon-heart.svg',
+                                              color: Colors.black,
+                                              height: 30,
+                                              width: 30,
+                                            )
+                                          ],
+                                        )
+                                      : SvgPicture.asset(
+                                          'assets/PostUI/icon-heart.svg',
+                                          color: Colors.black,
+                                          height: 30,
+                                          width: 30,
+                                        ),
+                                ),
+                                Text(formattedLikes,
+                                    style: const TextStyle(fontSize: 14))
+                              ],
+                            ),
+                            const SizedBox(width: 10),
+                            Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                Comments(postID: postID)));
+                                    /*ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Comment Tapped")));*/
+                                  },
+                                  child: SvgPicture.asset(
+                                    "assets/PostUI/icon-comment.svg",
+                                    height: 30,
+                                    width: 30,
+                                  ),
+                                ),
+                                Text(commentNumber,
+                                    style: const TextStyle(fontSize: 14))
+                              ],
+                            ),
+                            (userIsAdmin)
+                                ? const SizedBox(width: 10)
+                                : const SizedBox(),
+                            (userIsAdmin)
+                                ? Column(
+                                    children: [
+                                      GestureDetector(
+                                          onTap: () {
+                                            navigateToAdminView(postID);
+                                          },
+                                          child: SvgPicture.asset(
+                                            "assets/PostUI/icon-flag.svg",
+                                            height: 30,
+                                            width: 30,
+                                            color: (unreviewedReport)
+                                                ? Colors.deepOrange
+                                                : Colors.black,
+                                          )),
+                                      Text(reportNumber,
+                                          style: const TextStyle(fontSize: 14))
+                                    ],
+                                  )
+                                : const SizedBox(),
+                            (userIsAdmin)
+                                ? (deleted)
+                                    ? const SizedBox()
+                                    : const SizedBox(width: 10)
+                                : const SizedBox(),
+                            (userIsAdmin)
+                                ? (deleted)
+                                    ? const SizedBox()
+                                    : GestureDetector(
+                                        onTap: () async {
+                                          await loadRemovalToggle(postID);
+                                        },
+                                        child: (removed)
+                                            ? SvgPicture.asset(
+                                                "assets/PostUI/icon-approve.svg",
+                                                height: 30,
+                                                width: 30,
+                                                color: Colors.green,
+                                              )
+                                            : Container(
+                                                padding:
+                                                    EdgeInsets.only(top: 5),
+                                                child: SvgPicture.asset(
+                                                  "assets/PostUI/icon-remove.svg",
+                                                  height: 24,
+                                                  color: Colors.red,
+                                                ),
+                                              ))
+                                : const SizedBox(),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+
+    /*return Padding(
       padding: const EdgeInsets.all(6.0),
       child: SizedBox(
         height: calculatedHeight + 110,
@@ -664,8 +1014,10 @@ class _ForumHomeState extends State<ForumHome> {
                       fontSize: 20,
                     ),
                   ),
-                  Icon(Icons.shield_sharp,
-                      color: Color.fromRGBO(4, 57, 39, 100))
+                  (posterIsAdmin)
+                      ? Icon(Icons.shield,
+                          color: Color.fromRGBO(4, 57, 39, 100))
+                      : const SizedBox(),
                 ]),
               ),
             ),
@@ -829,6 +1181,31 @@ class _ForumHomeState extends State<ForumHome> {
                           ],
                         )
                       : const SizedBox(),
+                  (userIsAdmin)
+                      ? (deleted)
+                          ? const SizedBox()
+                          : const SizedBox(width: 10)
+                      : const SizedBox(),
+                  (userIsAdmin)
+                      ? (deleted)
+                          ? const SizedBox()
+                          : GestureDetector(
+                              onTap: () async {
+                                await loadRemovalToggle(postID);
+                              },
+                              child: (removed)
+                                  ? SvgPicture.asset(
+                                      "assets/PostUI/icon-approve.svg",
+                                      height: 30,
+                                      width: 30,
+                                      color: Colors.green,
+                                    )
+                                  : SvgPicture.asset(
+                                      "assets/PostUI/icon-remove.svg",
+                                      height: 24,
+                                      color: Colors.red,
+                                    ))
+                      : const SizedBox(),
                 ],
               ),
             ),
@@ -892,7 +1269,7 @@ class _ForumHomeState extends State<ForumHome> {
           ],
         ),
       ),
-    );
+    );*/
   }
 
   Widget AdminOptions() {
