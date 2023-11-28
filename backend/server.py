@@ -52,7 +52,8 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/setProfilePictureOnSignUp"
             or request.url.path == "/resetPassword"
             or match
-            or request.url.path == "/getEvents"
+            # or request.url.path == "/getEvents"
+            # or request.url.path == "/getPosts"
         ):
             return await call_next(request)
         # check if the user has a cookie
@@ -289,6 +290,12 @@ def createPost(postBody: str, imageURL: str, imageFileID: str, request: Request)
     DBManager.addPost(id, postBody, imageURL, imageFileID)
     return JSONResponse({"message": "Post Added"}, status_code=200)
 
+@app.post("/createComment")
+def createPost(postBody: str, imageURL: str, imageFileID: str, parentID: str, request: Request):
+    id = IdFromCookie(request.cookies["session_cookie"])
+    DBManager.addComment(id, postBody, imageURL, imageFileID, parentID)
+    return JSONResponse({"message": "Post Added"}, status_code=200)
+
 
 @app.post("/editPost")
 def editPost(postID: str, postBody: str, request: Request):
@@ -310,7 +317,7 @@ def toggleRemovalOfPost(postID: str, forceRemove: str, request: Request):
 
 @app.get("/getPosts")
 def getPosts(
-    start: int,
+    start: str,
     end: int,
     showReported: str,
     showRemoved: str,
@@ -327,14 +334,49 @@ def getPosts(
         showRemoved=showRemoved,
         userID=userID,
     )
-    posts = Post.listToJson(posts)
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    user = DBManager.getUserById(userID)
+    userLang = user['language']
+    posts = Post.listToJson(posts, userLang)
+    print("posts: ", len(posts))
     return posts
+
+@app.get("/getComments")
+def getComments(
+    parentID: str,
+    request: Request,
+):
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    # print("userID: ", userID)
+    comments = DBManager.getComments(parentID=parentID, userID=userID)
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    user = DBManager.getUserById(userID)
+    userLang = user['language']
+    comments = Post.listToJson(comments, userLang)
+    return comments
+
+@app.get("/getParents")
+def getParents(
+    parentID: str,
+    request: Request,
+):
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    # print("userID: ", userID)
+    comments = DBManager.getParents(parentID=parentID,)
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    user = DBManager.getUserById(userID)
+    userLang = user['language']
+    comments = Post.listToJson(comments, userLang)
+    return comments
 
 
 @app.get("/getPostByID")
 def getPostByID(postID: str, request: Request):
     post = DBManager.getPostByID(postID)
-    post = Post.toJson(post)
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    user = DBManager.getUserById(userID)
+    userLang = user['language']
+    post = Post.toJson(post, userLang)
     return post
 
 
@@ -408,6 +450,7 @@ def getUserByID(userID: str, request: Request):
         "profilePicture.url": pfpUrl,
         "profilePicture.fileId": pfpFileId,
         "admin": str(userDict["admin"]),
+        "banned": userDict["banned"],
     }
     return JSONResponse(content=returnedDict, status_code=200)
 
@@ -424,6 +467,12 @@ def updateUser(data: userinfo, request: Request):
         profilePictureURL=data.profilePictureURL,
     )
     return JSONResponse(content="User Updated", status_code=200)
+
+
+@app.post("/banUser")
+def banUser(adminID: str, bannedID: str, banMessage: str, request: Request):
+    DBManager.banUser(adminID=adminID, bannedID=bannedID, banMessage=banMessage)
+    return JSONResponse(content="User Banned", status_code=200)
 
 
 @app.post("/searchPosts", summary="Search Posts using a String input")
@@ -444,7 +493,10 @@ def searchPosts(data: postsearch):
         showReported=showReported,
         userID=userID,
     )
-    posts = Post.listToJson(posts)
+    userIDz = IdFromCookie(request.cookies["session_cookie"])
+    user = DBManager.getUserById(userIDz)
+    userLang = user['language']
+    posts = Post.listToJson(posts, userLang)
     return posts
 
 

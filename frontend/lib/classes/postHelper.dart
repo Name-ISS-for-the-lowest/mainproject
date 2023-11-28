@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/routeHandler.dart';
 
@@ -10,15 +11,15 @@ class PostHelper {
   static Map<String, String> cachedTranslations = {};
 
   static Future<Response> createPost(
-      String userID, String postBody, File? Photo) async {
+      String userID, String postBody, File? photo) async {
     Map<String, dynamic> params;
     String endPoint;
     String? imageURL;
     String? fileID;
     String url;
-    if (Photo != null) {
-      var formData = FormData.fromMap({
-        'photo': await MultipartFile.fromFile(Photo.path,
+    if (photo != null) {
+      FormData formData = FormData.fromMap({
+        'photo': await MultipartFile.fromFile(photo.path,
             filename: AuthHelper.userInfoCache['username'] + '_postAttachment'),
       });
       params = {
@@ -27,15 +28,30 @@ class PostHelper {
       };
       endPoint = '/uploadPhoto';
       url = '$defaultHost$endPoint';
+      print("made it here");
       try {
         final response = await RouteHandler.dio.post(url,
             data: formData,
             queryParameters: params,
             options:
                 Options(contentType: Headers.multipartFormDataContentType));
+
         imageURL = response.data['url'];
         fileID = response.data['fileId'];
       } on DioException catch (e) {
+        print("error $e");
+        if (e.response!.statusCode == 413) {
+          //can I try reducing the size of the image
+          ImageProvider image = FileImage(
+            photo,
+          );
+
+          return Response(
+            requestOptions: RequestOptions(path: url),
+            data: {'message': 'File too large'},
+            statusCode: 413,
+          );
+        }
         return Response(
           requestOptions: RequestOptions(path: url),
           data: {'message': e},
@@ -88,6 +104,67 @@ class PostHelper {
     }
   }
 
+  static Future<Response> createComment(
+      String userID, String postBody, String postID, File? Photo) async {
+    Map<String, dynamic> params;
+    String endPoint;
+    String? imageURL;
+    String? fileID;
+    String url;
+    if (Photo != null) {
+      var formData = FormData.fromMap({
+        'photo': await MultipartFile.fromFile(Photo.path,
+            filename: AuthHelper.userInfoCache['username'] + '_postAttachment'),
+      });
+      params = {
+        'name': AuthHelper.userInfoCache['username'],
+        'type': 'postAttachments'
+      };
+      endPoint = '/uploadPhoto';
+      url = '$defaultHost$endPoint';
+      try {
+        final response = await RouteHandler.dio.post(url,
+            data: formData,
+            queryParameters: params,
+            options:
+                Options(contentType: Headers.multipartFormDataContentType));
+        imageURL = response.data['url'];
+        fileID = response.data['fileId'];
+      } on DioException catch (e) {
+        return Response(
+          requestOptions: RequestOptions(path: url),
+          data: {'message': e},
+          statusCode: 500,
+        );
+      }
+    }
+    endPoint = '/createComment';
+    url = '$defaultHost$endPoint';
+    params = {
+      'postBody': postBody,
+      'imageURL': 'False',
+      'imageFileID': 'False',
+      'parentID': postID
+    };
+    if (imageURL != null) {
+      params['imageURL'] = imageURL;
+      params['imageFileID'] = fileID;
+    }
+
+    try {
+      final response = await RouteHandler.dio.post(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
   static Future<Response> deletePost(String postID) async {
     final params = {'postID': postID};
     String endPoint = '/deletePost';
@@ -125,13 +202,13 @@ class PostHelper {
     }
   }
 
-  static getPosts(int start, int end,
+  static getPosts(String start, int end,
       [Map<String, String>? specialSearchOptions]) async {
     specialSearchOptions ??= {
-        'showReported': 'All',
-        'showRemoved': 'None',
-        'showDeleted': 'None'
-      };
+      'showReported': 'All',
+      'showRemoved': 'None',
+      'showDeleted': 'None'
+    };
     final params = {
       'start': start,
       'end': end,
@@ -140,6 +217,46 @@ class PostHelper {
       'showDeleted': specialSearchOptions['showDeleted'],
     };
     String endPoint = '/getPosts';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.get(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static getComments(String parentID) async {
+    final params = {
+      'parentID': parentID,
+    };
+    String endPoint = '/getComments';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.get(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static getParents(String parentID) async {
+    final params = {
+      'parentID': parentID,
+    };
+    String endPoint = '/getParents';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.get(url,
@@ -195,13 +312,13 @@ class PostHelper {
     }
   }
 
-  static searchPosts(int start, int end, String search, String userID,
+  static searchPosts(String start, int end, String search, String userID,
       [Map<String, String>? specialSearchOptions]) async {
     specialSearchOptions ??= {
-        'showReported': 'All',
-        'showRemoved': 'None',
-        'showDeleted': 'None'
-      };
+      'showReported': 'All',
+      'showRemoved': 'None',
+      'showDeleted': 'None'
+    };
     final data = {
       'start': start,
       'end': end,

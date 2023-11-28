@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/postHelper.dart';
-import 'package:frontend/views/CoreTemplate.dart';
+import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/views/ConfirmReport.dart';
+import 'package:frontend/views/CoreTemplate.dart';
 
 class ReportPage extends StatefulWidget {
   String postID;
@@ -22,23 +23,15 @@ class _ReportPageState extends State<ReportPage> {
   };
 
   final Map<String, String> textToArg = {
-    'Hate Speech': 'hateSpeech',
-    'Illegal Content': 'illegalContent',
-    'Targeted Harassment': 'targetedHarassment',
-    'Inappropriate Content': 'inappropriateContent',
-    'Other Reason': 'otherReason'
+    Localize('Hate Speech'): 'hateSpeech',
+    Localize('Illegal Content'): 'illegalContent',
+    Localize('Targeted Harassment'): 'targetedHarassment',
+    Localize('Inappropriate Content'): 'inappropriateContent',
+    Localize('Other Reason'): 'otherReason'
   };
 
   void navigateToPrimaryScreens() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return const Scaffold(
-            body: CoreTemplate(),
-          );
-        },
-      ),
-    );
+    Navigator.of(context).pop();
   }
 
   void navigateToConfirm() {
@@ -70,8 +63,8 @@ class _ReportPageState extends State<ReportPage> {
             ),
             onTap: () => navigateToPrimaryScreens(),
           ),
-          title: const Text(
-            "Report Post",
+          title: Text(
+            Localize("Report Post"),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -91,11 +84,11 @@ class _ReportPageState extends State<ReportPage> {
         children: [
           Container(
               padding: const EdgeInsets.all(20.0),
-              child: const Column(
+              child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Are you sure you want to report this post?",
+                      Localize("Are you sure you want to report this post?"),
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
@@ -104,13 +97,15 @@ class _ReportPageState extends State<ReportPage> {
                     ),
                     SizedBox(height: 20),
                     Text(
-                      "We at International Student Station take reports very seriously, and highly encourage our users to report posts when they feel as if our rules are broken.",
+                      Localize(
+                          "We at International Student Station take reports very seriously, and highly encourage our users to report posts when they feel as if our rules are broken."),
                       style: TextStyle(fontSize: 17),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 20),
                     Text(
-                      "Please select the rule(s) you felt were violated in the post, and hit submit if you would like to file a report. Alternatively, hit the close button on the top left of your screen to cancel the report.",
+                      Localize(
+                          "Please select the rule(s) you felt were violated in the post, and hit submit if you would like to file a report. Alternatively, hit the close button on the top left of your screen to cancel the report."),
                       style: TextStyle(fontSize: 17),
                       textAlign: TextAlign.center,
                     ),
@@ -126,7 +121,7 @@ class _ReportPageState extends State<ReportPage> {
                           !reasonsSelected['hateSpeech']!;
                     });
                   },
-                  child: buildMenu('Hate Speech'),
+                  child: buildMenu(Localize('Hate Speech')),
                 ),
                 const SizedBox(
                   height: 20,
@@ -138,7 +133,7 @@ class _ReportPageState extends State<ReportPage> {
                           !reasonsSelected['illegalContent']!;
                     });
                   },
-                  child: buildMenu('Illegal Content'),
+                  child: buildMenu(Localize('Illegal Content')),
                 ),
                 const SizedBox(
                   height: 20,
@@ -150,7 +145,7 @@ class _ReportPageState extends State<ReportPage> {
                           !reasonsSelected['targetedHarassment']!;
                     });
                   },
-                  child: buildMenu('Targeted Harassment'),
+                  child: buildMenu(Localize('Targeted Harassment')),
                 ),
                 const SizedBox(
                   height: 20,
@@ -162,7 +157,7 @@ class _ReportPageState extends State<ReportPage> {
                           !reasonsSelected['inappropriateContent']!;
                     });
                   },
-                  child: buildMenu('Inappropriate Content'),
+                  child: buildMenu(Localize('Inappropriate Content')),
                 ),
                 const SizedBox(
                   height: 20,
@@ -174,7 +169,7 @@ class _ReportPageState extends State<ReportPage> {
                           !reasonsSelected['otherReason']!;
                     });
                   },
-                  child: buildMenu('Other Reason'),
+                  child: buildMenu(Localize('Other Reason')),
                 ),
               ])),
           const SizedBox(height: 16.0),
@@ -186,8 +181,8 @@ class _ReportPageState extends State<ReportPage> {
               navigateToConfirm();
               print(widget.postID);
             },
-            child: const Text(
-              "Submit",
+            child: Text(
+              Localize("Submit"),
               style: TextStyle(
                 fontSize: 20,
                 color: Color(0xff007EF1),

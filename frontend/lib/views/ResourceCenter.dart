@@ -41,7 +41,7 @@ class _ResourceCenterState extends State<ResourceCenter> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                height: 38,
+                height: 50,
                 width: 100,
                 child: Text(
                     textAlign: TextAlign.center,

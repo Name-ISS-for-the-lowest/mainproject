@@ -1,6 +1,6 @@
 from classes.DBManager import *
 
-adminEmails = ["Mr.Whiskers@example.com", "Good_Boy@example.com", "Kevin@example.com", "Luna@example.com", "dylancochran@csus.edu"]
+adminEmails = ["Mr.Whiskers@example.com", "Good_Boy@example.com", "Kevin@example.com", "Luna@example.com", "dylancochran@csus.edu", "tjudt-martine@csus.edu"]
 
 def setAdmins():
     DBManager.setAdmins(adminEmails)
