@@ -30,15 +30,7 @@ class _ReportPageState extends State<ReportPage> {
   };
 
   void navigateToPrimaryScreens() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return const Scaffold(
-            body: CoreTemplate(),
-          );
-        },
-      ),
-    );
+    Navigator.of(context).pop();
   }
 
   void navigateToConfirm() {

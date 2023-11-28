@@ -170,12 +170,20 @@ class _ForumHomeState extends State<ForumHome> {
         return;
       }
     } else {
-      var translationCall = await PostHelper.getTranslation(originalText);
-      if (mounted) {
-        setState(() {
-          String returnedTranslation = translationCall['result'];
-          PostHelper.cachedTranslations[originalText] = returnedTranslation;
-        });
+      if (originalText == '') {
+        if (mounted) {
+          setState(() {
+            PostHelper.cachedTranslations[originalText] = '';
+          });
+        }
+      } else {
+        var translationCall = await PostHelper.getTranslation(originalText);
+        if (mounted) {
+          setState(() {
+            String returnedTranslation = translationCall['result'];
+            PostHelper.cachedTranslations[originalText] = returnedTranslation;
+          });
+        }
       }
     }
   }
@@ -186,11 +194,16 @@ class _ForumHomeState extends State<ForumHome> {
         builder: (BuildContext context) {
           return Scaffold(
             body: CreatePost(
-                isEditing: true, originalText: postContent, postID: postID),
+              isEditing: true,
+              originalText: postContent,
+              postID: postID,
+            ),
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToReportPost(String postID) {
@@ -202,7 +215,9 @@ class _ForumHomeState extends State<ForumHome> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToAdminView(String postID) {
@@ -214,11 +229,13 @@ class _ForumHomeState extends State<ForumHome> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToViewProfile(String postID, String posterID) {
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
           return Scaffold(
@@ -226,7 +243,9 @@ class _ForumHomeState extends State<ForumHome> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToViewImage(List<String> inputs) {
@@ -238,7 +257,9 @@ class _ForumHomeState extends State<ForumHome> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToConfirmPost() {
@@ -250,7 +271,9 @@ class _ForumHomeState extends State<ForumHome> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void deletePost(String postID) {
@@ -410,7 +433,7 @@ class _ForumHomeState extends State<ForumHome> {
     );
 
     PopupMenuButton<String> threeDotMenu = PopupMenuButton<String>(
-      onSelected: (String result) {
+      onSelected: (String result) async {
         // Handle the selected option
         if (result == 'closeMenu') {
           // Closes menu and does absolutely nothing
@@ -573,7 +596,7 @@ class _ForumHomeState extends State<ForumHome> {
             Positioned(
               left: 15,
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
                   navigateToViewProfile(postID, posterID);
                 },
                 child: Container(
@@ -587,7 +610,8 @@ class _ForumHomeState extends State<ForumHome> {
                       imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
                       placeholder: (context, url) =>
                           const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -598,8 +622,9 @@ class _ForumHomeState extends State<ForumHome> {
               left: 80,
               top: 14,
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
                   navigateToViewProfile(postID, posterID);
+                  loadUpdate();
                 },
                 child: RichText(
                   text: TextSpan(

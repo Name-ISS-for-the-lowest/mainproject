@@ -1,6 +1,8 @@
 import 'package:frontend/classes/authHelper.dart';
 
 import 'package:frontend/classes/Data.dart';
+import 'dart:ui';
+import 'dart:ui' as ui;
 
 class Localizer {
   static final Map<String, dynamic> _localizedValues = Data.localizations;
@@ -19,7 +21,8 @@ class Localizer {
 
 String Localize(String text) {
   //get defualt language
-  String defaultLanguage = 'en';
+  Locale systemLocale = ui.window.locale;
+  String defaultLanguage = systemLocale.languageCode;
   if (AuthHelper.userInfoCache['language'] != null) {
     defaultLanguage = AuthHelper.userInfoCache['language'];
   }

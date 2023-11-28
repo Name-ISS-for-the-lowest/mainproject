@@ -10,15 +10,7 @@ class ConfirmReport extends StatefulWidget {
 
 class _ConfirmReportState extends State<ConfirmReport> {
   void navigateToPrimaryScreens() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return const Scaffold(
-            body: CoreTemplate(),
-          );
-        },
-      ),
-    );
+    Navigator.of(context).pop();
   }
 
   @override

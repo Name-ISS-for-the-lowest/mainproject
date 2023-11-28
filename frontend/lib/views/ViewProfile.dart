@@ -24,15 +24,7 @@ class _ViewProfileState extends State<ViewProfile> {
   int contentIndex = 0;
 
   void navigateToPrimaryScreens() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return const Scaffold(
-            body: CoreTemplate(),
-          );
-        },
-      ),
-    );
+    Navigator.of(context).pop();
   }
 
   void navigateToViewImage(List<String> inputs) {
