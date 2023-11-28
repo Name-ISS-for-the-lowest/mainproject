@@ -311,7 +311,7 @@ def toggleRemovalOfPost(postID: str, forceRemove: str, request: Request):
 
 @app.get("/getPosts")
 def getPosts(
-    start: int,
+    start: str,
     end: int,
     showReported: str,
     showRemoved: str,
