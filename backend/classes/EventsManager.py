@@ -45,6 +45,7 @@ class EventsManager:
                     "Content-Type": "application/json",
                 },
             )
+            print(results)
             finalList = results.json()["result"]
             for event in events:
                 event.title[lang] = finalList.pop(0)

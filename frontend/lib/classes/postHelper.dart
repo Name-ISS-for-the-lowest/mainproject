@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/routeHandler.dart';
 
@@ -10,15 +11,19 @@ class PostHelper {
   static Map<String, String> cachedTranslations = {};
 
   static Future<Response> createPost(
-      String userID, String postBody, File? Photo) async {
+      String userID, String postBody, File? photo, dynamic context) async {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Uploading post...'),
+    ));
+
     Map<String, dynamic> params;
     String endPoint;
     String? imageURL;
     String? fileID;
     String url;
-    if (Photo != null) {
+    if (photo != null) {
       var formData = FormData.fromMap({
-        'photo': await MultipartFile.fromFile(Photo.path,
+        'photo': await MultipartFile.fromFile(photo.path,
             filename: AuthHelper.userInfoCache['username'] + '_postAttachment'),
       });
       params = {

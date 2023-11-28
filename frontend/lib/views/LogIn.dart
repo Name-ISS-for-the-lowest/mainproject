@@ -311,40 +311,43 @@ class _LogInState extends State<LogIn> {
 
             //New User Forms Begin here -------------------------------
             Positioned(
-              bottom: 42,
-              child: Column(
-                children: [
-                  //This part is just text and formatting
-                  Text(
-                    Localize('Don\'t have an account?'),
-                    style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Color.fromRGBO(230, 183, 17, 1)),
-                  ),
-                  //Spacer
-                  const SizedBox(
-                    height: 9,
-                  ),
-                  //Sign Up button Formatting
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(330, 50),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5.0)),
-                      backgroundColor: const Color.fromRGBO(221, 151, 26, 1),
-                      foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
-                      textStyle: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+              top: screenHeight - 200,
+              child: SizedBox(
+                height: 300,
+                child: Column(
+                  children: [
+                    //This part is just text and formatting
+                    Text(
+                      Localize('Don\'t have an account?'),
+                      style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Color.fromRGBO(230, 183, 17, 1)),
                     ),
-                    child: Text(Localize('Sign Up')),
-                    onPressed: () => {navigateToSignUp()},
-                  ),
-                ],
+                    //Spacer
+                    const SizedBox(
+                      height: 9,
+                    ),
+                    //Sign Up button Formatting
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(330, 50),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0)),
+                        backgroundColor: const Color.fromRGBO(221, 151, 26, 1),
+                        foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
+                        textStyle: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      child: Text(Localize('Sign Up')),
+                      onPressed: () => {navigateToSignUp()},
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

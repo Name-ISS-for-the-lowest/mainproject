@@ -193,7 +193,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                 ))),
 
             Positioned(
-              bottom: 42,
+              top: screenHeight - 200,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   fixedSize: const Size(330, 50),

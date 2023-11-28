@@ -192,7 +192,7 @@ class _CreatePostState extends State<CreatePost> {
                           isSubmitting = true;
                         });
                         var response = await PostHelper.createPost(
-                            userID, currentPostBody, imageAttachment);
+                            userID, currentPostBody, imageAttachment, context);
                       }
                     }
 
