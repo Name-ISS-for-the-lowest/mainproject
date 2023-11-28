@@ -286,6 +286,11 @@ class _ForumHomeState extends State<ForumHome> {
     });
   }
 
+  void navigateToComments(String postID) {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => Comments(postID: postID)));
+  }
+
   void deletePost(String postID) {
     loadDelete(postID);
   }
@@ -427,40 +432,6 @@ class _ForumHomeState extends State<ForumHome> {
     }
 
     String commentNumber = '0';
-
-    SizedBox postBodyContainer = SizedBox(
-      width: 280,
-      child: Builder(
-        builder: (BuildContext context) {
-          return RichText(
-            softWrap: true,
-            text: TextSpan(
-              children: [
-                TextSpan(
-                    text: (currentlyTranslated.containsKey(postID))
-                        ? unescape.convert(
-                            PostHelper.cachedTranslations[postContent]!)
-                        : postContent,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: Colors.black,
-                      fontFamily: 'Inter',
-                    )),
-                if (isEdited)
-                  TextSpan(
-                    text: Localize('(Edited)'),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey,
-                    ),
-                  ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
 
     PopupMenuButton<String> threeDotMenu = PopupMenuButton<String>(
       onSelected: (String result) async {
@@ -662,7 +633,7 @@ class _ForumHomeState extends State<ForumHome> {
                         style: const TextStyle(
                           color: Colors.black,
                           fontFamily: 'Inter',
-                          fontSize: 20,
+                          fontSize: 22,
                         ),
                       ),
                       (posterIsAdmin)
@@ -750,6 +721,7 @@ class _ForumHomeState extends State<ForumHome> {
                                           : postContent,
                                   style: const TextStyle(
                                     color: Colors.black,
+                                    fontFamily: 'Inter',
                                     fontSize: 18,
                                   )),
                               if (isEdited)
@@ -767,10 +739,7 @@ class _ForumHomeState extends State<ForumHome> {
                             ? Container(
                                 child: GestureDetector(
                                   onTap: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                            content: Text(Localize(
-                                                "Expanded Post (should go to same place as comments)"))));
+                                    navigateToComments(postID);
                                   },
                                   child: SizedBox(
                                     width: 250,
@@ -883,13 +852,7 @@ class _ForumHomeState extends State<ForumHome> {
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                Comments(postID: postID)));
-                                    /*ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Comment Tapped")));*/
+                                    navigateToComments(postID);
                                   },
                                   child: SvgPicture.asset(
                                     "assets/PostUI/icon-comment.svg",

@@ -33,7 +33,6 @@ class _CommentsState extends State<Comments> {
   //for the comments of the post
   var commentData = [];
 
-
   Future load() async {
     var dataCall = await PostHelper.getPostByID(widget.postID);
     var comCall = await PostHelper.getComments(widget.postID);
@@ -69,10 +68,11 @@ class _CommentsState extends State<Comments> {
     loadDelete(postID);
   }
 
-    Widget _buildList() {
+  Widget _buildList() {
     return RefreshIndicator(
       onRefresh: () => loadUpdate(),
       child: ListView.builder(
+        itemCount: commentData.length,
         itemBuilder: (BuildContext context, int index) {
           print("Current Index:$index");
           print("Current Length:${commentData.length}");
@@ -103,7 +103,7 @@ class _CommentsState extends State<Comments> {
     }
   }
 
-    Future<void> loadUpdate() async {
+  Future<void> loadUpdate() async {
     var dataCall = await PostHelper.getComments(widget.postID);
     if (mounted) {
       setState(() {
@@ -147,14 +147,14 @@ class _CommentsState extends State<Comments> {
       MaterialPageRoute(
         builder: (BuildContext context) {
           return Scaffold(
-            body: ViewProfile(posterID: posterID),
+            body: ViewProfile(postID: postID, posterID: posterID),
           );
         },
       ),
     );
   }
 
-    void navigateToViewImage(List<String> inputs) {
+  void navigateToViewImage(List<String> inputs) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
@@ -166,7 +166,7 @@ class _CommentsState extends State<Comments> {
     );
   }
 
-    void navigateToAdminView(String postID) {
+  void navigateToAdminView(String postID) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
@@ -178,7 +178,7 @@ class _CommentsState extends State<Comments> {
     );
   }
 
-    void navigateToReportPost(String postID) {
+  void navigateToReportPost(String postID) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
@@ -190,7 +190,7 @@ class _CommentsState extends State<Comments> {
     );
   }
 
-    void navigateToConfirmPost() {
+  void navigateToConfirmPost() {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
@@ -233,7 +233,7 @@ class _CommentsState extends State<Comments> {
         child: CircularProgressIndicator(),
       );
     }
-    
+
     String posterName = post["username"];
     String postContent = post["content"];
     String postID = post["_id"];
@@ -460,7 +460,8 @@ class _CommentsState extends State<Comments> {
                       imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
                       placeholder: (context, url) =>
                           const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -617,11 +618,11 @@ class _CommentsState extends State<Comments> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                            Navigator.push(
-                                context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          CreateComment(isEditing: false, postID: postID)));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CreateComment(
+                                      isEditing: false, postID: postID)));
                         },
                         child: SvgPicture.asset(
                           "assets/PostUI/icon-comment.svg",
@@ -719,7 +720,7 @@ class _CommentsState extends State<Comments> {
     );
   }
 
-Widget _buildComment(int index) {
+  Widget _buildComment(int index) {
     String imageURL = commentData[index]["profilePicture"]['url'];
     String attachmentURL = 'Empty';
     if (commentData[index]['attachedImage'] != 'Empty') {
@@ -978,7 +979,8 @@ Widget _buildComment(int index) {
                       imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
                       placeholder: (context, url) =>
                           const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -1263,6 +1265,7 @@ Widget _buildComment(int index) {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     print(widget.postID);
@@ -1276,49 +1279,44 @@ Widget _buildComment(int index) {
     }
     return Scaffold(
         appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        leading: GestureDetector(
-          child: const Icon(
-            Icons.close,
-            color: Colors.black,
-            size: 30,
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.black),
+          leading: GestureDetector(
+            child: const Icon(
+              Icons.close,
+              color: Colors.black,
+              size: 30,
+            ),
+            onTap: () => Navigator.pop(context),
           ),
-          onTap: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          "Comments",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            color: Colors.black,
+          title: const Text(
+            "Comments",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.black,
+            ),
+          ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1.0),
+            child: Container(
+              height: 1.0,
+              color: const Color(0x5f000000),
+            ),
           ),
         ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(
-            height: 1.0,
-            color: const Color(0x5f000000),
-          ),
-        ),
-      ),
-      backgroundColor: const Color(0xffece7d5),
-      body: Column(
-          children: [
-            const SizedBox(height: 5), 
-            Expanded(child: _buildPost()),
-            Expanded(
-              child: (commentData.isNotEmpty)
+        backgroundColor: const Color(0xffece7d5),
+        body: Column(children: [
+          const SizedBox(height: 5),
+          Expanded(child: _buildPost()),
+          Expanded(
+            child: (commentData.isNotEmpty)
                 ? _buildList()
-                : Center(
-                    child: Text(Localize("No Comments Found"))
-                  ),
-            )
-          ]
-        )
-    );
+                : Center(child: Text(Localize("No Comments Found"))),
+          )
+        ]));
   }
 }

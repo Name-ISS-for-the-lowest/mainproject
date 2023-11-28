@@ -43,103 +43,105 @@ class _EventsPageState extends State<EventsPage> {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
-          return Container(
-            decoration: const BoxDecoration(
-              color: Color(0xffece7d5),
-            ),
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    String? eventId = event['id'];
-                    var language = AuthHelper.userInfoCache['language'];
-                    var url = Navigator.of(context).pop();
-                  },
-                  child: Container(
-                    width: 300,
-                    color: Colors.transparent,
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8.0),
-                          child: const Icon(Icons.close),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        const Text("Close Screen"),
-                      ],
-                    ),
-                  ),
-                ),
-                Row(children: [
-                  Expanded(
-                      child: Text(
-                    event['title']!,
-                    style: const TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )),
-                ]),
-                const SizedBox(height: 10.0),
-                Text(
-                  event['date']!,
-                  style: const TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10.0),
-                Text(
-                  event['location']!,
-                  style: const TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5.0),
-                Text(
-                  event['description']!,
-                  style: const TextStyle(fontSize: 14.0),
-                ),
-                const SizedBox(
-                  height: 50,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        String? eventId = event['id'];
-                        var language = AuthHelper.userInfoCache['language'];
-                        var url =
-                            "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$language";
-                        _launchURL(Uri.parse(url));
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.only(
-                            top: 8, bottom: 8, left: 16, right: 16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(color: Colors.black, width: 1.0),
-                          color: Colors.white,
-                        ),
-                        child: const Text(
-                          'Open Translated Website',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
+          return SingleChildScrollView(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Color(0xffece7d5),
+              ),
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      String? eventId = event['id'];
+                      var language = AuthHelper.userInfoCache['language'];
+                      var url = Navigator.of(context).pop();
+                    },
+                    child: Container(
+                      width: 300,
+                      color: Colors.transparent,
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8.0),
+                            child: const Icon(Icons.close),
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          const Text("Close Screen"),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  Row(children: [
+                    Expanded(
+                        child: Text(
+                      event['title']!,
+                      style: const TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )),
+                  ]),
+                  const SizedBox(height: 10.0),
+                  Text(
+                    event['date']!,
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10.0),
+                  Text(
+                    event['location']!,
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 5.0),
+                  Text(
+                    event['description']!,
+                    style: const TextStyle(fontSize: 14.0),
+                  ),
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          String? eventId = event['id'];
+                          var language = AuthHelper.userInfoCache['language'];
+                          var url =
+                              "https://events-csus-edu.translate.goog/?eventid=$eventId&_x_tr_sl=auto&_x_tr_tl=$language";
+                          _launchURL(Uri.parse(url));
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.only(
+                              top: 8, bottom: 8, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(color: Colors.black, width: 1.0),
+                            color: Colors.white,
+                          ),
+                          child: const Text(
+                            'Open Translated Website',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           );
         });
