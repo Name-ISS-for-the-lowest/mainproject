@@ -74,61 +74,6 @@ class _CommentsState extends State<Comments> {
     loadDelete(postID);
   }
 
-  Widget _buildList() {
-    print('WE GOT HERE');
-    int comShift = 0;
-    if (commentData.length == 0) {
-      comShift += 1;
-    }
-    int parShift = 0;
-    if (!viewParents) {
-      parShift = parentData.length;
-    }
-    return RefreshIndicator(
-      onRefresh: () => loadUpdate(),
-      child: ListView.builder(
-        itemCount:
-            commentData.length + 3 + parentData.length - parShift + comShift,
-        itemBuilder: (BuildContext context, int index) {
-          if (index < parentData.length && viewParents) {
-            return _buildComment(index, parentData, true);
-          }
-
-          if (index == parentData.length - parShift) {
-            return Divider(
-              height: 3,
-              color: Colors.black,
-            );
-          }
-
-          if (index == parentData.length + 1 - parShift) {
-            return _buildPost();
-          }
-
-          if (index == parentData.length + 2 - parShift) {
-            return Divider(
-              height: 3,
-              color: Colors.black,
-            );
-          }
-
-          if (commentData.isEmpty &&
-              index == parentData.length + 3 - parShift) {
-            return Padding(
-                padding: EdgeInsets.only(top: 10),
-                child: Center(
-                    child: Text(
-                  Localize('No Comments Found'),
-                  style: TextStyle(fontSize: 20),
-                )));
-          }
-
-          return _buildComment(index - parentData.length - 3 + parShift);
-        },
-      ),
-    );
-  }
-
   Future<void> loadDelete(String postID) async {
     await PostHelper.deletePost(postID);
     await load();
@@ -302,6 +247,8 @@ class _CommentsState extends State<Comments> {
     } else if (post['translations'] != '') {
       if (mounted) {
         setState(() {
+          print(PostHelper.cachedTranslations[originalText]);
+          print(post['translations']);
           PostHelper.cachedTranslations[originalText] = post['translations'];
         });
         return;
@@ -329,6 +276,61 @@ class _CommentsState extends State<Comments> {
     }
 
     return _buildComment(0, [post]);
+  }
+
+  Widget _buildList() {
+    print('WE GOT HERE');
+    int comShift = 0;
+    if (commentData.length == 0) {
+      comShift += 1;
+    }
+    int parShift = 0;
+    if (!viewParents) {
+      parShift = parentData.length;
+    }
+    return RefreshIndicator(
+      onRefresh: () => loadUpdate(),
+      child: ListView.builder(
+        itemCount:
+            commentData.length + 3 + parentData.length - parShift + comShift,
+        itemBuilder: (BuildContext context, int index) {
+          if (index < parentData.length && viewParents) {
+            return _buildComment(index, parentData, true);
+          }
+
+          if (index == parentData.length - parShift) {
+            return Divider(
+              height: 3,
+              color: Colors.black,
+            );
+          }
+
+          if (index == parentData.length + 1 - parShift) {
+            return _buildPost();
+          }
+
+          if (index == parentData.length + 2 - parShift) {
+            return Divider(
+              height: 3,
+              color: Colors.black,
+            );
+          }
+
+          if (commentData.isEmpty &&
+              index == parentData.length + 3 - parShift) {
+            return Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Center(
+                    child: Text(
+                  Localize('No Comments Found'),
+                  style: TextStyle(fontSize: 20),
+                )));
+          }
+
+          return _buildComment(index - parentData.length - 3 + parShift);
+        },
+      ),
+    );
   }
 
   Widget _buildComment(int index, [var postPassed, var parentPassed]) {
