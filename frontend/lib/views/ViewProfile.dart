@@ -20,7 +20,7 @@ class _ViewProfileState extends State<ViewProfile> {
   var poster;
   var post;
   Map postData = {};
-  bool firstLoad = true;
+  bool needsReload = true;
   Map<String, bool> currentlyTranslated = {};
   List contentHistory = [];
   int contentIndex = 0;
@@ -66,7 +66,7 @@ class _ViewProfileState extends State<ViewProfile> {
       setState(() {
         poster = userData;
         post = postData;
-        firstLoad = false;
+        needsReload = false;
       });
     }
   }
@@ -101,7 +101,7 @@ class _ViewProfileState extends State<ViewProfile> {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text("User has been Banned."),
                   ));
-                  firstLoad = true;
+                  needsReload = true;
                 });
               },
               child: const Text('OK'),
@@ -114,6 +114,10 @@ class _ViewProfileState extends State<ViewProfile> {
 
   @override
   Widget build(BuildContext context) {
+    if (needsReload) {
+      firstload();
+    }
+
     if (poster == null) {
       return const Scaffold(
         backgroundColor: Color(0xffece7d5),
@@ -139,7 +143,7 @@ class _ViewProfileState extends State<ViewProfile> {
     if (AuthHelper.userInfoCache['admin'] == 'True') {
       userIsAdmin = true;
     }
-    if (adminCheck == 'true') {
+    if (adminCheck == 'True') {
       posterIsAdmin = true;
     }
     if (bannedCheck != null) {
