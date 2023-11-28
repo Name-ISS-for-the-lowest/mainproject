@@ -52,7 +52,8 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/setProfilePictureOnSignUp"
             or request.url.path == "/resetPassword"
             or match
-            or request.url.path == "/getEvents"
+            # or request.url.path == "/getEvents"
+            # or request.url.path == "/getPosts"
         ):
             return await call_next(request)
         # check if the user has a cookie
@@ -189,7 +190,7 @@ def logout(request: Request, response: Response):
 
 
 @app.post("/signup")
-def signUp(creds: credentials):
+def signUp(creds: credentials, language: str = "en"):
     email = creds.email
     password = creds.password
     # check if the user already exists
@@ -214,7 +215,7 @@ def signUp(creds: credentials):
     # generate a token
     token = EmailSender.sendAuthenticationEmail(email)
     # insert the user into the db
-    DBManager.insertUser(email, passwordHash, salt, token)
+    DBManager.insertUser(email, passwordHash, salt, token, language)
     return JSONResponse(
         content={"message": "Please verify your email"}, status_code=200
     )
@@ -328,6 +329,7 @@ def getPosts(
         userID=userID,
     )
     posts = Post.listToJson(posts)
+    print("posts: ", len(posts))
     return posts
 
 

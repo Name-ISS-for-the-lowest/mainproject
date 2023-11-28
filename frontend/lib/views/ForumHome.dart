@@ -26,7 +26,7 @@ class ForumHome extends StatefulWidget {
 class _ForumHomeState extends State<ForumHome> {
   final List postData = [];
   final int postsPerFetch = 15;
-  Map searchParams = {"search": "", "postsFetched": 0};
+  Map searchParams = {"search": "", "postsFetched": 15};
   bool init = false;
   bool searching = false;
   bool firstLoad = true;
@@ -66,9 +66,11 @@ class _ForumHomeState extends State<ForumHome> {
     // print("Posts Per Fetch:$postsPerFetch");
     if (search == "") {
       try {
+        print(searchParams["postsFetched"]);
+        print(postsPerFetch);
         var dataCall = await await PostHelper.getPosts(
-            0, searchParams["postsFetched"], specialSearchArgs);
-        print("Data Call:$dataCall");
+            searchParams["postsFetched"], postsPerFetch, specialSearchArgs);
+        print("Data Call:${dataCall.length}");
         Map dataCallMap = {};
         for (var item in dataCall) {
           dataCallMap[item['_id']] = item;
@@ -83,13 +85,11 @@ class _ForumHomeState extends State<ForumHome> {
             postData.add(item);
           }
         }
-
-        int fetchedLength = dataCall.length;
-        searchParams["postsFetched"] += fetchedLength;
         if (firstLoad) {
           firstLoad = false;
           setState(() {});
         }
+        searchParams["postsFetched"] = postData.length;
         searching = false;
         return dataCall;
       } catch (e) {
@@ -293,9 +293,12 @@ class _ForumHomeState extends State<ForumHome> {
             );
           }
 
-          if (index >= postData.length) {
+          if (index >= postData.length - 5) {
             searchPosts(searchParams["search"], scrolling: true);
-            return null;
+            if (index >= postData.length) {
+              return null;
+            }
+            return _buildPost(index);
           }
           return _buildPost(index);
         },
