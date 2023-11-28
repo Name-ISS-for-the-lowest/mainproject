@@ -11,18 +11,14 @@ class PostHelper {
   static Map<String, String> cachedTranslations = {};
 
   static Future<Response> createPost(
-      String userID, String postBody, File? photo, dynamic context) async {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Uploading post...'),
-    ));
-
+      String userID, String postBody, File? photo) async {
     Map<String, dynamic> params;
     String endPoint;
     String? imageURL;
     String? fileID;
     String url;
     if (photo != null) {
-      var formData = FormData.fromMap({
+      FormData formData = FormData.fromMap({
         'photo': await MultipartFile.fromFile(photo.path,
             filename: AuthHelper.userInfoCache['username'] + '_postAttachment'),
       });
@@ -32,15 +28,30 @@ class PostHelper {
       };
       endPoint = '/uploadPhoto';
       url = '$defaultHost$endPoint';
+      print("made it here");
       try {
         final response = await RouteHandler.dio.post(url,
             data: formData,
             queryParameters: params,
             options:
                 Options(contentType: Headers.multipartFormDataContentType));
+
         imageURL = response.data['url'];
         fileID = response.data['fileId'];
       } on DioException catch (e) {
+        print("error $e");
+        if (e.response!.statusCode == 413) {
+          //can I try reducing the size of the image
+          ImageProvider image = FileImage(
+            photo,
+          );
+
+          return Response(
+            requestOptions: RequestOptions(path: url),
+            data: {'message': 'File too large'},
+            statusCode: 413,
+          );
+        }
         return Response(
           requestOptions: RequestOptions(path: url),
           data: {'message': e},

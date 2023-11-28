@@ -34,12 +34,15 @@ class _CreatePostState extends State<CreatePost> {
     }
   }
 
-  File? imageAttachment;
+  static File? imageAttachment;
   String currentPostBody = "";
   bool isSubmitting = false;
 
   Future pickImage() async {
-    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final image = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 50,
+    );
     if (image == null) return;
 
     if (mounted) {
@@ -51,12 +54,15 @@ class _CreatePostState extends State<CreatePost> {
   }
 
   Future pickCamera() async {
-    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+    final image = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+      imageQuality: 50,
+    );
     if (image == null) return;
 
     if (mounted) {
       setState(() {
-        imageAttachment = File(image.path);
+        _CreatePostState.imageAttachment = File(image.path);
       });
     }
     Navigator.of(context).pop();
@@ -198,7 +204,16 @@ class _CreatePostState extends State<CreatePost> {
                           isSubmitting = true;
                         });
                         var response = await PostHelper.createPost(
-                            userID, currentPostBody, imageAttachment, context);
+                            userID, currentPostBody, imageAttachment);
+                        if (response.statusCode == 200) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Post created!")));
+                          imageAttachment = null;
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Error creating post.")));
+                        }
                       }
                     }
 

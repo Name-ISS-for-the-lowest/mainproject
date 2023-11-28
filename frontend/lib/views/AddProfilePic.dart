@@ -27,7 +27,10 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
 
   Future<void> pickImage(ImageSource source) async {
     try {
-      final pickedFile = await ImagePicker().pickImage(source: source);
+      final pickedFile = await ImagePicker().pickImage(
+        source: source,
+        imageQuality: 50,
+      );
       if (pickedFile != null) {
         File getImage = File(pickedFile.path);
         setState(() {
@@ -174,7 +177,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
               children: [
                 //This part is just text and formatting
                 SizedBox(
-                  width: 280,
+                  width: MediaQuery.sizeOf(context).width * .8,
                   child: Text(
                     Localize('Add Profile Picture'),
                     style: const TextStyle(
