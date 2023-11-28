@@ -14,8 +14,9 @@ class DBManager:
     db = client["ISSDB"]
 
     @staticmethod
-    def insertUser(email, passwordHash, salt, token):
+    def insertUser(email, passwordHash, salt, token, language):
         new_user = User(email, passwordHash, salt, token)
+        new_user.language = language
         print(new_user.__dict__)
         print("here")
         id = DBManager.db["users"].insert_one(new_user.__dict__)
@@ -73,24 +74,24 @@ class DBManager:
             profilePicture["url"] != profilePictureURL
             or profilePicture["fileId"] != profilePictureFileID
         ):
-            profilePictureHistory = user.get('profilePictureHistory')
+            profilePictureHistory = user.get("profilePictureHistory")
             profilePictureHistory.append(oldProfilePicture)
             profilePicture["url"] = profilePictureURL
             profilePicture["fileId"] = profilePictureFileID
             newDict["profilePicture"] = profilePicture
-            newDict['profilePictureHistory'] = profilePictureHistory
+            newDict["profilePictureHistory"] = profilePictureHistory
         oldUsername = user.get("username")
         if oldUsername != username:
-            usernameHistory = user.get('usernameHistory')
+            usernameHistory = user.get("usernameHistory")
             usernameHistory.append(oldUsername)
-            newDict['usernameHistory'] = usernameHistory
+            newDict["usernameHistory"] = usernameHistory
         DBManager.db["users"].update_one({"_id": id}, {"$set": newDict})
 
     @staticmethod
     def banUser(adminID: str, bannedID: str, banMessage: str):
         adminID = ObjectId(adminID)
         bannedID = ObjectId(bannedID)
-        newDict = {'banned' : True, 'bannedBy': adminID, 'banMessage': banMessage}
+        newDict = {"banned": True, "bannedBy": adminID, "banMessage": banMessage}
         DBManager.db["users"].update_one({"_id": bannedID}, {"$set": newDict})
 
     @staticmethod
@@ -170,14 +171,14 @@ class DBManager:
         post = DBManager.db["posts"].find_one({"_id": postID})
         isRemoved = post.get("removed")
         removalToggle = not isRemoved
-        if forceRemove == 'Remove':
+        if forceRemove == "Remove":
             DBManager.db["posts"].update_one(
-            {"_id": postID}, {"$set": {"removed": True, "unreviewedReport" : False}}
-        )
-        elif forceRemove == 'Approve':
+                {"_id": postID}, {"$set": {"removed": True, "unreviewedReport": False}}
+            )
+        elif forceRemove == "Approve":
             DBManager.db["posts"].update_one(
-            {"_id": postID}, {"$set": {"removed": False, "unreviewedReport" : False}}
-        )
+                {"_id": postID}, {"$set": {"removed": False, "unreviewedReport": False}}
+            )
         else:
             DBManager.db["posts"].update_one(
                 {"_id": postID}, {"$set": {"removed": removalToggle}}
@@ -195,7 +196,7 @@ class DBManager:
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
         if showReported == "Only":
-            specialSearchParams["reports"] = {"$gt" : 0}
+            specialSearchParams["reports"] = {"$gt": 0}
         elif showReported == "Unreviewed":
             specialSearchParams["unreviewedReport"] = True
 
@@ -218,7 +219,7 @@ class DBManager:
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
             if likedResult is not None:
                 post.liked = True
-            reportResult = DBManager.db['reports'].find_one({"comboID": comboID})
+            reportResult = DBManager.db["reports"].find_one({"comboID": comboID})
             if reportResult is not None:
                 post.reportedByUser = True
 
@@ -235,7 +236,7 @@ class DBManager:
         post["userID"] = user["_id"]
         post["posterIsAdmin"] = user["admin"]
         post["email"] = user["email"]
-        post['posterIsBanned'] = user.get("banned")
+        post["posterIsBanned"] = user.get("banned")
         comboID = str(post["_id"]) + str(post["userID"])
         likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
         reportedResult = DBManager.db["reports"].find_one({"comboID": comboID})
@@ -258,8 +259,8 @@ class DBManager:
         elif showDeleted == "None":
             specialSearchParams["deleted"] = False
         if showReported == "Only":
-            #print(specialSearchParams["reports"])
-            specialSearchParams["reports"] = {"$gt" : 0}
+            # print(specialSearchParams["reports"])
+            specialSearchParams["reports"] = {"$gt": 0}
         elif showReported == "Unreviewed":
             specialSearchParams["unreviewedReport"] = True
         posts = (
@@ -306,18 +307,24 @@ class DBManager:
             # remove the like from the likes collection
             DBManager.db["likes"].delete_one({"comboID": comboID})
             return {"message": "Post unliked"}
-        
+
     @staticmethod
     def reportPost(postID, userID, specialDict):
         # check if the user has already liked the post
         comboID = str(postID) + str(userID)
         postID = ObjectId(postID)
         reportResult = DBManager.db["reports"].find_one({"comboID": comboID})
-        postResult = DBManager.db['posts'].find_one({'_id': postID})
-        reasonDict = postResult.get('reportReasons')
+        postResult = DBManager.db["posts"].find_one({"_id": postID})
+        reasonDict = postResult.get("reportReasons")
         if reportResult is None:
-            postDict = {"reports" : 1}
-            reasons = ['hateSpeech', 'illegalContent', 'targetedHarassment', 'inappropriateContent', 'otherReason']
+            postDict = {"reports": 1}
+            reasons = [
+                "hateSpeech",
+                "illegalContent",
+                "targetedHarassment",
+                "inappropriateContent",
+                "otherReason",
+            ]
             for reason in reasons:
                 if specialDict[reason]:
                     reasonDict[reason] += 1
@@ -325,12 +332,21 @@ class DBManager:
                 {"_id": postID}, {"$inc": {"reports": 1}}
             )
             result2 = DBManager.db["posts"].update_one(
-                {"_id": postID}, {"$set": {'reportReasons' : reasonDict, 'unreviewedReport' : True}}
+                {"_id": postID},
+                {"$set": {"reportReasons": reasonDict, "unreviewedReport": True}},
             )
             print(result.modified_count)
 
             # add the reports to the reports collection\
-            newReport = {"PostID": postID, "comboID": comboID, "hateSpeech": specialDict['hateSpeech'], 'illegalContent': specialDict['illegalContent'], 'targetedHarassment' : specialDict['targetedHarassment'], 'inappropriateContent': specialDict['inappropriateContent'], 'otherReason': specialDict['otherReason']}
+            newReport = {
+                "PostID": postID,
+                "comboID": comboID,
+                "hateSpeech": specialDict["hateSpeech"],
+                "illegalContent": specialDict["illegalContent"],
+                "targetedHarassment": specialDict["targetedHarassment"],
+                "inappropriateContent": specialDict["inappropriateContent"],
+                "otherReason": specialDict["otherReason"],
+            }
             DBManager.db["reports"].insert_one(newReport)
             print("Reported")
             return {"message": "Post reported"}
