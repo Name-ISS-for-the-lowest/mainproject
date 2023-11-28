@@ -26,7 +26,7 @@ class ForumHome extends StatefulWidget {
 class _ForumHomeState extends State<ForumHome> {
   final List postData = [];
   final int postsPerFetch = 15;
-  Map searchParams = {"search": "", "postsFetched": 15};
+  Map searchParams = {"search": "", "lastPostFetched": 'None'};
   bool init = false;
   bool searching = false;
   bool firstLoad = true;
@@ -58,18 +58,18 @@ class _ForumHomeState extends State<ForumHome> {
     if (searching) return;
     searching = true;
     if (!scrolling) {
-      searchParams["postsFetched"] = 0;
+      searchParams["lastPostFetched"] = 'None';
       postData.clear();
     }
     // print("I am fetching posts");
-    // print("Posts Fetched:$postsFetched");
+    // print("Posts Fetched:$lastPostFetched");
     // print("Posts Per Fetch:$postsPerFetch");
     if (search == "") {
       try {
-        print(searchParams["postsFetched"]);
+        print(searchParams["lastPostFetched"]);
         print(postsPerFetch);
-        var dataCall = await await PostHelper.getPosts(
-            searchParams["postsFetched"], postsPerFetch, specialSearchArgs);
+        var dataCall = await PostHelper.getPosts(
+            searchParams["lastPostFetched"], postsPerFetch, specialSearchArgs);
         print("Data Call:${dataCall.length}");
         Map dataCallMap = {};
         for (var item in dataCall) {
@@ -89,7 +89,12 @@ class _ForumHomeState extends State<ForumHome> {
           firstLoad = false;
           setState(() {});
         }
-        searchParams["postsFetched"] = postData.length;
+        if (postData.length - 1 >= 0) {
+          searchParams["lastPostFetched"] =
+              postData[postData.length - 1]['_id'];
+        } else {
+          searchParams["lastPostFetched"] = 'None';
+        }
         searching = false;
         return dataCall;
       } catch (e) {
@@ -100,7 +105,7 @@ class _ForumHomeState extends State<ForumHome> {
     } else {
       try {
         var dataCall = await PostHelper.searchPosts(
-            searchParams["postsFetched"],
+            searchParams["lastPostFetched"],
             postsPerFetch,
             search,
             AuthHelper.userInfoCache["_id"],
@@ -121,7 +126,12 @@ class _ForumHomeState extends State<ForumHome> {
           }
         }
         int fetchedLength = dataCall.length;
-        searchParams["postsFetched"] += fetchedLength;
+        if (fetchedLength - 1 >= 0) {
+          searchParams["lastPostFetched"] =
+              dataCall[dataCall.length - 1]['_id'];
+        } else {
+          searchParams["lastPostFetched"] = 'None';
+        }
         searching = false;
         return dataCall;
       } catch (e) {
@@ -170,12 +180,20 @@ class _ForumHomeState extends State<ForumHome> {
         return;
       }
     } else {
-      var translationCall = await PostHelper.getTranslation(originalText);
-      if (mounted) {
-        setState(() {
-          String returnedTranslation = translationCall['result'];
-          PostHelper.cachedTranslations[originalText] = returnedTranslation;
-        });
+      if (originalText == '') {
+        if (mounted) {
+          setState(() {
+            PostHelper.cachedTranslations[originalText] = '';
+          });
+        }
+      } else {
+        var translationCall = await PostHelper.getTranslation(originalText);
+        if (mounted) {
+          setState(() {
+            String returnedTranslation = translationCall['result'];
+            PostHelper.cachedTranslations[originalText] = returnedTranslation;
+          });
+        }
       }
     }
   }
@@ -186,11 +204,16 @@ class _ForumHomeState extends State<ForumHome> {
         builder: (BuildContext context) {
           return Scaffold(
             body: CreatePost(
-                isEditing: true, originalText: postContent, postID: postID),
+              isEditing: true,
+              originalText: postContent,
+              postID: postID,
+            ),
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToReportPost(String postID) {
@@ -202,7 +225,9 @@ class _ForumHomeState extends State<ForumHome> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToAdminView(String postID) {
@@ -214,11 +239,13 @@ class _ForumHomeState extends State<ForumHome> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToViewProfile(String postID, String posterID) {
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
           return Scaffold(
@@ -226,7 +253,9 @@ class _ForumHomeState extends State<ForumHome> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToViewImage(List<String> inputs) {
@@ -238,7 +267,9 @@ class _ForumHomeState extends State<ForumHome> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToConfirmPost() {
@@ -250,7 +281,9 @@ class _ForumHomeState extends State<ForumHome> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void deletePost(String postID) {
@@ -285,44 +318,59 @@ class _ForumHomeState extends State<ForumHome> {
 
   Future<void> loadDelete(String postID) async {
     await PostHelper.deletePost(postID);
-    var dataCall = await PostHelper.getPosts(
-        0, searchParams["postsFetched"], specialSearchArgs);
+    var dataCall =
+        await PostHelper.getPosts('None', postData.length, specialSearchArgs);
     if (mounted) {
       setState(() {
         postData.clear();
         postData.addAll(dataCall);
         num fetchedLength = dataCall.length;
         int convertedFetch = fetchedLength.toInt();
-        searchParams["postsFetched"] = convertedFetch;
+        if (convertedFetch - 1 >= 0) {
+          searchParams["lastPostFetched"] =
+              dataCall[dataCall.length - 1]['_id'];
+        } else {
+          searchParams["lastPostFetched"] = 'None';
+        }
       });
     }
   }
 
   Future<void> loadRemovalToggle(String postID) async {
     await PostHelper.toggleRemoval(postID);
-    var dataCall = await PostHelper.getPosts(
-        0, searchParams['postsFetched'], specialSearchArgs);
+    var dataCall =
+        await PostHelper.getPosts('None', postData.length, specialSearchArgs);
     if (mounted) {
       setState(() {
         postData.clear();
         postData.addAll(dataCall);
         num fetchedLength = dataCall.length;
         int convertedFetch = fetchedLength.toInt();
-        searchParams["postsFetched"] = convertedFetch;
+        if (convertedFetch - 1 >= 0) {
+          searchParams["lastPostFetched"] =
+              dataCall[dataCall.length - 1]['_id'];
+        } else {
+          searchParams["lastPostFetched"] = 'None';
+        }
       });
     }
   }
 
   Future<void> loadUpdate() async {
-    var dataCall = await PostHelper.getPosts(
-        0, searchParams['postsFetched'], specialSearchArgs);
+    var dataCall =
+        await PostHelper.getPosts('None', postsPerFetch, specialSearchArgs);
     if (mounted) {
       setState(() {
         postData.clear();
         postData.addAll(dataCall);
         num fetchedLength = dataCall.length;
         int convertedFetch = fetchedLength.toInt();
-        searchParams["postsFetched"] = convertedFetch;
+        if (convertedFetch - 1 >= 0) {
+          searchParams["lastPostFetched"] =
+              dataCall[dataCall.length - 1]['_id'];
+        } else {
+          searchParams["lastPostFetched"] = 'None';
+        }
       });
     }
   }
@@ -413,7 +461,7 @@ class _ForumHomeState extends State<ForumHome> {
     );
 
     PopupMenuButton<String> threeDotMenu = PopupMenuButton<String>(
-      onSelected: (String result) {
+      onSelected: (String result) async {
         // Handle the selected option
         if (result == 'closeMenu') {
           // Closes menu and does absolutely nothing
@@ -576,7 +624,7 @@ class _ForumHomeState extends State<ForumHome> {
             Positioned(
               left: 15,
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
                   navigateToViewProfile(postID, posterID);
                 },
                 child: Container(
@@ -602,8 +650,9 @@ class _ForumHomeState extends State<ForumHome> {
               left: 80,
               top: 14,
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
                   navigateToViewProfile(postID, posterID);
+                  loadUpdate();
                 },
                 child: RichText(
                   text: TextSpan(
@@ -1341,7 +1390,7 @@ class _SearchBarState extends State<SearchBarWidget> {
   void performSearch(String value) async {
     //add all items to set
     widget.searchParams["search"] = value;
-    widget.searchParams["postsFetched"] = 0;
+    widget.searchParams["lastPostFetched"] = 'None';
     await addAllItemsToSet();
     if (value.isEmpty) {
       widget.listSetState(() {

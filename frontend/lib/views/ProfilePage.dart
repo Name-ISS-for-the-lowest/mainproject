@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
+import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/selectorHelper.dart';
 import '../languagePicker/languages.dart';
 import 'package:image_picker/image_picker.dart';
@@ -191,6 +192,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           if (languagesPicked) {
                             AuthHelper.userInfoCache['language'] =
                                 trueItems[filteredItems[index]];
+                            PostHelper.cachedTranslations = {};
                           } else {
                             AuthHelper.userInfoCache['nationality'] =
                                 trueItems[filteredItems[index]];
