@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/classes/postHelper.dart';
-import 'package:frontend/views/CoreTemplate.dart';
 import 'package:frontend/views/ConfirmReport.dart';
+import 'package:frontend/views/CoreTemplate.dart';
 
 class ReportPage extends StatefulWidget {
   String postID;

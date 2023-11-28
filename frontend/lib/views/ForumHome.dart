@@ -12,8 +12,8 @@ import 'package:frontend/views/Comments.dart';
 import 'package:frontend/views/ConfirmReport.dart';
 import 'package:frontend/views/CreatePost.dart';
 import 'package:frontend/views/ReportPage.dart';
-import 'package:frontend/views/ViewProfile.dart';
 import 'package:frontend/views/ViewImage.dart';
+import 'package:frontend/views/ViewProfile.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 class ForumHome extends StatefulWidget {
@@ -222,7 +222,7 @@ class _ForumHomeState extends State<ForumHome> {
       MaterialPageRoute(
         builder: (BuildContext context) {
           return Scaffold(
-            body: ViewProfile(posterID: posterID),
+            body: ViewProfile(posterID: posterID, postID: postID),
           );
         },
       ),

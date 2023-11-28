@@ -9,14 +9,16 @@ import 'package:frontend/views/ViewImage.dart';
 
 class ViewProfile extends StatefulWidget {
   String posterID;
-  ViewProfile({super.key, required this.posterID});
+  String postID;
+  ViewProfile({super.key, required this.posterID, required this.postID});
 
   @override
   State<ViewProfile> createState() => _ViewProfileState();
 }
 
 class _ViewProfileState extends State<ViewProfile> {
-  var user;
+  var poster;
+  var post;
   Map postData = {};
   bool firstLoad = true;
   Map<String, bool> currentlyTranslated = {};
@@ -59,34 +61,97 @@ class _ViewProfileState extends State<ViewProfile> {
 
   void reload() async {
     var userData = await PostHelper.getUserByID(widget.posterID);
+    var postData = await PostHelper.getPostByID(widget.postID);
     if (mounted) {
       setState(() {
-        user = userData;
+        poster = userData;
+        post = postData;
+        firstLoad = false;
       });
     }
+  }
+  
+  Future<void> banDialog(BuildContext context, String userID) async {
+    TextEditingController textController = TextEditingController();
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Would you like to ban this poster?'),
+          content: TextField(
+            controller: textController,
+            decoration: const InputDecoration(hintText: 'Ban Reasoning'),
+            maxLines: null,
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Close the alert dialog
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await AuthHelper.banUser(AuthHelper.userInfoCache['_id'],
+                    userID, textController.text);
+                Navigator.of(context).pop();
+                setState(() {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("User has been Banned."),
+                  ));
+                  firstLoad = true;
+                });
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (user == null) {
+    if (poster == null) {
       return const Scaffold(
         backgroundColor: Color(0xffece7d5),
         body: Center(child: Text("Loading Profile...")),
       );
     }
 
-    String posterName = user["username"];
-    String posterEmail = user["email"];
-    String pfpURL = user["profilePicture.url"];
-    String posterNationality = Localize(user["nationality"]);
-    String posterLanguage = AuthHelper.languageNames[user["language"]];
-    String englishNationality = user['nationality'];
+    String userID = post['userID'];
+    String posterName = poster["username"];
+    String posterEmail = poster["email"];
+    String pfpURL = poster["profilePicture.url"];
+    String posterNationality = Localize(poster["nationality"]);
+    String posterLanguage = AuthHelper.languageNames[poster["language"]];
+    String englishNationality = poster['nationality'];
     String? emojiCheck = SelectorHelper.countryEmojiMap[englishNationality];
+    String? adminCheck = poster['admin'];
+    bool? bannedCheck = post['posterIsBanned'];
+    bool posterIsAdmin = false;
+    bool posterBanned = false;
+    bool userIsAdmin = false;
     String emoji = '';
+
+    if (AuthHelper.userInfoCache['admin'] == 'True') {
+      userIsAdmin = true;
+    }
+    if (adminCheck == 'true') {
+      posterIsAdmin = true;
+    }
+    if (bannedCheck != null) {
+      if (bannedCheck) {
+        posterBanned = bannedCheck;
+      }
+    }
+    
     if (emojiCheck != null) {
       emoji = '$emojiCheck ';
     }
-    String? localizedLanguage = SelectorHelper.reverseLangMap[user['language']];
+    String? localizedLanguage = SelectorHelper.reverseLangMap[poster['language']];
     if (localizedLanguage != null) {
       posterLanguage = localizedLanguage;
     }
@@ -160,6 +225,15 @@ class _ViewProfileState extends State<ViewProfile> {
                 ),
               ),
             ),
+            (posterBanned)?
+            const Align(
+              child: Text("[USER HAS BEEN BANNED]",
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red)),
+            )
+            : const SizedBox(),
             Align(
               alignment: Alignment.centerLeft,
               child: ListTile(
@@ -187,6 +261,35 @@ class _ViewProfileState extends State<ViewProfile> {
               title: Text(Localize('Email Address')),
               subtitle: Text(posterEmail),
             ),
+            (userIsAdmin) ?
+            Align(
+              child: GestureDetector(
+                onTap: () async {
+                  if (posterIsAdmin) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("You cannot ban an admin account!"),
+                    ));
+                  } else {
+                    print(post['posterIsBanned']);
+                    await banDialog(context, userID);
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.only(
+                      top: 8, bottom: 8, left: 16, right: 16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(color: Colors.black, width: 1.0),
+                    color: Color.fromARGB(255, 233, 54, 54),
+                  ),
+                  child: const Text(
+                    'Ban User',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ),
+            )
+            : const SizedBox(),
           ],
         ),
       ),
