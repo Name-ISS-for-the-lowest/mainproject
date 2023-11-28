@@ -199,20 +199,25 @@ class _AdminViewState extends State<AdminView> {
               const SizedBox(
                 height: 20,
               ),
-              Container(
-                width: 200, // Set your desired width
-                height: 200, // Set your desired height
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: "$pfpURL?tr=w-200,h-200,fo-auto",
-                    placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                    fit: BoxFit.fill,
+              GestureDetector(
+                onTap: () {
+                  navigateToViewImage([pfpURL]);
+                },
+                child: Container(
+                  width: 200, // Set your desired width
+                  height: 200, // Set your desired height
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: "$pfpURL?tr=w-200,h-200,fo-auto",
+                      placeholder: (context, url) =>
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
               ),
