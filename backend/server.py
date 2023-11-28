@@ -410,6 +410,7 @@ def getUserByID(userID: str, request: Request):
         "profilePicture.url": pfpUrl,
         "profilePicture.fileId": pfpFileId,
         "admin": str(userDict["admin"]),
+        "banned": userDict["banned"],
     }
     return JSONResponse(content=returnedDict, status_code=200)
 
