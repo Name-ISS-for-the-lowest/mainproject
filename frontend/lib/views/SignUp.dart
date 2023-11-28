@@ -75,7 +75,7 @@ class _SignUpState extends State<SignUp> {
 
     return Scaffold(
         backgroundColor: const Color.fromRGBO(4, 57, 39, 1.0),
-        // resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: true, // Extend content behind the AppBar
         appBar: AppBar(
           backgroundColor:

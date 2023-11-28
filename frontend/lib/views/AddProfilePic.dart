@@ -211,7 +211,7 @@ class _AddToProfilePicState extends State<AddToProfilePic> {
                 ),
 
                 SizedBox(
-                  width: 300,
+                  width: 340,
                   child: Text(
                     Localize(
                         "Please be mindful of other users, Avoid using images that may be considered disturbing or offensive. Images should be inline with Sac State's Hornet Honor Code policy"),
