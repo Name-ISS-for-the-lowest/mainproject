@@ -89,7 +89,7 @@ class PostHelper {
   }
 
   static Future<Response> createComment(
-    String userID, String postBody, String postID, File? Photo) async {
+      String userID, String postBody, String postID, File? Photo) async {
     Map<String, dynamic> params;
     String endPoint;
     String? imageURL;
@@ -221,6 +221,26 @@ class PostHelper {
       'parentID': parentID,
     };
     String endPoint = '/getComments';
+    final url = '$defaultHost$endPoint';
+    try {
+      final response = await RouteHandler.dio.get(url,
+          queryParameters: params,
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data;
+    } on DioException catch (e) {
+      return Response(
+        requestOptions: RequestOptions(path: url),
+        data: {'message': e},
+        statusCode: 500,
+      );
+    }
+  }
+
+  static getParents(String parentID) async {
+    final params = {
+      'parentID': parentID,
+    };
+    String endPoint = '/getParents';
     final url = '$defaultHost$endPoint';
     try {
       final response = await RouteHandler.dio.get(url,

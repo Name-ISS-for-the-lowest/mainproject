@@ -143,6 +143,9 @@ class DBManager:
         if imageURL != "False":
             Attachment = Picture(imageURL, imageFileID)
             newPost.attachedImage = Attachment.__dict__
+        DBManager.db["posts"].update_one(
+                {"_id": ObjectId(postID)}, {"$inc": {"comments": 1}}
+            )
         DBManager.db["posts"].insert_one(newPost.__dict__)
 
     @staticmethod
@@ -195,6 +198,7 @@ class DBManager:
     @staticmethod
     def getPosts(start, end, showRemoved, showDeleted, showReported, userID=None):
         specialSearchParams = {}
+        specialSearchParams['parent_id'] = None
         if showRemoved == "Only":
             specialSearchParams["removed"] = True
         elif showRemoved == "None":
@@ -207,6 +211,7 @@ class DBManager:
             specialSearchParams["reports"] = {"$gt": 0}
         elif showReported == "Unreviewed":
             specialSearchParams["unreviewedReport"] = True
+            del specialSearchParams['parent_id']
 
         if start != 'None':
             start = ObjectId(start)
@@ -260,9 +265,15 @@ class DBManager:
         return returnPost
 
     @staticmethod
-    def getComments(parentID: str):
+    def getComments(parentID: str, userID:str):
         ##objectID = ObjectId(parentID)
-        comments = DBManager.db["posts"].find({"parent_id": parentID})
+        user = DBManager.db["users"].find_one({"_id": ObjectId(userID)})
+        adminCheck = user.get('admin')
+        specialSearchParams = {"parent_id": parentID}
+        if adminCheck == False:
+            specialSearchParams['removed'] = False
+            specialSearchParams['deleted'] = False
+        comments = DBManager.db["posts"].find(specialSearchParams)
         returnComments = []
         for elem in comments:
             comment = Post.fromDict(elem)
@@ -281,10 +292,46 @@ class DBManager:
             returnComments.append(comment)
         
         return returnComments
+    
+    @staticmethod
+    def getParents(parentID: str):
+
+
+        parentHistory = []
+        checkedPost = DBManager.db['posts'].find_one({"_id": ObjectId(parentID)})
+        parentID = checkedPost.get('parent_id')
+        while True:
+            if parentID == None:
+                break
+            parentID = ObjectId(parentID)
+            checkedPost = DBManager.db['posts'].find_one({"_id": ObjectId(parentID)})
+            parentHistory.append(checkedPost)
+            parentID = checkedPost.get('parent_id')
+
+        returnParents = []
+        for elem in parentHistory:
+            parent = Post.fromDict(elem)
+            user = DBManager.db["users"].find_one({"_id": ObjectId(parent.userID)})
+            parent.profilePicture = user["profilePicture"]
+            parent.username = user["username"]
+            parent.posterIsAdmin = user["admin"]
+            parent.posterIsBanned = user["banned"]
+            comboID = str(parent._id) + str(parent.userID)
+            likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
+            if likedResult is not None:
+                parent.liked = True
+            reportResult = DBManager.db['reports'].find_one({"comboID": comboID})
+            if reportResult is not None:
+                parent.reportedByUser = True
+            returnParents.append(parent)
+            
+        
+        return returnParents
 
     @staticmethod
     def searchPosts(start, end, showRemoved, showDeleted, showReported, search, userID):
         specialSearchParams = {"content": {"$regex": search, "$options": "i"}}
+        specialSearchParams['parent_id'] = None
         if showRemoved == "Only":
             specialSearchParams["removed"] = True
         elif showRemoved == "None":
@@ -298,6 +345,7 @@ class DBManager:
             specialSearchParams["reports"] = {"$gt": 0}
         elif showReported == "Unreviewed":
             specialSearchParams["unreviewedReport"] = True
+            del specialSearchParams['parent_id']
 
         if start != 'None':
             start = ObjectId(start)

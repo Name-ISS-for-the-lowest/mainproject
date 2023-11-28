@@ -205,6 +205,7 @@ class _ForumHomeState extends State<ForumHome> {
           return Scaffold(
             body: CreatePost(
               isEditing: true,
+              isCommenting: false,
               originalText: postContent,
               postID: postID,
             ),
@@ -461,7 +462,7 @@ class _ForumHomeState extends State<ForumHome> {
       postContent += "...";
     }
 
-    String commentNumber = '0';
+    String commentNumber = postData[index]['comments'].toString();
 
     PopupMenuButton<String> threeDotMenu = PopupMenuButton<String>(
       onSelected: (String result) async {
@@ -612,12 +613,6 @@ class _ForumHomeState extends State<ForumHome> {
       ),
     );
 
-    double calculatedHeight = (postContent.length / 25 * 23) + 60;
-    if (postTooLong) calculatedHeight += 35;
-    if (attachmentURL != 'Empty') {
-      calculatedHeight += 410;
-    }
-
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 50),
       child: Column(
@@ -738,31 +733,36 @@ class _ForumHomeState extends State<ForumHome> {
                         SizedBox(
                           height: 15,
                         ),
-                        RichText(
-                          maxLines: null,
-                          softWrap: true,
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                  text:
-                                      (currentlyTranslated.containsKey(postID))
-                                          ? unescape.convert(PostHelper
-                                              .cachedTranslations[postContent]!)
-                                          : postContent,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'Inter',
-                                    fontSize: 18,
-                                  )),
-                              if (isEdited)
+                        GestureDetector(
+                          onTap: () {
+                            navigateToComments(postID);
+                          },
+                          child: RichText(
+                            maxLines: null,
+                            softWrap: true,
+                            text: TextSpan(
+                              children: [
                                 TextSpan(
-                                  text: Localize('(Edited)'),
-                                  style: const TextStyle(
-                                    fontStyle: FontStyle.italic,
-                                    color: Colors.grey,
+                                    text: (currentlyTranslated
+                                            .containsKey(postID))
+                                        ? unescape.convert(PostHelper
+                                            .cachedTranslations[postContent]!)
+                                        : postContent,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: 'Inter',
+                                      fontSize: 18,
+                                    )),
+                                if (isEdited)
+                                  TextSpan(
+                                    text: Localize('(Edited)'),
+                                    style: const TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.grey,
+                                    ),
                                   ),
-                                ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         postTooLong

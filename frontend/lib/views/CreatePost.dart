@@ -4,16 +4,22 @@ import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/views/CoreTemplate.dart';
+import 'package:frontend/views/Comments.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class CreatePost extends StatefulWidget {
   final bool isEditing;
+  final bool isCommenting;
   final String? originalText;
   final String? postID;
   const CreatePost(
-      {super.key, required this.isEditing, this.originalText, this.postID});
+      {super.key,
+      required this.isEditing,
+      required this.isCommenting,
+      this.originalText,
+      this.postID});
 
   @override
   State<CreatePost> createState() => _CreatePostState();
@@ -22,6 +28,10 @@ class CreatePost extends StatefulWidget {
 class _CreatePostState extends State<CreatePost> {
   void navigateToPrimaryScreens() {
     if (mounted) {
+      if (widget.isCommenting) {
+        Navigator.of(context).pop();
+        return;
+      }
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (BuildContext context) {
@@ -98,6 +108,7 @@ class _CreatePostState extends State<CreatePost> {
   Widget build(BuildContext context) {
     var userInfo = AuthHelper.userInfoCache;
     bool isEditing = widget.isEditing;
+    bool isCommenting = widget.isCommenting;
     String? originalText = widget.originalText;
     String? originalID = widget.postID;
     String imageURL = userInfo['profilePicture.url'];
@@ -128,7 +139,13 @@ class _CreatePostState extends State<CreatePost> {
             onTap: () => navigateToPrimaryScreens(),
           ),
           title: Text(
-            (isEditing) ? Localize("Edit Post") : Localize("New Post"),
+            (isEditing)
+                ? (isCommenting)
+                    ? ("Edit Comment")
+                    : Localize("Edit Post")
+                : (isCommenting)
+                    ? ("New Comment")
+                    : Localize("New Post"),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -197,8 +214,13 @@ class _CreatePostState extends State<CreatePost> {
                         setState(() {
                           isSubmitting = true;
                         });
-                        var response = await PostHelper.createPost(
-                            userID, currentPostBody, imageAttachment);
+                        if (widget.isCommenting) {
+                          var response = await PostHelper.createComment(
+                              userID, currentPostBody, postID, imageAttachment);
+                        } else {
+                          var response = await PostHelper.createPost(
+                              userID, currentPostBody, imageAttachment);
+                        }
                       }
                     }
 
@@ -237,6 +259,7 @@ class _CreatePostState extends State<CreatePost> {
                       width: MediaQuery.of(context).size.width * 0.8,
                       height: 200,
                       child: TextField(
+                        autofocus: true,
                         controller:
                             TextEditingController(text: currentPostBody),
                         decoration: InputDecoration(
@@ -253,19 +276,21 @@ class _CreatePostState extends State<CreatePost> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 24.0, top: 0),
-                    child: GestureDetector(
-                      onTap: () {
-                        openCameraDialog(context);
-                      },
-                      child: SvgPicture.asset(
-                        'assets/PostUI/photos.svg',
-                        height: 20,
-                        width: 20,
-                      ),
-                    ),
-                  ),
+                  (isEditing)
+                      ? const SizedBox()
+                      : Padding(
+                          padding: const EdgeInsets.only(left: 24.0, top: 0),
+                          child: GestureDetector(
+                            onTap: () {
+                              openCameraDialog(context);
+                            },
+                            child: SvgPicture.asset(
+                              'assets/PostUI/photos.svg',
+                              height: 20,
+                              width: 20,
+                            ),
+                          ),
+                        ),
                 ],
               ),
             ],

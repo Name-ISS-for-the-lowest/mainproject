@@ -14,6 +14,7 @@ class Post:
     attachedImage = Picture()
     date: datetime.datetime
     likes: int
+    comments: int
     reports: int
     imagelinks: list
     liked: bool = False
@@ -36,6 +37,7 @@ class Post:
         self.userID = user_id
         self.date = datetime.datetime.now()
         self.likes = 0
+        self.comments = 0
         self.reports = 0
         self.liked = False
         self.reportedByUser = False

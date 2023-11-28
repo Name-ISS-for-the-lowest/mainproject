@@ -10,7 +10,7 @@ class RouteHandler {
   static var cookieJar;
   static final dio = Dio();
   static bool started = false;
-  static const defaultHost = "https://issapp.gabrielmalek.com/";
+  static const defaultHost = "http://10.0.2.2:8000";
 
   static init() async {
     if (started) return;

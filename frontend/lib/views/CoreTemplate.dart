@@ -19,7 +19,10 @@ class _CoreTemplateState extends State<CoreTemplate> {
   final screens = [
     const ForumHome(),
     const ResourceCenter(),
-    const CreatePost(isEditing: false),
+    const CreatePost(
+      isEditing: false,
+      isCommenting: false,
+    ),
     const EventsPage(),
     const ProfilePage(),
   ];
@@ -39,7 +42,10 @@ class _CoreTemplateState extends State<CoreTemplate> {
       MaterialPageRoute(
         builder: (BuildContext context) {
           return const Scaffold(
-            body: CreatePost(isEditing: false),
+            body: CreatePost(
+              isEditing: false,
+              isCommenting: false,
+            ),
           );
         },
       ),

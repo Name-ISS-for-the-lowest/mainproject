@@ -32,11 +32,16 @@ class _CommentsState extends State<Comments> {
 
   //for the comments of the post
   var commentData = [];
+  //for the parents of the post
+  var parentData = [];
+  bool viewParents = false;
 
   Future load() async {
     var dataCall = await PostHelper.getPostByID(widget.postID);
     var comCall = await PostHelper.getComments(widget.postID);
+    var parCall = await PostHelper.getParents(widget.postID);
     Map comCallMap = {};
+    Map parCallMap = {};
     /*for (var item in comCall) {
       comCallMap[item["_id"]] = item;
     }
@@ -55,6 +60,7 @@ class _CommentsState extends State<Comments> {
         fetched = true;
         post = dataCall;
         commentData = comCall;
+        parentData = parCall.reversed.toList();
         init = false;
       });
     }
@@ -69,19 +75,49 @@ class _CommentsState extends State<Comments> {
   }
 
   Widget _buildList() {
+    print('WE GOT HERE');
+    int comShift = 0;
+    if (commentData.length == 0) {
+      comShift += 1;
+    }
+    int parShift = 0;
+    if (!viewParents) {
+      parShift = parentData.length;
+    }
     return RefreshIndicator(
       onRefresh: () => loadUpdate(),
       child: ListView.builder(
-        itemCount: commentData.length,
+        itemCount:
+            commentData.length + 3 + parentData.length - parShift + comShift,
         itemBuilder: (BuildContext context, int index) {
-          print("Current Index:$index");
-          print("Current Length:${commentData.length}");
-          if (commentData.isEmpty && index == 0) {
-            return const Center(
-              child: CircularProgressIndicator(),
+          if (index < parentData.length && viewParents) {
+            return _buildComment(index, parentData, true);
+          }
+
+          if (index == parentData.length - parShift) {
+            return Divider(
+              height: 3,
+              color: Colors.black,
             );
           }
-          return _buildComment(index);
+
+          if (index == parentData.length + 1 - parShift) {
+            return _buildPost();
+          }
+
+          if (index == parentData.length + 2 - parShift) {
+            return Divider(
+              height: 3,
+              color: Colors.black,
+            );
+          }
+
+          if (commentData.isEmpty &&
+              index == parentData.length + 3 - parShift) {
+            return Center(child: Text('No Comments Found'));
+          }
+
+          return _buildComment(index - parentData.length - 3 + parShift);
         },
       ),
     );
@@ -89,30 +125,16 @@ class _CommentsState extends State<Comments> {
 
   Future<void> loadDelete(String postID) async {
     await PostHelper.deletePost(postID);
-    var dataCall = await PostHelper.getPostByID(postID);
-    if (mounted) {
-      setState(() {});
-    }
+    await load();
   }
 
   Future<void> loadRemovalToggle(String postID) async {
     await PostHelper.toggleRemoval(postID);
-    var dataCall = await PostHelper.getPostByID(postID);
-    if (mounted) {
-      setState(() {});
-    }
+    await load();
   }
 
   Future<void> loadUpdate() async {
-    var dataCall = await PostHelper.getComments(widget.postID);
-    if (mounted) {
-      setState(() {
-        commentData.clear();
-        commentData.addAll(dataCall);
-        num fetchedLength = dataCall.length;
-        int convertedFetch = fetchedLength.toInt();
-      });
-    }
+    await load();
   }
 
   String formatLargeNumber(int number) {
@@ -135,11 +157,16 @@ class _CommentsState extends State<Comments> {
         builder: (BuildContext context) {
           return Scaffold(
             body: CreatePost(
-                isEditing: true, originalText: postContent, postID: postID),
+                isEditing: true,
+                isCommenting: true,
+                originalText: postContent,
+                postID: postID),
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToViewProfile(String postID, String posterID) {
@@ -151,7 +178,9 @@ class _CommentsState extends State<Comments> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToViewImage(List<String> inputs) {
@@ -163,7 +192,9 @@ class _CommentsState extends State<Comments> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToAdminView(String postID) {
@@ -175,7 +206,9 @@ class _CommentsState extends State<Comments> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToReportPost(String postID) {
@@ -187,7 +220,9 @@ class _CommentsState extends State<Comments> {
           );
         },
       ),
-    );
+    ).then((result) async {
+      await loadUpdate();
+    });
   }
 
   void navigateToConfirmPost() {
@@ -199,6 +234,59 @@ class _CommentsState extends State<Comments> {
           );
         },
       ),
+    ).then((result) async {
+      await loadUpdate();
+    });
+  }
+
+  void navigateToComments(String postID) {
+    Navigator.push(context,
+            MaterialPageRoute(builder: (context) => Comments(postID: postID)))
+        .then((result) async {
+      await loadUpdate();
+    });
+  }
+
+  void navigateToCreateComment(String postID) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => CreatePost(
+                  postID: postID,
+                  isEditing: false,
+                  isCommenting: true,
+                ))).then((result) async {
+      await loadUpdate();
+    });
+  }
+
+  Future<void> removalAlertDialog(
+      BuildContext context, String postID, bool removed) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text((removed)
+              ? 'Do you wish to approve this post?'
+              : 'Do you wish to remove this post?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await loadRemovalToggle(postID);
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -234,504 +322,29 @@ class _CommentsState extends State<Comments> {
       );
     }
 
-    String posterName = post["username"];
-    String postContent = post["content"];
-    String postID = post["_id"];
-    String posterID = post['userID'];
-    String reportNumber = post['reports'];
-    late int likes = post['likes'];
-    bool posterIsAdmin = false;
-    bool userIsAdmin = false;
-    String attachmentURL = 'Empty';
-    if (post['attachedImage'] != 'Empty') {
-      attachmentURL = post['attachedImage']['url'];
-    }
-    //These booleans below may come in handy when we are making admin views
-    bool deleted = false;
-    bool removed = false;
-    if (AuthHelper.userInfoCache['admin'] == 'True') {
-      userIsAdmin = true;
-    }
-    bool isEdited = false;
-    var liked = post['liked'];
-    var unreviewedReport = post['unreviewedReport'];
-    if (post['edited'] == 'True') {
-      isEdited = true;
-    }
-    if (post['posterIsAdmin'] == 'True') {
-      posterIsAdmin = true;
-    }
-    if (post['deleted'] == 'True') {
-      deleted = true;
-    }
-    if (post['removed'] == 'True') {
-      removed = true;
-    }
-
-    String formattedLikes = formatLargeNumber(likes);
-    postContent = postContent.replaceAll('\n', ' ');
-
-    String commentNumber = '0';
-
-    SizedBox postBodyContainer = SizedBox(
-      width: 280,
-      child: Builder(
-        builder: (BuildContext context) {
-          return RichText(
-            softWrap: true,
-            text: TextSpan(
-              children: [
-                TextSpan(
-                    text: (currentlyTranslated.containsKey(postContent))
-                        ? currentlyTranslated[postContent]!
-                        : postContent,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'Inter',
-                    )),
-                if (isEdited)
-                  const TextSpan(
-                    text: ' (Edited)',
-                    style: TextStyle(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey,
-                    ),
-                  ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-
-    PopupMenuButton<String> threeDotMenu = PopupMenuButton<String>(
-      onSelected: (String result) {
-        // Handle the selected option
-        if (result == 'closeMenu') {
-          // Closes menu and does absolutely nothing
-        } else if (result == 'editPost') {
-          navigateToEditPost(post["content"], postID);
-        } else if (result == 'deletePost') {
-          deletePost(postID);
-        } else if (result == 'reportPost') {
-          // Handle option 2
-        }
-      },
-      itemBuilder: (BuildContext context) {
-        List<PopupMenuEntry<String>> menuItems = [];
-
-        menuItems.add(
-          PopupMenuItem<String>(
-            value: 'closeMenu',
-            child: Row(
-              children: [
-                SizedBox(
-                  height: 15,
-                  width: 15,
-                  child: SvgPicture.asset(
-                    'assets/icon-x.svg',
-                  ),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                const Text('Close Menu'),
-              ],
-            ),
-          ),
-        );
-
-        if (posterID == AuthHelper.userInfoCache['_id']) {
-          menuItems.add(
-            PopupMenuItem<String>(
-              value: 'editPost',
-              child: Row(
-                children: [
-                  SizedBox(
-                    height: 15,
-                    width: 15,
-                    child: SvgPicture.asset(
-                      'assets/PostUI/icon-editpost.svg',
-                      color: const Color(0xff0094FF),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Text(
-                    'Edit Post',
-                    style: TextStyle(
-                      color: Color(0xff0094FF),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-
-          menuItems.add(
-            PopupMenuItem<String>(
-              value: 'deletePost',
-              child: Row(
-                children: [
-                  SizedBox(
-                    height: 15,
-                    width: 15,
-                    child: SvgPicture.asset(
-                      'assets/PostUI/icon-trash.svg',
-                      color: Colors.red,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Text(
-                    'Delete Post',
-                    style: TextStyle(
-                      color: Colors.red,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        } else {
-          menuItems.add(
-            PopupMenuItem<String>(
-              value: 'reportPost',
-              child: Row(
-                children: [
-                  SizedBox(
-                    height: 15,
-                    width: 15,
-                    child: SvgPicture.asset(
-                      'assets/PostUI/icon-flag.svg',
-                      color: Colors.red,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Text(
-                    'Report Post',
-                    style: TextStyle(
-                      color: Colors.red,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-
-        return menuItems;
-      },
-      color: const Color(0xffffffff),
-      child: SvgPicture.asset(
-        "assets/PostUI/icon-3dots.svg",
-        width: 20,
-        height: 5,
-        color: Colors.black,
-      ),
-    );
-
-    double calculatedHeight = (postContent.length / 25 * 14) + 50;
-
-    return Padding(
-      padding: const EdgeInsets.all(6.0),
-      child: SizedBox(
-        height: calculatedHeight + 100,
-        child: Stack(
-          children: [
-            Positioned(
-              left: 15,
-              child: GestureDetector(
-                onTap: () {
-                  navigateToViewProfile(postID, posterID);
-                },
-                child: Container(
-                  width: 50, // Set your desired width
-                  height: 50, // Set your desired height
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
-                      placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 80,
-              top: 14,
-              child: GestureDetector(
-                onTap: () {
-                  navigateToViewProfile(postID, posterID);
-                },
-                child: RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                          text: posterName,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'Inter',
-                          )),
-                      if (posterIsAdmin)
-                        TextSpan(
-                          text: ' [${Localize("Admin")}]',
-                          style: const TextStyle(
-                            color: Color.fromRGBO(4, 57, 39, 100),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-                left: 80,
-                top: 40,
-                //I'm sorry for my sins
-                child: (userIsAdmin)
-                    ? (deleted)
-                        ? Text(
-                            "[${Localize('Deleted By User')}]",
-                            style: const TextStyle(color: Colors.red),
-                          )
-                        : (removed)
-                            ? Text(
-                                "[${Localize('Post Removed')}]",
-                                style: const TextStyle(
-                                  color: Colors.red,
-                                ),
-                              )
-                            : const SizedBox()
-                    : const SizedBox()),
-            Positioned(
-              left: 340,
-              top: 12.5,
-              child: Container(
-                child: threeDotMenu,
-              ),
-            ),
-            Positioned(
-              left: 40,
-              top: 65,
-              child: Container(
-                height: calculatedHeight,
-                width: 1,
-                color: const Color(0x5f000000),
-              ),
-            ),
-            Positioned(
-              top: 65,
-              left: 55,
-              child: postBodyContainer,
-            ),
-            Positioned(
-              bottom: 80,
-              right: 10,
-              child: (attachmentURL != 'Empty')
-                  ? GestureDetector(
-                      onTap: () {
-                        navigateToViewImage([attachmentURL]);
-                      },
-                      child: Container(
-                        height: 340,
-                        width: 340,
-                        color: Colors.black,
-                        child: CachedNetworkImage(
-                          imageUrl: "$attachmentURL?tr=w-340,h-340,fo-auto",
-                          placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                        ),
-                      ),
-                    )
-                  : const SizedBox(),
-            ),
-            Positioned(
-              bottom: 20,
-              left: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          var response = await PostHelper.likePost(postID);
-                          setState(() {
-                            post['liked'] = !liked;
-
-                            liked = !liked;
-
-                            if (liked) {
-                              post['likes']++;
-                            } else {
-                              post['likes']--;
-                            }
-                          });
-                        },
-                        child: (liked)
-                            ? Stack(
-                                children: [
-                                  Positioned(
-                                    left: 1,
-                                    child: SvgPicture.asset(
-                                      'assets/PostUI/icon-heartFilled.svg',
-                                      color: Colors.red,
-                                      height: 20,
-                                      width: 20,
-                                    ),
-                                  ),
-                                  SvgPicture.asset(
-                                    'assets/PostUI/icon-heart.svg',
-                                    color: Colors.black,
-                                    height: 20,
-                                    width: 20,
-                                  )
-                                ],
-                              )
-                            : SvgPicture.asset(
-                                'assets/PostUI/icon-heart.svg',
-                                color: Colors.black,
-                                height: 20,
-                                width: 20,
-                              ),
-                      ),
-                      Text(formattedLikes, style: const TextStyle(fontSize: 11))
-                    ],
-                  ),
-                  const SizedBox(width: 5),
-                  Column(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CreateComment(
-                                      isEditing: false, postID: postID)));
-                        },
-                        child: SvgPicture.asset(
-                          "assets/PostUI/icon-comment.svg",
-                          height: 20,
-                          width: 20,
-                        ),
-                      ),
-                      Text(commentNumber, style: const TextStyle(fontSize: 11))
-                    ],
-                  ),
-                  (userIsAdmin) ? const SizedBox(width: 5) : const SizedBox(),
-                  (userIsAdmin)
-                      ? Column(
-                          children: [
-                            GestureDetector(
-                                onTap: () {
-                                  navigateToAdminView(postID);
-                                },
-                                child: SvgPicture.asset(
-                                  "assets/PostUI/icon-flag.svg",
-                                  height: 20,
-                                  width: 20,
-                                  color: (unreviewedReport)
-                                      ? Colors.deepOrange
-                                      : Colors.black,
-                                )),
-                            Text(reportNumber,
-                                style: const TextStyle(fontSize: 11))
-                          ],
-                        )
-                      : const SizedBox(),
-                  (userIsAdmin)
-                      ? (deleted)
-                          ? const SizedBox()
-                          : const SizedBox(width: 5)
-                      : const SizedBox(),
-                  (userIsAdmin)
-                      ? (deleted)
-                          ? const SizedBox()
-                          : GestureDetector(
-                              onTap: () async {
-                                await loadRemovalToggle(postID);
-                              },
-                              child: (removed)
-                                  ? SvgPicture.asset(
-                                      "assets/PostUI/icon-approve.svg",
-                                      height: 20,
-                                      width: 20,
-                                      color: Colors.green,
-                                    )
-                                  : SvgPicture.asset(
-                                      "assets/PostUI/icon-remove.svg",
-                                      height: 18,
-                                      width: 18,
-                                      color: Colors.red,
-                                    ))
-                      : const SizedBox(),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 33,
-              left: 280,
-              child: GestureDetector(
-                onTap: () async {
-                  await translatePost(postContent);
-                  if (post['translations'] == '') {
-                    await PostHelper.storeTranslation(
-                        PostHelper.cachedTranslations[postContent]!,
-                        post['_id']);
-                  }
-                  if (mounted) {
-                    setState(() {
-                      if (currentlyTranslated.containsKey(postID)) {
-                        currentlyTranslated.remove(postID);
-                      } else {
-                        currentlyTranslated[postID] = 'True';
-                      }
-                    });
-                  }
-                },
-                child: Text(
-                  (currentlyTranslated.containsKey(postID))
-                      ? Localize("Original Text")
-                      : Localize("Translate"),
-                  style: const TextStyle(
-                    color: Color(0xff0094FF),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    return _buildComment(0, [post]);
   }
 
-  Widget _buildComment(int index) {
-    String imageURL = commentData[index]["profilePicture"]['url'];
-    String attachmentURL = 'Empty';
-    if (commentData[index]['attachedImage'] != 'Empty') {
-      attachmentURL = commentData[index]['attachedImage']['url'];
+  Widget _buildComment(int index, [var postPassed, var parentPassed]) {
+    var parentOverride = false;
+    if (parentPassed != null) {
+      parentOverride = true;
     }
-    String posterName = commentData[index]["username"];
-    String postContent = commentData[index]["content"];
-    String postID = commentData[index]["_id"];
-    String posterID = commentData[index]['userID'];
-    String reportNumber = commentData[index]['reports'];
-    late int likes = commentData[index]['likes'];
+    var dataSource = commentData;
+    if (postPassed != null) {
+      dataSource = postPassed;
+    }
+    String imageURL = dataSource[index]["profilePicture"]['url'];
+    String attachmentURL = 'Empty';
+    if (dataSource[index]['attachedImage'] != 'Empty') {
+      attachmentURL = dataSource[index]['attachedImage']['url'];
+    }
+    String posterName = dataSource[index]["username"];
+    String postContent = dataSource[index]["content"];
+    String postID = dataSource[index]["_id"];
+    String posterID = dataSource[index]['userID'];
+    String reportNumber = dataSource[index]['reports'];
+    late int likes = dataSource[index]['likes'];
     bool posterIsAdmin = false;
     bool userIsAdmin = false;
     //These booleans below may come in handy when we are making admin views
@@ -741,73 +354,35 @@ class _CommentsState extends State<Comments> {
       userIsAdmin = true;
     }
     bool isEdited = false;
-    var liked = commentData[index]['liked'];
-    var reportedByUser = commentData[index]['reportedByUser'];
-    var unreviewedReport = commentData[index]['unreviewedReport'];
-    if (commentData[index]['edited'] == 'True') {
+    var liked = dataSource[index]['liked'];
+    var reportedByUser = dataSource[index]['reportedByUser'];
+    var unreviewedReport = dataSource[index]['unreviewedReport'];
+    if (dataSource[index]['edited'] == 'True') {
       isEdited = true;
     }
-    if (commentData[index]['posterIsAdmin'] == 'True') {
+    if (dataSource[index]['posterIsAdmin'] == 'True') {
       posterIsAdmin = true;
     }
-    if (commentData[index]['deleted'] == 'True') {
+    if (dataSource[index]['deleted'] == 'True') {
       deleted = true;
     }
-    if (commentData[index]['removed'] == 'True') {
+    if (dataSource[index]['removed'] == 'True') {
       removed = true;
     }
     var unescape = HtmlUnescape();
 
     String formattedLikes = formatLargeNumber(likes);
     postContent = postContent.replaceAll('\n', ' ');
-    bool postTooLong = false;
-    if (postContent.length > 200) {
-      postTooLong = true;
-      postContent = postContent.substring(0, 200);
-      postContent += "...";
-    }
 
-    String commentNumber = '0';
-
-    SizedBox postBodyContainer = SizedBox(
-      width: 280,
-      child: Builder(
-        builder: (BuildContext context) {
-          return RichText(
-            softWrap: true,
-            text: TextSpan(
-              children: [
-                TextSpan(
-                    text: (currentlyTranslated.containsKey(postID))
-                        ? unescape.convert(
-                            PostHelper.cachedTranslations[postContent]!)
-                        : postContent,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'Inter',
-                    )),
-                if (isEdited)
-                  TextSpan(
-                    text: Localize('(Edited)'),
-                    style: const TextStyle(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey,
-                    ),
-                  ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+    String commentNumber = dataSource[index]['comments'].toString();
 
     PopupMenuButton<String> threeDotMenu = PopupMenuButton<String>(
-      onSelected: (String result) {
+      onSelected: (String result) async {
         // Handle the selected option
         if (result == 'closeMenu') {
           // Closes menu and does absolutely nothing
         } else if (result == 'editPost') {
-          navigateToEditPost(commentData[index]["content"], postID);
+          navigateToEditPost(dataSource[index]["content"], postID);
         } else if (result == 'deletePost') {
           deletePost(postID);
         } else if (result == 'reportPost') {
@@ -950,318 +525,354 @@ class _CommentsState extends State<Comments> {
       ),
     );
 
-    double calculatedHeight = (postContent.length / 25 * 14) + 50;
-    if (postTooLong) calculatedHeight += 35;
-    if (attachmentURL != 'Empty') {
-      calculatedHeight += 410;
-    }
-
     return Padding(
-      padding: const EdgeInsets.all(6.0),
-      child: SizedBox(
-        height: calculatedHeight + 100,
-        child: Stack(
-          children: [
-            Positioned(
-              left: 15,
-              child: GestureDetector(
-                onTap: () {
-                  navigateToViewProfile(postID, posterID);
-                },
-                child: Container(
-                  width: 50, // Set your desired width
-                  height: 50, // Set your desired height
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
-                      placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 80,
-              top: 14,
-              child: GestureDetector(
-                onTap: () {
-                  navigateToViewProfile(postID, posterID);
-                },
-                child: RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                          text: posterName,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'Inter',
-                          )),
-                      if (posterIsAdmin)
-                        TextSpan(
-                          text: ' [${Localize("Admin")}]',
-                          style: const TextStyle(
-                            color: Color.fromRGBO(4, 57, 39, 100),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-                left: 80,
-                top: 40,
-                //I'm sorry for my sins
-                child: (userIsAdmin)
-                    ? (deleted)
-                        ? Text(
-                            "[${Localize('Deleted By User')}]",
-                            style: const TextStyle(color: Colors.red),
-                          )
-                        : (removed)
-                            ? Text(
-                                "[${Localize('Post Removed')}]",
-                                style: const TextStyle(
-                                  color: Colors.red,
-                                ),
-                              )
-                            : const SizedBox()
-                    : const SizedBox()),
-            Positioned(
-              left: 340,
-              top: 12.5,
-              child: Container(
-                child: threeDotMenu,
-              ),
-            ),
-            Positioned(
-              left: 40,
-              top: 65,
-              child: Container(
-                height: calculatedHeight,
-                width: 1,
-                color: const Color(0x5f000000),
-              ),
-            ),
-            Positioned(
-              top: 65,
-              left: 55,
-              child: postBodyContainer,
-            ),
-            Positioned(
-              bottom: 80,
-              right: 10,
-              child: (attachmentURL != 'Empty')
-                  ? GestureDetector(
-                      onTap: () {
-                        navigateToViewImage([attachmentURL]);
-                      },
-                      child: Container(
-                        height: 340,
-                        width: 340,
-                        color: Colors.black,
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 50),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      navigateToViewProfile(postID, posterID);
+                    },
+                    child: Container(
+                      width: 50, // Set your desired width
+                      height: 50, // Set your desired height
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: ClipOval(
                         child: CachedNetworkImage(
-                          imageUrl: "$attachmentURL?tr=w-340,h-340,fo-auto",
+                          imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
                           placeholder: (context, url) =>
                               const CircularProgressIndicator(),
                           errorWidget: (context, url, error) =>
                               const Icon(Icons.error),
+                          fit: BoxFit.fill,
                         ),
                       ),
-                    )
-                  : const SizedBox(),
-            ),
-            Positioned(
-              bottom: 20,
-              left: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          var response = await PostHelper.likePost(postID);
-                          setState(() {
-                            commentData[index]['liked'] = !liked;
-
-                            liked = !liked;
-
-                            if (liked) {
-                              commentData[index]['likes']++;
-                            } else {
-                              commentData[index]['likes']--;
-                            }
-                          });
-                        },
-                        child: (liked)
-                            ? Stack(
-                                children: [
-                                  Positioned(
-                                    left: 1,
-                                    child: SvgPicture.asset(
-                                      'assets/PostUI/icon-heartFilled.svg',
-                                      color: Colors.red,
-                                      height: 20,
-                                      width: 20,
-                                    ),
-                                  ),
-                                  SvgPicture.asset(
-                                    'assets/PostUI/icon-heart.svg',
-                                    color: Colors.black,
-                                    height: 20,
-                                    width: 20,
-                                  )
-                                ],
-                              )
-                            : SvgPicture.asset(
-                                'assets/PostUI/icon-heart.svg',
-                                color: Colors.black,
-                                height: 20,
-                                width: 20,
-                              ),
-                      ),
-                      Text(formattedLikes, style: const TextStyle(fontSize: 11))
-                    ],
+                    ),
                   ),
-                  const SizedBox(width: 5),
-                  Column(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      Comments(postID: postID)));
-                          /*ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Comment Tapped")));*/
-                        },
-                        child: SvgPicture.asset(
-                          "assets/PostUI/icon-comment.svg",
-                          height: 20,
-                          width: 20,
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      navigateToViewProfile(postID, posterID);
+                      loadUpdate();
+                    },
+                    child: Row(children: [
+                      Text(
+                        posterName,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'Inter',
+                          fontSize: 22,
                         ),
                       ),
-                      Text(commentNumber, style: const TextStyle(fontSize: 11))
-                    ],
+                      (posterIsAdmin)
+                          ? Icon(Icons.shield,
+                              color: Color.fromRGBO(4, 57, 39, 100))
+                          : const SizedBox(),
+                    ]),
                   ),
-                  (userIsAdmin) ? const SizedBox(width: 5) : const SizedBox(),
-                  (userIsAdmin)
-                      ? Column(
-                          children: [
-                            GestureDetector(
-                                onTap: () {
-                                  navigateToAdminView(postID);
-                                },
-                                child: SvgPicture.asset(
-                                  "assets/PostUI/icon-flag.svg",
-                                  height: 20,
-                                  width: 20,
-                                  color: (unreviewedReport)
-                                      ? Colors.deepOrange
-                                      : Colors.black,
-                                )),
-                            Text(reportNumber,
-                                style: const TextStyle(fontSize: 11))
-                          ],
-                        )
-                      : const SizedBox(),
-                  (userIsAdmin)
-                      ? (deleted)
-                          ? const SizedBox()
-                          : const SizedBox(width: 5)
-                      : const SizedBox(),
-                  (userIsAdmin)
-                      ? (deleted)
-                          ? const SizedBox()
-                          : GestureDetector(
-                              onTap: () async {
-                                await loadRemovalToggle(postID);
-                              },
-                              child: (removed)
-                                  ? SvgPicture.asset(
-                                      "assets/PostUI/icon-approve.svg",
-                                      height: 20,
-                                      width: 20,
-                                      color: Colors.green,
-                                    )
-                                  : SvgPicture.asset(
-                                      "assets/PostUI/icon-remove.svg",
-                                      height: 18,
-                                      width: 18,
-                                      color: Colors.red,
-                                    ))
-                      : const SizedBox(),
                 ],
               ),
-            ),
-            Positioned(
-              bottom: 33,
-              left: 280,
-              child: GestureDetector(
-                onTap: () async {
-                  await translatePost(postContent);
-                  if (commentData[index]['translations'] == '') {
-                    await PostHelper.storeTranslation(
-                        PostHelper.cachedTranslations[postContent]!,
-                        commentData[index]['_id']);
-                  }
-                  if (mounted) {
-                    setState(() {
-                      if (currentlyTranslated.containsKey(postID)) {
-                        currentlyTranslated.remove(postID);
-                      } else {
-                        currentlyTranslated[postID] = 'True';
-                      }
-                    });
-                  }
-                },
-                child: Text(
-                  (currentlyTranslated.containsKey(postID))
-                      ? Localize("Original Text")
-                      : Localize("Translate"),
-                  style: const TextStyle(
-                    color: Color(0xff0094FF),
-                  ),
-                ),
+              Expanded(child: const SizedBox()),
+              Container(
+                child: threeDotMenu,
               ),
-            ),
-            Positioned(
-              bottom: 60,
-              left: 55,
-              child: postTooLong
-                  ? Container(
-                      child: GestureDetector(
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(Localize(
-                                  "Expanded Post (should go to same place as comments)"))));
-                        },
-                        child: SizedBox(
-                          width: 250,
-                          child: Text(
-                            Localize(
-                                "Post too tall to view on home page. Please click here to expand post."),
-                            style: const TextStyle(
-                              color: Color(0x55000000),
-                            ),
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 25, top: 5),
+            child: Row(
+              children: [
+                Flexible(
+                  child: Container(
+                    padding: EdgeInsets.only(left: 10),
+                    decoration: BoxDecoration(
+                      border: Border(
+                          left: BorderSide(width: 1.0, color: Colors.grey)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        (userIsAdmin)
+                            ? (deleted)
+                                ? Text(
+                                    "[${Localize('Deleted By User')}]",
+                                    style: const TextStyle(color: Colors.red),
+                                  )
+                                : (removed)
+                                    ? Text(
+                                        "[${Localize('Post Removed')}]",
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      )
+                                    : const SizedBox()
+                            : const SizedBox(),
+                        (attachmentURL != 'Empty')
+                            ? Container(
+                                padding: EdgeInsets.only(top: 10),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    navigateToViewImage([attachmentURL]);
+                                  },
+                                  child: Container(
+                                    height: 340,
+                                    width: 340,
+                                    color: Colors.black,
+                                    child: CachedNetworkImage(
+                                      imageUrl:
+                                          "$attachmentURL?tr=w-340,h-340,fo-auto",
+                                      placeholder: (context, url) =>
+                                          const CircularProgressIndicator(),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox(),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        RichText(
+                          maxLines: null,
+                          softWrap: true,
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                  text:
+                                      (currentlyTranslated.containsKey(postID))
+                                          ? unescape.convert(PostHelper
+                                              .cachedTranslations[postContent]!)
+                                          : postContent,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: 'Inter',
+                                    fontSize: 18,
+                                  )),
+                              if (isEdited)
+                                TextSpan(
+                                  text: Localize('(Edited)'),
+                                  style: const TextStyle(
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                      ),
-                    )
-                  : const SizedBox(),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(right: 20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  await translatePost(postContent);
+                                  if (dataSource[index]['translations'] == '') {
+                                    await PostHelper.storeTranslation(
+                                        PostHelper
+                                            .cachedTranslations[postContent]!,
+                                        dataSource[index]['_id']);
+                                  }
+                                  if (mounted) {
+                                    setState(() {
+                                      if (currentlyTranslated
+                                          .containsKey(postID)) {
+                                        currentlyTranslated.remove(postID);
+                                      } else {
+                                        currentlyTranslated[postID] = 'True';
+                                      }
+                                    });
+                                  }
+                                },
+                                child: Text(
+                                  (currentlyTranslated.containsKey(postID))
+                                      ? Localize("Original Text")
+                                      : Localize("Translate"),
+                                  style: const TextStyle(
+                                    color: Color(0xff0094FF),
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () async {
+                                    var response =
+                                        await PostHelper.likePost(postID);
+                                    setState(() {
+                                      dataSource[index]['liked'] = !liked;
+
+                                      liked = !liked;
+
+                                      if (liked) {
+                                        dataSource[index]['likes']++;
+                                      } else {
+                                        dataSource[index]['likes']--;
+                                      }
+                                    });
+                                  },
+                                  child: (liked)
+                                      ? Stack(
+                                          children: [
+                                            Positioned(
+                                              left: 1,
+                                              child: SvgPicture.asset(
+                                                'assets/PostUI/icon-heartFilled.svg',
+                                                color: Colors.red,
+                                                height: 30,
+                                                width: 30,
+                                              ),
+                                            ),
+                                            SvgPicture.asset(
+                                              'assets/PostUI/icon-heart.svg',
+                                              color: Colors.black,
+                                              height: 30,
+                                              width: 30,
+                                            )
+                                          ],
+                                        )
+                                      : SvgPicture.asset(
+                                          'assets/PostUI/icon-heart.svg',
+                                          color: Colors.black,
+                                          height: 30,
+                                          width: 30,
+                                        ),
+                                ),
+                                Text(formattedLikes,
+                                    style: const TextStyle(fontSize: 14))
+                              ],
+                            ),
+                            const SizedBox(width: 10),
+                            (postPassed != null)
+                                ? Column(
+                                    children: [
+                                      SvgPicture.asset(
+                                        "assets/PostUI/icon-comment.svg",
+                                        height: 30,
+                                        width: 30,
+                                      ),
+                                      Text(commentNumber,
+                                          style: const TextStyle(fontSize: 14))
+                                    ],
+                                  )
+                                : const SizedBox(),
+                            (userIsAdmin && postPassed != null)
+                                ? const SizedBox(width: 10)
+                                : const SizedBox(),
+                            (userIsAdmin)
+                                ? Column(
+                                    children: [
+                                      GestureDetector(
+                                          onTap: () {
+                                            navigateToAdminView(postID);
+                                          },
+                                          child: SvgPicture.asset(
+                                            "assets/PostUI/icon-flag.svg",
+                                            height: 30,
+                                            width: 30,
+                                            color: (unreviewedReport)
+                                                ? Colors.deepOrange
+                                                : Colors.black,
+                                          )),
+                                      Text(reportNumber,
+                                          style: const TextStyle(fontSize: 14))
+                                    ],
+                                  )
+                                : const SizedBox(),
+                            (userIsAdmin)
+                                ? (deleted)
+                                    ? const SizedBox()
+                                    : const SizedBox(width: 10)
+                                : const SizedBox(),
+                            (userIsAdmin)
+                                ? (deleted)
+                                    ? const SizedBox()
+                                    : GestureDetector(
+                                        onTap: () async {
+                                          await removalAlertDialog(
+                                              context, postID, removed);
+                                        },
+                                        child: (removed)
+                                            ? SvgPicture.asset(
+                                                "assets/PostUI/icon-approve.svg",
+                                                height: 30,
+                                                width: 30,
+                                                color: Colors.green,
+                                              )
+                                            : Container(
+                                                padding:
+                                                    EdgeInsets.only(top: 5),
+                                                child: SvgPicture.asset(
+                                                  "assets/PostUI/icon-remove.svg",
+                                                  height: 24,
+                                                  color: Colors.red,
+                                                ),
+                                              ))
+                                : const SizedBox(),
+                          ],
+                        ),
+                        (postPassed != null)
+                            ? Padding(
+                                padding: EdgeInsets.only(right: 20),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    GestureDetector(
+                                        onTap: () async {
+                                          navigateToCreateComment(postID);
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.reply,
+                                              color: Colors.black,
+                                              size: 30,
+                                            ),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(
+                                              "Reply to User",
+                                              style: TextStyle(fontSize: 20),
+                                            )
+                                          ],
+                                        )),
+                                  ],
+                                ),
+                              )
+                            : const SizedBox(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1309,14 +920,6 @@ class _CommentsState extends State<Comments> {
           ),
         ),
         backgroundColor: const Color(0xffece7d5),
-        body: Column(children: [
-          const SizedBox(height: 5),
-          Expanded(child: _buildPost()),
-          Expanded(
-            child: (commentData.isNotEmpty)
-                ? _buildList()
-                : Center(child: Text(Localize("No Comments Found"))),
-          )
-        ]));
+        body: _buildList());
   }
 }

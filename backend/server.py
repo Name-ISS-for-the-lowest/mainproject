@@ -345,7 +345,18 @@ def getComments(
 ):
     userID = IdFromCookie(request.cookies["session_cookie"])
     # print("userID: ", userID)
-    comments = DBManager.getComments(parentID=parentID,)
+    comments = DBManager.getComments(parentID=parentID, userID=userID)
+    comments = Post.listToJson(comments)
+    return comments
+
+@app.get("/getParents")
+def getParents(
+    parentID: str,
+    request: Request,
+):
+    userID = IdFromCookie(request.cookies["session_cookie"])
+    # print("userID: ", userID)
+    comments = DBManager.getParents(parentID=parentID,)
     comments = Post.listToJson(comments)
     return comments
 
