@@ -37,6 +37,20 @@ class _CommentsState extends State<Comments> {
   Future load() async {
     var dataCall = await PostHelper.getPostByID(widget.postID);
     var comCall = await PostHelper.getComments(widget.postID);
+    Map comCallMap = {};
+    /*for (var item in comCall) {
+      comCallMap[item["_id"]] = item;
+    }
+    var arrayOfCurrentIds = [];
+    for (var item in commentData) {
+          arrayOfCurrentIds.add(item['_id']);
+        }
+    for (var item in dataCall) {
+        //only input items with unique id's
+        if (!arrayOfCurrentIds.contains(item['_id'])) {
+          commentData.add(item);
+        }
+        }*/
     if (mounted) {
       setState(() {
         fetched = true;

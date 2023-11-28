@@ -267,7 +267,7 @@ class DBManager:
             comment.username = user["username"]
             comment.posterIsAdmin = user["admin"]
             comment.posterIsBanned = user["banned"]
-            comboID = str(comment["_id"]) + str(comment.userID)
+            comboID = str(comment._id) + str(comment.userID)
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
             if likedResult is not None:
                 comment.liked = True
