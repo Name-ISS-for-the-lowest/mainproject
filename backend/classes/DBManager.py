@@ -441,9 +441,15 @@ class DBManager:
 
     @staticmethod
     def addTranslationToPost(translatedText, userLang, postID):
+
+        post = DBManager.db['posts'].find_one({"_id": ObjectId(postID)})
+        translations = post['translations']
+        translations[userLang] = translatedText
+
+
         result = DBManager.db["posts"].update_one(
             {"_id": ObjectId(postID)},
-            {"$set": {f"translations.{userLang}": translatedText}},
+            {"$set": {"translations": translations}},
         )
         # print(result.matched_count)
         if result.matched_count == 1:

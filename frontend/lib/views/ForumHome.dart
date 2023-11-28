@@ -15,6 +15,7 @@ import 'package:frontend/views/ReportPage.dart';
 import 'package:frontend/views/ViewImage.dart';
 import 'package:frontend/views/ViewProfile.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'package:http/http.dart';
 
 class ForumHome extends StatefulWidget {
   const ForumHome({super.key});

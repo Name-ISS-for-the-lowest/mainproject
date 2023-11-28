@@ -297,6 +297,7 @@ class _CommentsState extends State<Comments> {
   }
 
   Future<void> translatePost(String originalText) async {
+    //first I check if cachedTranslations contains the original text as a key
     if (PostHelper.cachedTranslations.containsKey(originalText)) {
       return;
     } else if (post['translations'] != '') {
@@ -307,12 +308,20 @@ class _CommentsState extends State<Comments> {
         return;
       }
     } else {
-      var translationCall = await PostHelper.getTranslation(originalText);
-      if (mounted) {
-        setState(() {
-          String returnedTranslation = translationCall['result'];
-          PostHelper.cachedTranslations[originalText] = returnedTranslation;
-        });
+      if (originalText == '') {
+        if (mounted) {
+          setState(() {
+            PostHelper.cachedTranslations[originalText] = '';
+          });
+        }
+      } else {
+        var translationCall = await PostHelper.getTranslation(originalText);
+        if (mounted) {
+          setState(() {
+            String returnedTranslation = translationCall['result'];
+            PostHelper.cachedTranslations[originalText] = returnedTranslation;
+          });
+        }
       }
     }
   }
