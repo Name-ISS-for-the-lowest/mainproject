@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class postsearch(BaseModel):
-    start: int
+    start: str
     end: int
     search: str
     userID : str

@@ -52,7 +52,8 @@ class CookiesMiddleWare(BaseHTTPMiddleware):
             or request.url.path == "/setProfilePictureOnSignUp"
             or request.url.path == "/resetPassword"
             or match
-            or request.url.path == "/getEvents"
+            # or request.url.path == "/getEvents"
+            # or request.url.path == "/getPosts"
         ):
             return await call_next(request)
         # check if the user has a cookie
@@ -310,7 +311,7 @@ def toggleRemovalOfPost(postID: str, forceRemove: str, request: Request):
 
 @app.get("/getPosts")
 def getPosts(
-    start: int,
+    start: str,
     end: int,
     showReported: str,
     showRemoved: str,
@@ -328,6 +329,7 @@ def getPosts(
         userID=userID,
     )
     posts = Post.listToJson(posts)
+    print("posts: ", len(posts))
     return posts
 
 
@@ -425,6 +427,11 @@ def updateUser(data: userinfo, request: Request):
         profilePictureURL=data.profilePictureURL,
     )
     return JSONResponse(content="User Updated", status_code=200)
+
+@app.post("/banUser")
+def banUser(adminID: str, bannedID: str, banMessage:str, request: Request):
+    DBManager.banUser(adminID=adminID, bannedID=bannedID, banMessage=banMessage)
+    return JSONResponse(content="User Banned", status_code=200)
 
 
 @app.post("/searchPosts", summary="Search Posts using a String input")

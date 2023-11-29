@@ -200,11 +200,14 @@ class DBManager:
         elif showReported == "Unreviewed":
             specialSearchParams["unreviewedReport"] = True
 
+        if start != 'None':
+            start = ObjectId(start)
+            specialSearchParams["_id"] = {"$lt": start}
+
         posts = (
             DBManager.db["posts"]
             .find(specialSearchParams)
             .sort("_id", -1)
-            .skip(start)
             .limit(end)
         )
         returnPosts = []
@@ -263,11 +266,14 @@ class DBManager:
             specialSearchParams["reports"] = {"$gt": 0}
         elif showReported == "Unreviewed":
             specialSearchParams["unreviewedReport"] = True
+
+        if start != 'None':
+            start = ObjectId(start)
+            specialSearchParams["_id"] = {"$lt": start}
         posts = (
             DBManager.db["posts"]
             .find(specialSearchParams)
             .sort("_id", -1)
-            .skip(start)
             .limit(end)
         )
         returnPosts = []

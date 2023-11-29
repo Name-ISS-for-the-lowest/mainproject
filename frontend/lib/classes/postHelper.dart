@@ -125,13 +125,13 @@ class PostHelper {
     }
   }
 
-  static getPosts(int start, int end,
+  static getPosts(String start, int end,
       [Map<String, String>? specialSearchOptions]) async {
     specialSearchOptions ??= {
-        'showReported': 'All',
-        'showRemoved': 'None',
-        'showDeleted': 'None'
-      };
+      'showReported': 'All',
+      'showRemoved': 'None',
+      'showDeleted': 'None'
+    };
     final params = {
       'start': start,
       'end': end,
@@ -195,13 +195,13 @@ class PostHelper {
     }
   }
 
-  static searchPosts(int start, int end, String search, String userID,
+  static searchPosts(String start, int end, String search, String userID,
       [Map<String, String>? specialSearchOptions]) async {
     specialSearchOptions ??= {
-        'showReported': 'All',
-        'showRemoved': 'None',
-        'showDeleted': 'None'
-      };
+      'showReported': 'All',
+      'showRemoved': 'None',
+      'showDeleted': 'None'
+    };
     final data = {
       'start': start,
       'end': end,

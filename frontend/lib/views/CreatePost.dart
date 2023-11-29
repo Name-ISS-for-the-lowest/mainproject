@@ -183,6 +183,12 @@ class _CreatePostState extends State<CreatePost> {
                 ),
                 GestureDetector(
                   onTap: () async {
+                    if (currentPostBody == '') {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Please add some content to your post."),
+                      ));
+                      return;
+                    }
                     if (isEditing) {
                       var response =
                           await PostHelper.editPost(postID, currentPostBody);
@@ -223,26 +229,44 @@ class _CreatePostState extends State<CreatePost> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  height: 200,
-                  child: TextField(
-                    controller: TextEditingController(text: currentPostBody),
-                    decoration: InputDecoration(
-                      hintText: Localize("Begin Typing"),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 15.0, horizontal: 10.0),
+              Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      height: 200,
+                      child: TextField(
+                        controller:
+                            TextEditingController(text: currentPostBody),
+                        decoration: InputDecoration(
+                          hintText: Localize("Begin Typing"),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 15.0, horizontal: 10.0),
+                        ),
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null,
+                        onChanged: (text) {
+                          currentPostBody = text;
+                        },
+                      ),
                     ),
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    onChanged: (text) {
-                      currentPostBody = text;
-                    },
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24.0, top: 0),
+                    child: GestureDetector(
+                      onTap: () {
+                        openCameraDialog(context);
+                      },
+                      child: SvgPicture.asset(
+                        'assets/PostUI/photos.svg',
+                        height: 20,
+                        width: 20,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -254,49 +278,12 @@ class _CreatePostState extends State<CreatePost> {
                     children: [
                       Positioned(
                         top: 20,
-                        width: 400,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                openCameraDialog(context);
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.only(
-                                    top: 8, bottom: 8, left: 16, right: 16),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  border: Border.all(
-                                      color: Colors.black, width: 1.0),
-                                  color: Colors.white,
-                                ),
-                                child: Text(
-                                  (imageAttachment == null)
-                                      ? "Attach Image"
-                                      : "Change Image",
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 50,
                         right: 25,
                         height: 350,
                         width: 350,
                         child: (imageAttachment != null)
                             ? Stack(
                                 children: [
-                                  Positioned(
-                                    child: Container(
-                                      height: 350,
-                                      width: 350,
-                                      color: Colors.black,
-                                    ),
-                                  ),
                                   Positioned(
                                     child: Image.file(
                                       imageAttachment!,

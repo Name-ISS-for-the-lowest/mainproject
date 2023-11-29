@@ -4,7 +4,6 @@ import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/selectorHelper.dart';
-import 'package:frontend/views/CoreTemplate.dart';
 import 'package:frontend/views/ViewImage.dart';
 
 class ViewProfile extends StatefulWidget {
@@ -26,15 +25,7 @@ class _ViewProfileState extends State<ViewProfile> {
   int contentIndex = 0;
 
   void navigateToPrimaryScreens() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return const Scaffold(
-            body: CoreTemplate(),
-          );
-        },
-      ),
-    );
+    Navigator.of(context).pop();
   }
 
   void navigateToViewImage(List<String> inputs) {
@@ -70,7 +61,7 @@ class _ViewProfileState extends State<ViewProfile> {
       });
     }
   }
-  
+
   Future<void> banDialog(BuildContext context, String userID) async {
     TextEditingController textController = TextEditingController();
 
@@ -151,11 +142,12 @@ class _ViewProfileState extends State<ViewProfile> {
         posterBanned = bannedCheck;
       }
     }
-    
+
     if (emojiCheck != null) {
       emoji = '$emojiCheck ';
     }
-    String? localizedLanguage = SelectorHelper.reverseLangMap[poster['language']];
+    String? localizedLanguage =
+        SelectorHelper.reverseLangMap[poster['language']];
     if (localizedLanguage != null) {
       posterLanguage = localizedLanguage;
     }
@@ -229,15 +221,15 @@ class _ViewProfileState extends State<ViewProfile> {
                 ),
               ),
             ),
-            (posterBanned)?
-            const Align(
-              child: Text("[USER HAS BEEN BANNED]",
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red)),
-            )
-            : const SizedBox(),
+            (posterBanned)
+                ? const Align(
+                    child: Text("[USER HAS BEEN BANNED]",
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red)),
+                  )
+                : const SizedBox(),
             Align(
               alignment: Alignment.centerLeft,
               child: ListTile(
@@ -265,35 +257,33 @@ class _ViewProfileState extends State<ViewProfile> {
               title: Text(Localize('Email Address')),
               subtitle: Text(posterEmail),
             ),
-            (userIsAdmin) ?
-            Align(
-              child: GestureDetector(
-                onTap: () async {
-                  if (posterIsAdmin) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("You cannot ban an admin account!"),
-                    ));
-                  } else {
-                    print(post['posterIsBanned']);
-                    await banDialog(context, userID);
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(
-                      top: 8, bottom: 8, left: 16, right: 16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: Colors.black, width: 1.0),
-                    color: Color.fromARGB(255, 233, 54, 54),
-                  ),
-                  child: const Text(
-                    'Ban User',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ),
-            )
-            : const SizedBox(),
+            (userIsAdmin)
+                ? Align(
+                    child: GestureDetector(
+                      onTap: () async {
+                        if (posterIsAdmin) {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                            content: Text("You cannot ban an admin account!"),
+                          ));
+                        } else {
+                          print(post['posterIsBanned']);
+                          await banDialog(context, userID);
+                        }
+                      },
+                      child: ListTile(
+                        leading: const Icon(
+                          Icons.gavel_outlined,
+                          color: Colors.redAccent,
+                        ),
+                        title: Text(
+                          'Ban User',
+                          style: TextStyle(color: Colors.redAccent),
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox(),
           ],
         ),
       ),
