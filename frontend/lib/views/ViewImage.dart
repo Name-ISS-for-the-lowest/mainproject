@@ -37,7 +37,7 @@ class _ViewImageState extends State<ViewImage> {
           title: Text(
             Localize("Image View"),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: Colors.black,

@@ -111,7 +111,7 @@ class _ViewProfileState extends State<ViewProfile> {
 
     if (poster == null) {
       return Scaffold(
-        backgroundColor: Color(0xffece7d5),
+        backgroundColor: const Color(0xffece7d5),
         body: Center(child: Text(Localize("Loading Profile..."))),
       );
     }
@@ -165,7 +165,7 @@ class _ViewProfileState extends State<ViewProfile> {
           title: Text(
             Localize("User Profile"),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: Colors.black,
@@ -220,7 +220,7 @@ class _ViewProfileState extends State<ViewProfile> {
             (posterBanned)
                 ? Align(
                     child: Text(Localize("[USER HAS BEEN BANNED]"),
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Colors.red)),
@@ -274,7 +274,7 @@ class _ViewProfileState extends State<ViewProfile> {
                         ),
                         title: Text(
                           Localize('Ban User'),
-                          style: TextStyle(color: Colors.redAccent),
+                          style: const TextStyle(color: Colors.redAccent),
                         ),
                       ),
                     ),

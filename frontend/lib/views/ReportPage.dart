@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/views/ConfirmReport.dart';
-import 'package:frontend/views/CoreTemplate.dart';
 
 class ReportPage extends StatefulWidget {
   String postID;
@@ -66,7 +65,7 @@ class _ReportPageState extends State<ReportPage> {
           title: Text(
             Localize("Report Post"),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: Colors.black,
@@ -89,24 +88,24 @@ class _ReportPageState extends State<ReportPage> {
                   children: [
                     Text(
                       Localize("Are you sure you want to report this post?"),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Text(
                       Localize(
                           "We at International Student Station take reports very seriously, and highly encourage our users to report posts when they feel as if our rules are broken."),
-                      style: TextStyle(fontSize: 17),
+                      style: const TextStyle(fontSize: 17),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Text(
                       Localize(
                           "Please select the rule(s) you felt were violated in the post, and hit submit if you would like to file a report. Alternatively, hit the close button on the top left of your screen to cancel the report."),
-                      style: TextStyle(fontSize: 17),
+                      style: const TextStyle(fontSize: 17),
                       textAlign: TextAlign.center,
                     ),
                   ])),
@@ -183,7 +182,7 @@ class _ReportPageState extends State<ReportPage> {
             },
             child: Text(
               Localize("Submit"),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 color: Color(0xff007EF1),
               ),

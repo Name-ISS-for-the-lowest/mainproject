@@ -186,7 +186,7 @@ class _PasswordState extends State<PasswordSetUp> {
                 ),
               ),
 
-              SizedBox(
+              const SizedBox(
                 height: 200,
               ),
               ElevatedButton(

@@ -189,7 +189,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 250,
                     ),
                     ElevatedButton(
