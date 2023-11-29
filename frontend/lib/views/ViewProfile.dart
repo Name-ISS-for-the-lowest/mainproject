@@ -69,10 +69,10 @@ class _ViewProfileState extends State<ViewProfile> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Would you like to ban this poster?'),
+          title: Text(Localize('Would you like to ban this user?')),
           content: TextField(
             controller: textController,
-            decoration: const InputDecoration(hintText: 'Ban Reasoning'),
+            decoration: InputDecoration(hintText: Localize('Ban Reasoning')),
             maxLines: null,
           ),
           actions: <Widget>[
@@ -81,7 +81,7 @@ class _ViewProfileState extends State<ViewProfile> {
                 // Close the alert dialog
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(Localize('Cancel')),
             ),
             TextButton(
               onPressed: () async {
@@ -89,13 +89,13 @@ class _ViewProfileState extends State<ViewProfile> {
                     userID, textController.text);
                 Navigator.of(context).pop();
                 setState(() {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text("User has been Banned."),
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(Localize("User has been Banned.")),
                   ));
                   needsReload = true;
                 });
               },
-              child: const Text('OK'),
+              child: Text(Localize('Confirm')),
             ),
           ],
         );
@@ -110,9 +110,9 @@ class _ViewProfileState extends State<ViewProfile> {
     }
 
     if (poster == null) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: Color(0xffece7d5),
-        body: Center(child: Text("Loading Profile...")),
+        body: Center(child: Text(Localize("Loading Profile..."))),
       );
     }
 
@@ -122,6 +122,7 @@ class _ViewProfileState extends State<ViewProfile> {
     String pfpURL = poster["profilePicture.url"];
     String posterNationality = Localize(poster["nationality"]);
     String posterLanguage = AuthHelper.languageNames[poster["language"]];
+    posterLanguage = Localize(posterLanguage);
     String englishNationality = poster['nationality'];
     String? emojiCheck = SelectorHelper.countryEmojiMap[englishNationality];
     String? adminCheck = poster['admin'];
@@ -146,11 +147,6 @@ class _ViewProfileState extends State<ViewProfile> {
     if (emojiCheck != null) {
       emoji = '$emojiCheck ';
     }
-    String? localizedLanguage =
-        SelectorHelper.reverseLangMap[poster['language']];
-    if (localizedLanguage != null) {
-      posterLanguage = localizedLanguage;
-    }
 
     return Scaffold(
       backgroundColor: const Color(0xffece7d5),
@@ -166,8 +162,8 @@ class _ViewProfileState extends State<ViewProfile> {
             ),
             onTap: () => navigateToPrimaryScreens(),
           ),
-          title: const Text(
-            "User Profile",
+          title: Text(
+            Localize("User Profile"),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -222,8 +218,8 @@ class _ViewProfileState extends State<ViewProfile> {
               ),
             ),
             (posterBanned)
-                ? const Align(
-                    child: Text("[USER HAS BEEN BANNED]",
+                ? Align(
+                    child: Text(Localize("[USER HAS BEEN BANNED]"),
                         style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -262,9 +258,9 @@ class _ViewProfileState extends State<ViewProfile> {
                     child: GestureDetector(
                       onTap: () async {
                         if (posterIsAdmin) {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(const SnackBar(
-                            content: Text("You cannot ban an admin account!"),
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                Localize("You cannot ban an admin account!")),
                           ));
                         } else {
                           print(post['posterIsBanned']);
@@ -277,7 +273,7 @@ class _ViewProfileState extends State<ViewProfile> {
                           color: Colors.redAccent,
                         ),
                         title: Text(
-                          'Ban User',
+                          Localize('Ban User'),
                           style: TextStyle(color: Colors.redAccent),
                         ),
                       ),

@@ -92,16 +92,16 @@ class _ResetPasswordState extends State<ResetPassword> {
         body: Stack(
           alignment: Alignment.center,
           children: [
-            //Background animation (increase top offset value to move anim down, decrease to move up)
-            Positioned(
-                top: 200,
-                child: SizedBox(
-                  height: screenHeight,
-                  child: LottieBuilder.asset(
-                    'assets/BackgroundWave.json',
-                    fit: BoxFit.fill,
-                  ),
-                )),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(
+                height: screenHeight * 0.6,
+                child: LottieBuilder.asset(
+                  'assets/BackgroundWave.json',
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
 
             //Returning User Form begins Here--------------------------
             Positioned(
@@ -189,31 +189,31 @@ class _ResetPasswordState extends State<ResetPassword> {
                         ),
                       ),
                     ),
+                    SizedBox(
+                      height: 250,
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(330, 50),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0)),
+                        backgroundColor: const Color.fromRGBO(230, 183, 17, 1),
+                        foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
+                        textStyle: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      child: Text(Localize('Send Recovery Email')),
+                      onPressed: () async {
+                        await executeRestsetPassWord(emailController.text);
+                        navigateBacktoLogIn();
+                      },
+                    ),
                   ],
                 ))),
 
-            Positioned(
-              bottom: 42,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  fixedSize: const Size(330, 50),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0)),
-                  backgroundColor: const Color.fromRGBO(230, 183, 17, 1),
-                  foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
-                  textStyle: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                child: Text(Localize('Send Recovery Email')),
-                onPressed: () async {
-                  await executeRestsetPassWord(emailController.text);
-                  navigateBacktoLogIn();
-                },
-              ),
-            )
             //Next Button Styling
           ],
         ));
