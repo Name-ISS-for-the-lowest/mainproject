@@ -7,7 +7,6 @@ import 'package:frontend/classes/Localize.dart';
 import 'package:frontend/classes/authHelper.dart';
 import 'package:frontend/classes/postHelper.dart';
 import 'package:frontend/classes/selectorHelper.dart';
-import '../languagePicker/languages.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:frontend/home.dart';
 import 'package:frontend/views/ViewImage.dart';
@@ -21,10 +20,10 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   Future<void> updateUser() async {
-    var response = await AuthHelper.updateUser();
-    if (mounted) {
-      setState(() {});
-    }
+    await AuthHelper.updateUser();
+    print("made it here bitch");
+    print(AuthHelper.userInfoCache['language']);
+    setState(() {});
   }
 
   late TextEditingController controller;
@@ -77,7 +76,6 @@ class _ProfilePageState extends State<ProfilePage> {
         AuthHelper.languageNames[AuthHelper.userInfoCache['language']];
     language = Localize(language);
     String emailAddress = AuthHelper.userInfoCache['email'];
-    Language selectedDialogLanguage = Languages.english;
 
     //DELETE ACCOUNT BUTTON
     showDeleteAlertDialog(BuildContext context) {
@@ -184,16 +182,22 @@ class _ProfilePageState extends State<ProfilePage> {
                     itemCount: filteredItems.length,
                     itemBuilder: (context, index) {
                       return GestureDetector(
-                        onTap: () async {
-                          if (languagesPicked) {
-                            AuthHelper.userInfoCache['language'] =
-                                trueItems[filteredItems[index]];
-                            PostHelper.cachedTranslations = {};
-                          } else {
-                            AuthHelper.userInfoCache['nationality'] =
-                                trueItems[filteredItems[index]];
-                          }
-                          await updateUser();
+                        onTap: () {
+                          setState(() {
+                            if (languagesPicked) {
+                              AuthHelper.userInfoCache['language'] =
+                                  trueItems[filteredItems[index]];
+                              PostHelper.cachedTranslations = {};
+                            } else {
+                              AuthHelper.userInfoCache['nationality'] =
+                                  trueItems[filteredItems[index]];
+                            }
+                            // sleep(const Duration(milliseconds: 2000));
+                            updateUser();
+                          });
+
+                          print(AuthHelper.userInfoCache['language']);
+                          setState(() {});
                           Navigator.of(context).pop();
                         },
                         child: Container(

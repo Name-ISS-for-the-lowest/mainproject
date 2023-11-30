@@ -120,7 +120,7 @@ class _SignupCompleteState extends State<SignupComplete> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 250,
                 ),
                 ElevatedButton(

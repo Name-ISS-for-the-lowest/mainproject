@@ -310,7 +310,7 @@ class _LogInState extends State<LogIn> {
                         context, emailController.text, passwordController.text)
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 200,
                 ),
                 SizedBox(
