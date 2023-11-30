@@ -144,8 +144,8 @@ class DBManager:
             Attachment = Picture(imageURL, imageFileID)
             newPost.attachedImage = Attachment.__dict__
         DBManager.db["posts"].update_one(
-                {"_id": ObjectId(postID)}, {"$inc": {"comments": 1}}
-            )
+            {"_id": ObjectId(postID)}, {"$inc": {"comments": 1}}
+        )
         DBManager.db["posts"].insert_one(newPost.__dict__)
 
     @staticmethod
@@ -198,7 +198,7 @@ class DBManager:
     @staticmethod
     def getPosts(start, end, showRemoved, showDeleted, showReported, userID=None):
         specialSearchParams = {}
-        specialSearchParams['parent_id'] = None
+        specialSearchParams["parent_id"] = None
         if showRemoved == "Only":
             specialSearchParams["removed"] = True
         elif showRemoved == "None":
@@ -211,17 +211,14 @@ class DBManager:
             specialSearchParams["reports"] = {"$gt": 0}
         elif showReported == "Unreviewed":
             specialSearchParams["unreviewedReport"] = True
-            del specialSearchParams['parent_id']
+            del specialSearchParams["parent_id"]
 
-        if start != 'None':
+        if start != "None":
             start = ObjectId(start)
             specialSearchParams["_id"] = {"$lt": start}
 
         posts = (
-            DBManager.db["posts"]
-            .find(specialSearchParams)
-            .sort("_id", -1)
-            .limit(end)
+            DBManager.db["posts"].find(specialSearchParams).sort("_id", -1).limit(end)
         )
         returnPosts = []
         for elem in posts:
@@ -241,7 +238,6 @@ class DBManager:
 
             returnPosts.append(post)
         return returnPosts
-
 
     @staticmethod
     def getPostByID(postID: str):
@@ -265,14 +261,14 @@ class DBManager:
         return returnPost
 
     @staticmethod
-    def getComments(parentID: str, userID:str):
+    def getComments(parentID: str, userID: str):
         ##objectID = ObjectId(parentID)
         user = DBManager.db["users"].find_one({"_id": ObjectId(userID)})
-        adminCheck = user.get('admin')
+        adminCheck = user.get("admin")
         specialSearchParams = {"parent_id": parentID}
         if adminCheck == False:
-            specialSearchParams['removed'] = False
-            specialSearchParams['deleted'] = False
+            specialSearchParams["removed"] = False
+            specialSearchParams["deleted"] = False
         comments = DBManager.db["posts"].find(specialSearchParams)
         returnComments = []
         for elem in comments:
@@ -286,27 +282,25 @@ class DBManager:
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
             if likedResult is not None:
                 comment.liked = True
-            reportResult = DBManager.db['reports'].find_one({"comboID": comboID})
+            reportResult = DBManager.db["reports"].find_one({"comboID": comboID})
             if reportResult is not None:
                 comment.reportedByUser = True
             returnComments.append(comment)
-        
+
         return returnComments
-    
+
     @staticmethod
     def getParents(parentID: str):
-
-
         parentHistory = []
-        checkedPost = DBManager.db['posts'].find_one({"_id": ObjectId(parentID)})
-        parentID = checkedPost.get('parent_id')
+        checkedPost = DBManager.db["posts"].find_one({"_id": ObjectId(parentID)})
+        parentID = checkedPost.get("parent_id")
         while True:
             if parentID == None:
                 break
             parentID = ObjectId(parentID)
-            checkedPost = DBManager.db['posts'].find_one({"_id": ObjectId(parentID)})
+            checkedPost = DBManager.db["posts"].find_one({"_id": ObjectId(parentID)})
             parentHistory.append(checkedPost)
-            parentID = checkedPost.get('parent_id')
+            parentID = checkedPost.get("parent_id")
 
         returnParents = []
         for elem in parentHistory:
@@ -320,18 +314,17 @@ class DBManager:
             likedResult = DBManager.db["likes"].find_one({"comboID": comboID})
             if likedResult is not None:
                 parent.liked = True
-            reportResult = DBManager.db['reports'].find_one({"comboID": comboID})
+            reportResult = DBManager.db["reports"].find_one({"comboID": comboID})
             if reportResult is not None:
                 parent.reportedByUser = True
             returnParents.append(parent)
-            
-        
+
         return returnParents
 
     @staticmethod
     def searchPosts(start, end, showRemoved, showDeleted, showReported, search, userID):
         specialSearchParams = {"content": {"$regex": search, "$options": "i"}}
-        specialSearchParams['parent_id'] = None
+        specialSearchParams["parent_id"] = None
         if showRemoved == "Only":
             specialSearchParams["removed"] = True
         elif showRemoved == "None":
@@ -345,16 +338,13 @@ class DBManager:
             specialSearchParams["reports"] = {"$gt": 0}
         elif showReported == "Unreviewed":
             specialSearchParams["unreviewedReport"] = True
-            del specialSearchParams['parent_id']
+            del specialSearchParams["parent_id"]
 
-        if start != 'None':
+        if start != "None":
             start = ObjectId(start)
             specialSearchParams["_id"] = {"$lt": start}
         posts = (
-            DBManager.db["posts"]
-            .find(specialSearchParams)
-            .sort("_id", -1)
-            .limit(end)
+            DBManager.db["posts"].find(specialSearchParams).sort("_id", -1).limit(end)
         )
         returnPosts = []
         for elem in posts:
@@ -441,16 +431,15 @@ class DBManager:
 
     @staticmethod
     def addTranslationToPost(translatedText, userLang, postID):
-
-        post = DBManager.db['posts'].find_one({"_id": ObjectId(postID)})
-        translations = post['translations']
+        post = DBManager.db["posts"].find_one({"_id": ObjectId(postID)})
+        translations = post["translations"]
         translations[userLang] = translatedText
-
 
         result = DBManager.db["posts"].update_one(
             {"_id": ObjectId(postID)},
             {"$set": {"translations": translations}},
         )
+
         # print(result.matched_count)
         if result.matched_count == 1:
             return {"message": "Translation added"}

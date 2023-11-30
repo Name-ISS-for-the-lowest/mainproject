@@ -54,96 +54,96 @@ class _AccountAlreadyExistsState extends State<AccountAlreadyExists> {
           alignment: Alignment.center,
           children: [
             //Background animation (increase top offset value to move anim down, decrease to move up)
-            Positioned(
-                top: 200,
-                child: SizedBox(
-                  height: screenHeight,
-                  child: LottieBuilder.asset(
-                    'assets/BackgroundWave.json',
-                    fit: BoxFit.fill,
-                  ),
-                )),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(
+                height: screenHeight * 0.6,
+                child: LottieBuilder.asset(
+                  'assets/BackgroundWave.json',
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
 
             //Returning User Form begins Here--------------------------
-            Positioned(
-                top: 100,
-                child: SingleChildScrollView(
-                    child: Column(
-                  children: [
-                    //This part is just text and formatting
-                    SizedBox(
-                      width: 350,
-                      child: Text(
-                        Localize('Account Already Exists'),
-                        style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 45,
-                            color: Color.fromRGBO(255, 255, 255, 1)),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-
-                    //Spacer for Column elements
-                    const SizedBox(
-                      height: 25,
-                    ),
-
-                    SizedBox(
-                      width: 300,
-                      child: Text(
-                        Localize('Please login or reset password to continue.'),
-                        style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Color.fromRGBO(230, 183, 17, 1)),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-
-                    //Spacer for Column elements
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    SizedBox(
-                      width: 300,
-                      child: Text(
-                        Localize(
-                            'We hope you enjoy your time with us. Press the button below at any time to return to the login page and begin browsing.'),
-                        style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Color.fromRGBO(230, 183, 17, 1)),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ))),
-
-            Positioned(
-              bottom: 42,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  fixedSize: const Size(330, 50),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0)),
-                  backgroundColor: const Color.fromRGBO(230, 183, 17, 1),
-                  foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
-                  textStyle: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+            SingleChildScrollView(
+                child: Column(
+              children: [
+                //This part is just text and formatting
+                SizedBox(
+                  width: 350,
+                  child: Text(
+                    Localize('Account Already Exists'),
+                    style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 45,
+                        color: Color.fromRGBO(255, 255, 255, 1)),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                child: Text(Localize('Return to Login')),
-                onPressed: () => {
-                  navigateBacktoLogIn(),
-                },
-              ),
-            )
+
+                //Spacer for Column elements
+                const SizedBox(
+                  height: 25,
+                ),
+
+                SizedBox(
+                  width: 300,
+                  child: Text(
+                    Localize('Please login or reset password to continue.'),
+                    style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color.fromRGBO(230, 183, 17, 1)),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+
+                //Spacer for Column elements
+                const SizedBox(
+                  height: 20,
+                ),
+
+                SizedBox(
+                  width: 300,
+                  child: Text(
+                    Localize(
+                        'We hope you enjoy your time with us. Press the button below at any time to return to the login page and begin browsing.'),
+                    style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color.fromRGBO(230, 183, 17, 1)),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                SizedBox(
+                  height: 250,
+                ),
+
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    fixedSize: const Size(330, 50),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0)),
+                    backgroundColor: const Color.fromRGBO(230, 183, 17, 1),
+                    foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
+                    textStyle: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  child: Text(Localize('Return to Login')),
+                  onPressed: () => {
+                    navigateBacktoLogIn(),
+                  },
+                ),
+              ],
+            )),
+
             //Next Button Styling
           ],
         ));

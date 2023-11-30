@@ -44,12 +44,15 @@ class _CreatePostState extends State<CreatePost> {
     }
   }
 
-  File? imageAttachment;
+  static File? imageAttachment;
   String currentPostBody = "";
   bool isSubmitting = false;
 
   Future pickImage() async {
-    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final image = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 50,
+    );
     if (image == null) return;
 
     if (mounted) {
@@ -61,12 +64,15 @@ class _CreatePostState extends State<CreatePost> {
   }
 
   Future pickCamera() async {
-    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+    final image = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+      imageQuality: 50,
+    );
     if (image == null) return;
 
     if (mounted) {
       setState(() {
-        imageAttachment = File(image.path);
+        _CreatePostState.imageAttachment = File(image.path);
       });
     }
     Navigator.of(context).pop();
@@ -161,184 +167,195 @@ class _CreatePostState extends State<CreatePost> {
             ),
           )),
       backgroundColor: const Color(0xffece7d5),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 50, // Set your desired width
-                      height: 50, // Set your desired height
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
-                          placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        screenName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    if (currentPostBody == '') {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            Localize("Please add some content to your post.")),
-                      ));
-                      return;
-                    }
-                    if (isEditing) {
-                      var response =
-                          await PostHelper.editPost(postID, currentPostBody);
-                    } else {
-                      if (isSubmitting == false) {
-                        setState(() {
-                          isSubmitting = true;
-                        });
-                        var response = await PostHelper.createPost(
-                            userID, currentPostBody, imageAttachment, context);
-                      }
-                    }
-
-                    navigateToPrimaryScreens();
-                  },
-                  child: Text(
-                    Localize("Publish Post"),
-                    style: const TextStyle(
-                      color: Color(0xff007EF1),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Row(
-            children: [
-              Container(
-                width: 45,
-                height: 200,
-                decoration: const BoxDecoration(
-                  //only set right border
-                  border: Border(
-                    right: BorderSide(
-                      color: Color(0x5f000000),
-                      width: 1.0,
-                    ),
-                  ),
-                ),
-              ),
-              Stack(
+      body: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      height: 200,
-                      child: TextField(
-                        autofocus: true,
-                        controller:
-                            TextEditingController(text: currentPostBody),
-                        decoration: InputDecoration(
-                          hintText: Localize("Begin Typing"),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 15.0, horizontal: 10.0),
+                  Row(
+                    children: [
+                      Container(
+                        width: 50, // Set your desired width
+                        height: 50, // Set your desired height
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
                         ),
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        onChanged: (text) {
-                          currentPostBody = text;
-                        },
-                      ),
-                    ),
-                  ),
-                  (isEditing)
-                      ? const SizedBox()
-                      : Padding(
-                          padding: const EdgeInsets.only(left: 24.0, top: 0),
-                          child: GestureDetector(
-                            onTap: () {
-                              openCameraDialog(context);
-                            },
-                            child: SvgPicture.asset(
-                              'assets/PostUI/photos.svg',
-                              height: 20,
-                              width: 20,
-                            ),
+                        child: ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: "$imageURL?tr=w-50,h-50,fo-auto",
+                            placeholder: (context, url) =>
+                                const CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                            fit: BoxFit.fill,
                           ),
                         ),
-                ],
-              ),
-            ],
-          ),
-          (isEditing == false)
-              ? SizedBox(
-                  height: 500,
-                  width: 400,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        top: 20,
-                        right: 25,
-                        height: 350,
-                        width: 350,
-                        child: (imageAttachment != null)
-                            ? Stack(
-                                children: [
-                                  Positioned(
-                                    child: Image.file(
-                                      imageAttachment!,
-                                      height: 350,
-                                      width: 350,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    right: 0,
-                                    top: 0,
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        imageAttachment = null;
-                                        if (mounted) {
-                                          setState(() {});
-                                        }
-                                      },
-                                      child: SvgPicture.asset(
-                                        'assets/PostUI/icon-xcircle.svg',
-                                        color: Colors.grey,
-                                        height: 40,
-                                        width: 40,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              )
-                            : const SizedBox(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          screenName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                )
-              : const SizedBox(),
-        ],
+                  GestureDetector(
+                    onTap: () async {
+                      if (currentPostBody == '') {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(Localize(
+                              "Please add some content to your post.")),
+                        ));
+                        return;
+                      }
+                      if (isEditing) {
+                        var response =
+                            await PostHelper.editPost(postID, currentPostBody);
+                      } else {
+                        if (isSubmitting == false) {
+                          setState(() {
+                            isSubmitting = true;
+                          });
+                          if (widget.isCommenting) {
+                            var response = await PostHelper.createComment(
+                                userID,
+                                currentPostBody,
+                                postID,
+                                imageAttachment);
+                          } else {
+                            var response = await PostHelper.createPost(
+                                userID, currentPostBody, imageAttachment);
+                          }
+                        }
+                      }
+
+                      navigateToPrimaryScreens();
+                    },
+                    child: Text(
+                      Localize("Publish Post"),
+                      style: const TextStyle(
+                        color: Color(0xff007EF1),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                Container(
+                  width: 45,
+                  height: 200,
+                  decoration: const BoxDecoration(
+                    //only set right border
+                    border: Border(
+                      right: BorderSide(
+                        color: Color(0x5f000000),
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                ),
+                Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        height: 200,
+                        child: TextField(
+                          autofocus: true,
+                          controller:
+                              TextEditingController(text: currentPostBody),
+                          decoration: InputDecoration(
+                            hintText: Localize("Begin Typing"),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 15.0, horizontal: 10.0),
+                          ),
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
+                          onChanged: (text) {
+                            currentPostBody = text;
+                          },
+                        ),
+                      ),
+                    ),
+                    (isEditing)
+                        ? const SizedBox()
+                        : Padding(
+                            padding: const EdgeInsets.only(left: 24.0, top: 0),
+                            child: GestureDetector(
+                              onTap: () {
+                                openCameraDialog(context);
+                              },
+                              child: SvgPicture.asset(
+                                'assets/PostUI/photos.svg',
+                                height: 20,
+                                width: 20,
+                              ),
+                            ),
+                          ),
+                  ],
+                ),
+              ],
+            ),
+            (isEditing == false)
+                ? SizedBox(
+                    height: 500,
+                    width: 400,
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          top: 20,
+                          right: 25,
+                          height: 350,
+                          width: 350,
+                          child: (imageAttachment != null)
+                              ? Stack(
+                                  children: [
+                                    Positioned(
+                                      child: Image.file(
+                                        imageAttachment!,
+                                        height: 350,
+                                        width: 350,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      right: 0,
+                                      top: 0,
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          imageAttachment = null;
+                                          if (mounted) {
+                                            setState(() {});
+                                          }
+                                        },
+                                        child: SvgPicture.asset(
+                                          'assets/PostUI/icon-xcircle.svg',
+                                          color: Colors.grey,
+                                          height: 40,
+                                          width: 40,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                )
+                              : const SizedBox(),
+                        ),
+                      ],
+                    ),
+                  )
+                : const SizedBox(),
+          ],
+        ),
       ),
     );
   }

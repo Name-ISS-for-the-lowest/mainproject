@@ -56,25 +56,26 @@ class _CoreTemplateState extends State<CoreTemplate> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffece7d5),
-      resizeToAvoidBottomInset: true,
-      body: Column(
-        children: [
-          SizedBox(
-            height: 75,
-            width: 75,
-            child: SvgPicture.asset("assets/iss-small.svg"),
-          ),
-          Container(
-            height: 1.0, // Set the desired height of the line
-            color: const Color(0x5f000000),
-            margin: const EdgeInsets.symmetric(vertical: 0),
-          ),
-          SizedBox(
-            height: 734,
-            width: 412,
-            child: screens[selectedIndex],
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              height: 75,
+              width: 75,
+              child: SvgPicture.asset("assets/iss-small.svg"),
+            ),
+            Container(
+              height: 1.0, // Set the desired height of the line
+              color: const Color(0x5f000000),
+              margin: const EdgeInsets.symmetric(vertical: 0),
+            ),
+            SizedBox(
+              height: 734,
+              width: 412,
+              child: screens[selectedIndex],
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: SizedBox(
         height: 80,

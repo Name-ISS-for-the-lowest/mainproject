@@ -317,7 +317,10 @@ class _ProfilePageState extends State<ProfilePage> {
     File? image;
 
     Future pickImage() async {
-      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      final image = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+      );
       if (image == null) return;
 
       final imageTemporary = File(image.path);
@@ -331,7 +334,10 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     Future pickCamera() async {
-      final image = await ImagePicker().pickImage(source: ImageSource.camera);
+      final image = await ImagePicker().pickImage(
+        source: ImageSource.camera,
+        imageQuality: 50,
+      );
       if (image == null) return;
 
       final imageTemporary = File(image.path);

@@ -88,10 +88,10 @@ class _SignUpState extends State<SignUp> {
           alignment: Alignment.center,
           children: [
             //Background animation (increase top offset value to move anim down, decrease to move up)
-            Positioned(
-                top: 200,
+            Align(
+                alignment: Alignment.bottomCenter,
                 child: SizedBox(
-                  height: screenHeight,
+                  height: screenHeight * 0.6,
                   child: LottieBuilder.asset(
                     'assets/BackgroundWave.json',
                     fit: BoxFit.fill,
@@ -99,116 +99,116 @@ class _SignUpState extends State<SignUp> {
                 )),
 
             //Returning User Form begins Here--------------------------
-            Positioned(
-                top: 100,
-                child: SingleChildScrollView(
-                    child: Column(
-                  children: [
-                    //This part is just text and formatting
-                    SizedBox(
-                      width: 280,
-                      child: Text(
-                        Localize('Welcome to the I.S.S!'),
-                        style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 45,
-                            color: Color.fromRGBO(255, 255, 255, 1)),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-
-                    //Spacer for Column elements
-                    const SizedBox(
-                      height: 25,
-                    ),
-
-                    SizedBox(
-                      width: 300,
-                      child: Text(
-                        Localize(
-                            'Before we begin, please enter a valid Sacramento State email.'),
-                        style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Color.fromRGBO(230, 183, 17, 1)),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-
-                    //Spacer for Column elements
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    SizedBox(
-                      width: 300,
-                      child: Text(
-                        Localize(
-                            'These can be identified by the “@csus.edu” handle near the end like this:'),
-                        style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Color.fromRGBO(230, 183, 17, 1)),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-
-                    //Spacer for Column elements
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    //Spacer for Column elements
-
-                    //Email Field Styling
-
-                    SizedBox(
-                      width: 330,
-                      height: 55,
-                      child: TextField(
-                        controller: emailController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          labelText: Localize('Email'),
-                          contentPadding: const EdgeInsets.all(18),
-                          fillColor: Colors.white,
-                          filled: true,
-                          floatingLabelBehavior: FloatingLabelBehavior.never,
-                        ),
-                      ),
-                    ),
-                  ],
-                ))),
-
-            Positioned(
-              bottom: 42,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  fixedSize: const Size(330, 50),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0)),
-                  backgroundColor: const Color.fromRGBO(230, 183, 17, 1),
-                  foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
-                  textStyle: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+            SingleChildScrollView(
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                //This part is just text and formatting
+                SizedBox(
+                  width: 280,
+                  child: Text(
+                    Localize('Welcome to the I.S.S!'),
+                    style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 45,
+                        color: Color.fromRGBO(255, 255, 255, 1)),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                child: Text(Localize('Next')),
-                onPressed: () => {
-                  if (validateEmail(emailController.text))
-                    {
-                      navigateToPassWordSetUp(emailController.text),
-                    }
-                },
-              ),
-            )
+
+                //Spacer for Column elements
+                const SizedBox(
+                  height: 25,
+                ),
+
+                SizedBox(
+                  width: 300,
+                  child: Text(
+                    Localize(
+                        'Before we begin, please enter a valid Sacramento State email.'),
+                    style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color.fromRGBO(230, 183, 17, 1)),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+
+                //Spacer for Column elements
+                const SizedBox(
+                  height: 20,
+                ),
+
+                SizedBox(
+                  width: 300,
+                  child: Text(
+                    Localize(
+                        'These can be identified by the “@csus.edu” handle near the end like this:'),
+                    style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color.fromRGBO(230, 183, 17, 1)),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+
+                //Spacer for Column elements
+                const SizedBox(
+                  height: 100,
+                ),
+
+                //Spacer for Column elements
+
+                //Email Field Styling
+
+                SizedBox(
+                  width: 330,
+                  height: 55,
+                  child: TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      labelText: Localize('Email'),
+                      contentPadding: const EdgeInsets.all(18),
+                      fillColor: Colors.white,
+                      filled: true,
+                      floatingLabelBehavior: FloatingLabelBehavior.never,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 200,
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    fixedSize: const Size(330, 50),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0)),
+                    backgroundColor: const Color.fromRGBO(230, 183, 17, 1),
+                    foregroundColor: const Color.fromRGBO(93, 78, 63, 1),
+                    textStyle: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  child: Text(Localize('Next')),
+                  onPressed: () => {
+                    if (validateEmail(emailController.text))
+                      {
+                        navigateToPassWordSetUp(emailController.text),
+                      }
+                  },
+                ),
+              ],
+            )),
+
             //Next Button Styling
           ],
         ));

@@ -987,20 +987,26 @@ class _ForumHomeState extends State<ForumHome> {
                   adminOptionsToggled = !adminOptionsToggled;
                 });
               },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    adminOptionsToggled
-                        ? Localize("Close Admin Options")
-                        : Localize("Open Admin Options"),
-                    style: TextStyle(color: toggleColor),
-                  ),
-                  SvgPicture.asset(
-                    "assets/PostUI/icon-adminoptions.svg",
-                    color: toggleColor,
-                  ),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.only(right: 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Text(
+                        adminOptionsToggled
+                            ? Localize("Close Admin Options")
+                            : Localize("Open Admin Options"),
+                        style: TextStyle(color: toggleColor),
+                      ),
+                    ),
+                    SvgPicture.asset(
+                      "assets/PostUI/icon-adminoptions.svg",
+                      color: toggleColor,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
