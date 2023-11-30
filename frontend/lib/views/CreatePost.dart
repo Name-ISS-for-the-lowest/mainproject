@@ -215,13 +215,8 @@ class _CreatePostState extends State<CreatePost> {
                         setState(() {
                           isSubmitting = true;
                         });
-                        if (widget.isCommenting) {
-                          var response = await PostHelper.createComment(
-                              userID, currentPostBody, postID, imageAttachment);
-                        } else {
-                          var response = await PostHelper.createPost(
-                              userID, currentPostBody, imageAttachment);
-                        }
+                        var response = await PostHelper.createPost(
+                            userID, currentPostBody, imageAttachment, context);
                       }
                     }
 
