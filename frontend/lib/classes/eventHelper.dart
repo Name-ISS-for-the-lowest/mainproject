@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:frontend/classes/routeHandler.dart';
 import 'package:frontend/classes/keywordData.dart';
@@ -21,7 +23,6 @@ class EventHelper {
         events.clear();
       }
     }
-    print(events);
     try {
       if (fetching) {
         return;
@@ -39,8 +40,7 @@ class EventHelper {
           queryParameters: params,
           options: Options(responseType: ResponseType.json));
       var results = response.data;
-      print("I am right here");
-      print(results[0]['id']);
+      results = jsonDecode(results);
 
       final eventsSecondary = <Map<String, String>>[];
 
@@ -72,16 +72,22 @@ class EventHelper {
               });
             }
           }
+          print("printing events");
+          print(events);
+          print("printing secondary events");
+          print(eventsSecondary);
           for (var event in eventsSecondary) {
             events.add(event);
           }
         });
       }
+
       fetched = true;
       fetching = false;
       return response;
     } on DioException catch (e) {
       //sc
+      print("had an error");
       print(e);
       // Handle the error, you might want to throw an exception or return a default response
       rethrow;
@@ -91,11 +97,16 @@ class EventHelper {
   static bool isEventRecommended(var event) {
     String eventTitle = event['title']["en"];
     String eventDescription = event['description']["en"];
-    List? userKeywords = [];
+    eventTitle = eventTitle.toLowerCase();
+    eventDescription = eventDescription.toLowerCase();
+    print("Nationality");
+    print(AuthHelper.userInfoCache['nationality']);
+
+    List userKeywords = [];
     String userNationality = "N\\A";
     if (AuthHelper.userInfoCache.containsKey('nationality')) {
       userKeywords =
-          keywordData.countryKeywords[AuthHelper.userInfoCache['nationality']];
+          keywordData.countryKeywords[AuthHelper.userInfoCache['nationality']]!;
       userNationality = AuthHelper.userInfoCache['nationality'];
     }
 
@@ -111,7 +122,6 @@ class EventHelper {
         eventDescription.contains(userLanguage)) {
       return true;
     }
-    userKeywords = [];
 
     for (String keyword in userKeywords) {
       if (eventTitle.toLowerCase().contains(keyword.toLowerCase()) ||
